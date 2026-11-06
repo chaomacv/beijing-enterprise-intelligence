@@ -1,0 +1,113 @@
+# Beijing Enterprise Intelligence
+
+把北京公共数据平台下载的异构文件，转换为有来源证据的企业记录、业务事件与标签画像。语义理解使用私有环境中的 Qwen；读取、分块、校验和聚合使用 Python。
+
+这是从 [beijing-open-data-enterprise-risk](https://github.com/chaomacv/beijing-open-data-enterprise-risk) 的业务问题出发建立的新后处理工程。原仓库和原始数据不做删除或覆盖。本项目重新实现处理模块，不复制旧脚本中的云 API 凭据或非企业筛选提示词。
+
+## 当前版本能做什么
+
+1. 接收独立下载器的工作目录，或服务器上的原始文件目录；按内容哈希盘点并保存处理状态。
+2. 识别 CSV、Excel、JSON/JSONL、RDF/XML。识别“扩展名是 CSV、实际是 Excel”的文件，读取全部工作表。
+3. 为每个工作表生成首/中/尾加固定种子随机样本的文件卡片。原始记录保存在 SQLite，采样只用于文件筛选。
+4. 生成按完整记录划分的准备块；使用本地模型时，再以实际 tokenizer 和聊天模板检查输入/输出预算。
+5. 用本地模型筛选文件、逐块抽取主体和事件，验证原文引用、主体索引与逐条 ID 覆盖。截断或验证失败时递归缩小批次，单条仍失败则进入复核。
+6. 使用信用代码校验、名称和地址做保守实体关联；名称相似只生成复核候选，不直接合并。
+7. 导出事实事件、标签、画像、匹配依据、复核队列和来源索引。保留 proposed/confirmed/removed/revoked/unknown 状态，不生成授信评分。
+
+这是 v0.1 可运行起点。已提供真实文件准备路径、规则基线和本地模型调用代码；**尚未部署模型或验证真实 LLM 抽取质量，也不宣称已完成全量数据处理或准确率评测**。
+
+## 安装
+
+Python >=3.10。在服务器项目目录执行：
+
+```bash
+python3.10 -m venv .venv
+.venv/bin/python -m pip install -e .
+```
+
+文件准备和规则 Demo 不需要 GPU、浏览器、平台登录或云 API。
+
+## 先运行离线闭环
+
+```bash
+.venv/bin/bank-data demo --work-dir ../demo_process_work
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+Demo 输入由代码生成并明确标注为合成示例，所有企业名称和业务事实都是虚构的测试素材。`demo` 使用显式的规则基线，不能冒充 LLM 结果或银行实际业务数据。
+
+## 准备真实文件
+
+```bash
+.venv/bin/bank-data prepare \
+  --input /opt/data/private/mc/Bank/beijing_download_work \
+  --work-dir /opt/data/private/mc/Bank/process_work
+```
+
+也可以把 `--input` 指向 `/opt/data/private/mc/Bank/data/raw/full-catalog` 等专门的数据目录。下载器的浏览器目录、运行依赖、目录导出和控制文件不参与业务抽取。下载或复制尚未结束的 `.part/.crdownload` 文件被排除。
+
+`prepare` 输出：
+
+- `inventory.json`：每个文件的内容哈希、格式与状态。
+- `state.sqlite`：原始位置、原值、工作表和缓存。
+- `file_cards.jsonl`：模型筛选所需的文件摘要。
+- `prepared_chunks.jsonl`：按记录划分的准备块。
+- `prepare_summary.json`：准备结果及解析失败统计。
+
+解析失败会隔离整个文件，不把“读到一半”记作成功。原始文件保持只读。工作目录必须在输入目录之外。
+
+## 使用本地 Qwen
+
+先在服务器的独立推理环境中准备并验证 Qwen3-8B 服务，模型权重放在仓库外。GPU 驱动与推理框架版本必须实测兼容，不由本项目自动升级。服务只开放给本机/私有网络，推荐本机 `127.0.0.1:8000`。
+
+```bash
+.venv/bin/python -m pip install -e '.[llm]'
+.venv/bin/bank-data run \
+  --input /opt/data/private/mc/Bank/data/raw/full-catalog \
+  --work-dir /opt/data/private/mc/Bank/process_work \
+  --backend local \
+  --endpoint http://127.0.0.1:8000/v1 \
+  --model Qwen/Qwen3-8B \
+  --tokenizer-dir /path/to/local/Qwen3-8B
+```
+
+tokenizer 只从本地读取，不下载远程代码。端点只允许 loopback/RFC1918 地址，禁用代理及重定向，没有云 API 回退。模型接口需要支持 `response_format=json_schema` 和 Qwen 的 `enable_thinking=false`；不同服务实现需先做小规模兼容性验证。
+
+明确选择规则对照：
+
+```bash
+.venv/bin/bank-data run --input /path/to/data --work-dir /path/to/private_work --backend rules
+```
+
+## 最终输出与核验
+
+`record_results.json` 给每条已解析记录一个处理结果；`FILE_EXCLUDED`、`REVIEW` 和 `NO_EVENT` 含义不同。`run_summary.json` 的状态覆盖检查只说明台账完整，不代表语义召回率为 100%。
+
+`source_index.json` 将结果关联回原文件、工作表和逻辑记录序号；事件的 evidence 必须是指定单元格中的原文。文件、模型配置或提示词变化会影响缓存键；更换模型权重时应使用不同的服务模型名或新的工作目录，避免复用旧模型结果。
+
+`entities.json`、`entity_mentions.json`、`match_decisions.json` 保留实体来源和匹配理由。不同且可信的信用代码不会自动合并；同名无地址的记录保留独立主体和候选。信用代码校验只证明形式/校验位正确，不等于权威工商身份核验。
+
+## 当前边界
+
+- 文件抽样不能保证发现罕见事件；排除文件仍需独立抽查与标注评估。
+- 多行表头采用可检查的启发式。复杂子表、公式、脚注继承、图像、PDF/OCR、压缩包和超大普通 JSON 暂进入复核，不能宣称已支持所有文件。
+- SQLite 读取层可流式接入，但 v0.1 的提取结果聚合与实体匹配仍在内存中进行；先做小批次验证。亿级数据需要后续分区、SQL 聚合和独立评测。
+- 超长单条记录目前进入复核；跨段重叠与 fragment 级合并是下一阶段工作。
+- 没有可靠事件编号时保守保留不同源事件，不把语义相似直接当成重复。尚未实现跨事件阶段的自动关联。
+- 向量召回、概率匹配、关系图、人工复核界面、实体撤销合并等属于下一阶段，不作为本轮已交付能力。
+- 没有训练/验证集，因此不报告准确率、性能提升或银行收益。
+
+## 数据与代码分离
+
+原始数据、处理结果、模型权重、浏览器资料与凭据均不提交 Git。建议服务器布局：
+
+```text
+Bank/
+  beijing-enterprise-intelligence/   # 仅源码、配置、文档、测试
+  beijing_download_work/            # 原下载工作目录
+  data/raw/                        # 原始文件
+  models/                          # 本地权重
+  process_work/                    # 私有处理结果
+```
+
+详细契约见 [docs/data_contract.md](docs/data_contract.md)。
