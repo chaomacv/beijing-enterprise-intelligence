@@ -1,0 +1,165 @@
+"""Streaming readers. Preserve source positions, role-bearing headers and raw values."""
+import codecs
+import csv
+import io
+import itertools
+import json
+from pathlib import Path
+
+from .common import ontology, text
+
+SUPPORTED = {'.csv', '.xlsx', '.xls', '.json', '.jsonl', '.ndjson', '.xml', '.rdf'}
+CONTROL_FILES = {'provenance.json', 'datasets.json', 'normalized-catalog.json', 'catalog-change.json'}
+SKIP_DIRS = {'catalog', 'runtime', 'cache', 'driver-cache', 'browser-profile', 'chrome-profile',
+             'recovery', 'interrupted', 'temp', '.git', '.venv', '__pycache__'}
+
+
+def discover(root):
+    import os
+    root = Path(root).resolve()
+    if not root.is_dir():
+        raise ValueError('Input must be a dedicated data/download-work directory')
+    # Known download layouts exclude browsers, package caches, exports and logs.
+    locations = [p for p in (root / 'all-files', root / 'files') if p.is_dir()]
+    if not locations:
+        locations = [root]
+    for location in locations:
+        for directory, dirs, names in os.walk(location, followlinks=False):
+            dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS and not d.startswith('.'))
+            for name in sorted(names):
+                p = Path(directory) / name
+                if p.is_symlink() or name in CONTROL_FILES or p.suffix in {'.part', '.crdownload', '.tmp', '.log', '.sqlite', '.db'}:
+                    continue
+                if not locations == [root] and p.parent == root:
+                    continue
+                if p.suffix.lower() in SUPPORTED or p.parent != root:
+                    yield p
+                elif name not in {'RUNNING.lock', 'download-policy.json', 'login-confirmed.json'}:
+                    yield p
+
+
+def detect(path):
+    with path.open('rb') as f:
+        prefix = f.read(8)
+    if prefix.startswith(b'PK\x03\x04'):
+        import zipfile
+        with zipfile.ZipFile(path) as z:
+            return 'xlsx' if 'xl/workbook.xml' in z.namelist() else 'unsupported_archive'
+    if prefix.startswith(b'\xd0\xcf\x11\xe0'):
+        return 'xls'
+    return path.suffix.lower().lstrip('.')
+
+
+def encoding_for(path):
+    for encoding in ('utf-8-sig', 'gb18030'):
+        decoder = codecs.getincrementaldecoder(encoding)()
+        try:
+            with path.open('rb') as f:
+                for block in iter(lambda: f.read(1024 * 1024), b''):
+                    decoder.decode(block, final=False)
+            decoder.decode(b'', final=True)
+            return encoding
+        except UnicodeDecodeError:
+            continue
+    raise ValueError('Unsupported text encoding; no lossy decoder fallback')
+
+
+def cells_as_text(values):
+    return ['' if v is None else str(v) for v in values]
+
+
+def table_records(rows, sheet):
+    top = list(itertools.islice(rows, 20))
+    if not top:
+        return
+    names = set(ontology()['name_fields'])
+    known = names | set(ontology()['code_fields']) | {'序号', '项目名称', '日期', '批次'}
+    def score(item):
+        values = [str(v or '').strip() for v in item[1]]
+        return sum(v in known for v in values) + 2 * sum(v in names for v in values)
+    candidates = [(i, values) for i, values in enumerate(top)]
+    best = max(candidates, key=score)
+    header_uncertain = score(best) == 0
+    index = best[0] if not header_uncertain else 0
+    original_header = cells_as_text(top[index])
+    keys, used = [], set()
+    for i, label in enumerate(original_header):
+        label = label.strip() or f'__column_{i + 1}'
+        key = label
+        while key in used:
+            key += '__duplicate'
+        used.add(key); keys.append(key)
+    context = {'original_header': original_header, 'header_record': index + 1,
+               'preamble': [cells_as_text(r) for r in top[:index]], 'header_uncertain': header_uncertain}
+    for number, values in enumerate(itertools.chain(top[index + 1:], rows), index + 2):
+        values = cells_as_text(values)
+        if not any(v.strip() for v in values):
+            continue
+        if values == original_header:
+            continue  # Repeated structural header, not a business record.
+        cells = {keys[i] if i < len(keys) else f'__extra_{i + 1}': value for i, value in enumerate(values)}
+        yield sheet, number, cells, {**context, 'width_mismatch': len(values) != len(keys)}
+
+
+def read_records(path, kind):
+    if kind == 'csv':
+        encoding = encoding_for(path)
+        with path.open(encoding=encoding, newline='') as f:
+            sample = f.read(16384); f.seek(0)
+            try:
+                dialect = csv.Sniffer().sniff(sample, delimiters=',\t;|')
+            except csv.Error:
+                dialect = csv.excel
+            csv.field_size_limit(16 * 1024 * 1024)
+            yield from table_records(csv.reader(f, dialect=dialect, strict=True), 'csv')
+    elif kind == 'xlsx':
+        import openpyxl
+        with path.open('rb') as f:
+            book = openpyxl.load_workbook(f, read_only=True, data_only=True)
+            try:
+                for sheet in book:
+                    yield from table_records(sheet.iter_rows(values_only=True), sheet.title)
+            finally:
+                book.close()
+    elif kind == 'xls':
+        import xlrd
+        book = xlrd.open_workbook(str(path), on_demand=True)
+        try:
+            for sheet in book.sheets():
+                yield from table_records((sheet.row_values(i) for i in range(sheet.nrows)), sheet.name)
+        finally:
+            book.release_resources()
+    elif kind in ('jsonl', 'ndjson'):
+        with path.open(encoding=encoding_for(path)) as f:
+            for n, line in enumerate(f, 1):
+                if not line.strip(): continue
+                row = json.loads(line)
+                if not isinstance(row, dict): raise ValueError('JSONL record must be an object')
+                yield 'jsonl', n, {k: text(v) for k, v in row.items()}, {}
+    elif kind == 'json':
+        if path.stat().st_size > 64 * 1024 * 1024:
+            raise ValueError('JSON >64 MiB requires streaming conversion; file queued for review')
+        data = json.loads(path.read_text(encoding=encoding_for(path)))
+        if isinstance(data, dict): data = data.get('data', data.get('records', [data]))
+        if not isinstance(data, list): raise ValueError('Unsupported JSON structure')
+        for n, row in enumerate(data, 1):
+            if not isinstance(row, dict): raise ValueError('JSON row must be an object')
+            yield 'json', n, {k: text(v) for k, v in row.items()}, {}
+    elif kind in ('rdf', 'xml'):
+        from defusedxml.ElementTree import iterparse
+        ordinal = 0
+        for _, element in iterparse(str(path), events=('end',)):
+            tag = element.tag.rsplit('}', 1)[-1]
+            if tag not in ('Description', 'record', 'row'):
+                continue
+            cells = {}
+            for child in element:
+                key = child.tag.rsplit('}', 1)[-1]
+                if key in cells: key += f'__duplicate_{len(cells)}'
+                cells[key] = ''.join(child.itertext()) or json.dumps(child.attrib, ensure_ascii=False)
+            if cells:
+                ordinal += 1
+                yield 'xml', ordinal, cells, {'xml_tag': tag}
+            element.clear()
+    else:
+        raise ValueError('Unsupported format; OCR/archive handling is not enabled')
