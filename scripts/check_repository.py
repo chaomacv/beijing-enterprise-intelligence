@@ -3,7 +3,7 @@ import re
 import subprocess
 from pathlib import PurePosixPath
 
-allowed = {'.env.example', '.gitattributes', '.gitignore', '.github', 'README.md', 'pyproject.toml', 'src', 'tests', 'docs', 'scripts'}
+allowed = {'.env.example', '.gitattributes', '.gitignore', '.github', 'README.md', 'pyproject.toml', 'src', 'tests', 'docs', 'scripts', 'showcase'}
 paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
 credential = re.compile(rb'(?:AIza[0-9A-Za-z_-]{30,}|gh[pousr]_[0-9A-Za-z]{20,}|-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----)')
 errors = []

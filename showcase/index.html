@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f6f0">
+  <title>Beijing Enterprise Intelligence · 从公开数据到有据可查的企业情报</title>
+  <meta name="description" content="一项可探索的本地模型数据工程实践：理解文件、保留记录、核对证据，将北京公开数据组织为企业事实与标签。">
+  <meta property="og:title" content="Beijing Enterprise Intelligence">
+  <meta property="og:description" content="分散的数据，有据可查的企业情报。探索文件筛选、结构化抽取与企业归并的工程选择。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://chaomacv.github.io/beijing-enterprise-intelligence/">
+  <meta property="og:image" content="https://chaomacv.github.io/beijing-enterprise-intelligence/assets/project-preview.svg">
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="model.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要内容</a>
+  <header class="header">
+    <a class="brand" href="#top" aria-label="Beijing Enterprise Intelligence 首页"><img src="assets/mark.svg" width="31" height="31" alt=""><span>BEI<span class="brand-rest"> / enterprise intelligence</span></span></a>
+    <nav aria-label="主导航"><a href="#approach">方法选择</a><a href="#lab">交互实验</a><a href="#evidence">企业与证据</a><a href="#release">项目进展</a></nav>
+    <a class="repo-link" href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="main">
+    <section class="hero shell" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="signal-dot"></span> BEIJING OPEN DATA · LOCAL INTELLIGENCE</p>
+        <h1 id="hero-title">分散的数据，<br>有据可查的<br><span class="hero-emphasis">企业情报。</span></h1>
+        <p class="hero-lead">面向银行的企业信息梳理，用本地模型理解政务表格。<br class="desktop-break">从文件筛选到事件归并，让每条事实保留来处。</p>
+        <div class="hero-actions"><a class="button primary" href="#lab">进入交互实验 <span aria-hidden="true">↗</span></a><a class="text-link" href="#approach">了解方法 <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-footnote">开放源码 <span>·</span> 本地 Qwen 方案 <span>·</span> 原始证据可追溯</p>
+      </div>
+      <div class="hero-figure">
+        <div class="figure-top"><span><i></i> A DATA STORY, IN THREE MOVES</span><span>FIG. 01</span></div>
+        <svg class="data-landscape" viewBox="0 0 610 440" role="img" aria-labelledby="landscape-title landscape-desc">
+          <title id="landscape-title">从分散文件到企业与证据的数据流示意</title>
+          <desc id="landscape-desc">多种颜色的源文件记录，经过筛选与结构化处理，归到企业节点，所有结果仍连接到来源。图形为方法示意，不表示全量运行统计。</desc>
+          <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="#d8dcd0"/></pattern></defs>
+          <rect width="610" height="440" fill="url(#dots)"/>
+          <g class="flow-paths" fill="none" stroke-width="1.25">
+            <path d="M90 100 C190 100 180 210 303 210" stroke="#759d80"/><path d="M115 165 C190 165 200 210 303 210" stroke="#ce9d70"/>
+            <path d="M70 250 C180 250 185 210 303 210" stroke="#7a9eb1"/><path d="M113 326 C210 326 190 210 303 210" stroke="#9c99b0"/>
+            <path d="M305 210 C390 210 395 120 485 120" stroke="#527b62"/><path d="M305 210 C400 210 385 295 485 295" stroke="#85a1b4"/>
+            <path d="M485 120 C550 120 565 170 559 210" stroke="#c4ccbc" stroke-dasharray="3 5"/><path d="M485 295 C550 295 565 260 559 210" stroke="#c4ccbc" stroke-dasharray="3 5"/>
+          </g>
+          <g class="flow-particles"><circle r="3.5" fill="#6e9578"><animateMotion dur="5s" repeatCount="indefinite" path="M90 100 C190 100 180 210 303 210 C390 210 395 120 485 120"/></circle><circle r="3.5" fill="#7096aa"><animateMotion dur="6s" repeatCount="indefinite" path="M70 250 C180 250 185 210 303 210 C400 210 385 295 485 295"/></circle></g>
+          <g class="source-block" transform="translate(56 58)"><rect width="72" height="57" rx="5" fill="#e4ecd8"/><path d="M14 18h43M14 28h43M14 38h30" stroke="#92a583" stroke-width="3"/><text x="5" y="76">资质认定.csv</text></g>
+          <g class="source-block" transform="translate(82 140)"><rect width="72" height="57" rx="5" fill="#f2e2d3"/><path d="M14 18h43M14 28h43M14 38h30" stroke="#c49c76" stroke-width="3"/><text x="6" y="77">行政处罚.xlsx</text></g>
+          <g class="source-block" transform="translate(36 225)"><rect width="72" height="57" rx="5" fill="#dee8ec"/><path d="M14 18h43M14 28h43M14 38h30" stroke="#88a5b1" stroke-width="3"/><text x="4" y="77">采购合同.csv</text></g>
+          <g class="source-block" transform="translate(80 303)"><rect width="72" height="57" rx="5" fill="#e8e3ee"/><path d="M14 18h43M14 28h43M14 38h30" stroke="#aaa0b5" stroke-width="3"/><text x="4" y="77">更多公开文件</text></g>
+          <circle cx="303" cy="210" r="61" fill="#f7f8f1" stroke="#d1dac6"/><circle cx="303" cy="210" r="43" fill="#254f3d"/>
+          <g stroke="#dce9bd" stroke-width="2.5" fill="none"><path d="M284 199h38M284 209h27M284 219h32"/><path d="M315 209l7 7 10-14"/></g>
+          <text class="svg-label" x="303" y="295" text-anchor="middle">理解 · 抽取 · 核验</text><text class="svg-micro" x="303" y="315" text-anchor="middle">LOCAL MODEL + PYTHON</text>
+          <g class="entity-point"><circle cx="485" cy="120" r="32" fill="#dce8bc" stroke="#b9c99e"/><circle cx="485" cy="112" r="7" fill="#52704c"/><path d="M473 132q12-15 24 0" fill="#52704c"/><text class="svg-label" x="485" y="178" text-anchor="middle">企业 A</text></g>
+          <g class="entity-point"><circle cx="485" cy="295" r="32" fill="#dce8ed" stroke="#b3c8d0"/><circle cx="485" cy="287" r="7" fill="#608493"/><path d="M473 307q12-15 24 0" fill="#608493"/><text class="svg-label" x="485" y="353" text-anchor="middle">企业 B</text></g>
+          <g transform="translate(533 188)"><rect width="50" height="43" rx="5" fill="#fff" stroke="#d6dccd"/><path d="M546 201h23M546 209h23M546 217h15" stroke="#aab79e" stroke-width="2" transform="translate(-533 -188)"/></g>
+          <text class="svg-micro" x="559" y="254" text-anchor="middle">EVIDENCE</text>
+        </svg>
+        <div class="figure-bottom"><span class="legend"><i class="dot sage"></i>源文件 <i class="dot blue"></i>企业主体 <i class="dot sand"></i>事实证据</span><span>方法示意 · 非运行统计</span></div>
+      </div>
+    </section>
+
+    <div class="principle-strip shell"><span><b>01</b> 先理解文件</span><span><b>02</b> 逐条保留证据</span><span><b>03</b> 谨慎归并企业</span><a href="#release">当前版本 v0.1 <span aria-hidden="true">↗</span></a></div>
+
+    <section class="section shell" id="approach" aria-labelledby="approach-title">
+      <div class="section-intro"><div><p class="eyebrow">THE ENGINEERING QUESTION</p><h2 id="approach-title">每一种方法，<br>都对应一个具体困难。</h2></div><p>数千份表格，字段各异，信息分散。项目关注如何组合已有工具，以及如何验证这些选择是否有效。</p></div>
+      <div class="choices">
+        <article><div class="choice-visual mini-samples" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><p class="overline">01 / SELECT</p><h3>文件太多，先看什么？</h3><p>把文件名、表头和分层样本组织为文件卡片，交给本地模型判断相关性。保留、复核、排除，决策都有依据。</p><a href="#lab" data-open-lab="sample">探索文件抽样 <span aria-hidden="true">↗</span></a></article>
+        <article><div class="choice-visual mini-chunks" aria-hidden="true"><span>表头 + 记录 01–04</span><span>表头 + 记录 05–08</span><span>表头 + 记录 09–12</span></div><p class="overline">02 / EXTRACT</p><h3>表格太长，怎样分开看？</h3><p>完整记录进入分块，每块携带语境和表头。记录编号、输出预算与证据核验，共同约束抽取结果。</p><a href="#lab" data-open-lab="chunk">探索结构分块 <span aria-hidden="true">↗</span></a></article>
+        <article><div class="choice-visual mini-match" aria-hidden="true"><span>企业名称</span><i>＋</i><span>身份字段</span><b>→</b><span class="match-result">归属判断</span></div><p class="overline">03 / RESOLVE</p><h3>名称相近，是同一家吗？</h3><p>先找可靠标识，再核对名称和地址。相似记录进入候选；证据不足时保留独立主体，供后续复核。</p><a href="#lab" data-open-lab="match">探索匹配边界 <span aria-hidden="true">↗</span></a></article>
+      </div>
+    </section>
+
+    <section class="section lab-section" id="lab" aria-labelledby="lab-title">
+      <div class="shell"><div class="section-intro"><div><p class="eyebrow">AN EXPLORABLE NOTEBOOK</p><h2 id="lab-title">把方法，变成可以操作的实验。</h2></div><p>调整参数，观察数据怎样流动。这里使用合成数据解释机制；交互在浏览器内完成，不调用模型。</p></div>
+      <div class="notebook">
+        <div class="notebook-bar"><span><i></i> enterprise_intelligence / methods.notebook</span><span class="small-tag">交互式方法示意</span></div>
+        <div class="lab-tabs" role="tablist" aria-label="方法实验"><button id="tab-sample" role="tab" aria-selected="true" aria-controls="panel-sample" data-lab="sample">01 <span>文件抽样</span></button><button id="tab-chunk" role="tab" aria-selected="false" aria-controls="panel-chunk" data-lab="chunk" tabindex="-1">02 <span>结构分块</span></button><button id="tab-match" role="tab" aria-selected="false" aria-controls="panel-match" data-lab="match" tabindex="-1">03 <span>企业匹配</span></button></div>
+        <div class="lab-panel" id="panel-sample" role="tabpanel" aria-labelledby="tab-sample">
+          <div class="lab-explanation"><p class="overline">INPUT / A FILE CARD</p><h3>用少量样本，<br>理解整份文件的结构。</h3><p>这份合成表共有 120 条记录。拖动滑块，观察首、中、尾及随机补样如何组成模型输入。</p><label class="slider-label" for="sample-count">首 / 中 / 尾，每处 <output id="sample-count-value" for="sample-count">3</output> 行</label><input id="sample-count" type="range" min="1" max="10" value="3"><label class="check-label"><input id="random-sample" type="checkbox" checked> 加入 6 条固定种子随机样本</label><p class="lab-boundary">抽样控制的是模型输入量。罕见事件仍可能漏采，需要轻量扫描与排除文件复查。</p></div>
+          <div class="lab-canvas"><div class="canvas-caption"><span>合成文件 / 公开资质名单.csv</span><span>120 ROWS</span></div><div id="sample-grid" class="sample-grid" role="img" aria-label="120 条记录中的抽样位置"></div><div class="sample-legend"><span><i class="dot sage"></i>首 / 中 / 尾</span><span><i class="dot sand"></i>随机补样</span><span><i class="dot pale"></i>未送入本轮卡片</span></div><div class="sampling-result" aria-live="polite"><div><strong id="sample-selected">15</strong><span>行样本进入模型</span></div><div><strong>120</strong><span>行原始记录保留</span></div><div class="sample-ratio"><span id="sample-percent">12.5%</span><div><i id="sample-meter"></i></div><small>样本占原始记录的比例</small></div></div><p class="canvas-note">卡片同时携带：文件名 / 原始表头 / 行列统计 / 样本位置</p></div>
+        </div>
+        <div class="lab-panel" id="panel-chunk" role="tabpanel" aria-labelledby="tab-chunk" hidden>
+          <div class="lab-explanation"><p class="overline">CONTEXT / COMPLETE RECORDS</p><h3>分开读取，<br>把语境一起带过去。</h3><p>12 条合成记录按完整行分块。每块重复携带表头和金额单位；每条记录保留自己的编号。</p><label class="slider-label" for="chunk-size">每块包含 <output id="chunk-size-value" for="chunk-size">4</output> 条记录</label><input id="chunk-size" type="range" min="2" max="6" value="4"><div class="chunk-summary" id="chunk-summary" aria-live="polite"></div><p class="lab-boundary">网页展示行分块原理。真实模型输入还需使用实际 tokenizer，同时检查输入和输出预算；超长单条进入复核。</p></div>
+          <div class="lab-canvas"><div class="canvas-caption"><span>分块预览 / 点击切换</span><span>RECORD-AWARE</span></div><div id="chunk-buttons" class="chunk-buttons" aria-label="选择分块"></div><div class="context-strip"><span>文件：合成项目明细.csv</span><span>金额单位：万元</span></div><div class="table-scroll"><table class="chunk-table"><caption class="sr-only">所选分块的完整记录</caption><thead><tr><th>记录编号</th><th>企业名称</th><th>项目金额</th><th>状态</th></tr></thead><tbody id="chunk-rows"></tbody></table></div><div class="coverage-line"><span class="signal-dot"></span><span id="chunk-coverage">12 / 12 个记录编号都有去向</span></div><p class="canvas-note">编号覆盖可核对；事实是否完整提取，仍需标注评估。</p></div>
+        </div>
+        <div class="lab-panel" id="panel-match" role="tabpanel" aria-labelledby="tab-match" hidden>
+          <div class="lab-explanation"><p class="overline">IDENTITY / EVIDENCE BEFORE MERGE</p><h3>把“相似”，<br>变成有依据的判断。</h3><p>切换三种身份信息组合，观察为什么有的记录可以关联，有的只能等待复核。</p><div class="match-cases" role="group" aria-label="匹配案例"><button data-match="same" aria-pressed="true">名称与地址一致</button><button data-match="conflict" aria-pressed="false">标识存在冲突</button><button data-match="uncertain" aria-pressed="false">只有相近名称</button></div><p class="lab-boundary">以下身份值均为示意。向量可补充候选召回；是否同一企业仍需字段证据。向量模块尚待实现与评估。</p></div>
+          <div class="lab-canvas"><div class="canvas-caption"><span>两条记录 / 身份字段对照</span><span>NO BLIND MERGE</span></div><div class="pair-cards"><div id="match-left"></div><span class="pair-connector" aria-hidden="true">↔</span><div id="match-right"></div></div><div class="match-verdict" id="match-verdict" aria-live="polite"></div><p class="canvas-note">判定保留理由；缺失值不等于一致，独立主体也可拥有相似名称。</p></div>
+        </div>
+        <noscript><p class="fallback">开启 JavaScript 可以操作实验；方法说明与源码链接仍可直接阅读。</p></noscript>
+      </div></div>
+    </section>
+
+    <section class="section shell" id="evidence" aria-labelledby="evidence-title">
+      <div class="section-intro"><div><p class="eyebrow">FOLLOW THE EVIDENCE</p><h2 id="evidence-title">从一个标签，回到一条原文。</h2></div><p>下面的结果来自仓库规则 Demo 的实际运行。两家合成企业、三条事件；点击事件查看文件、行位置和证据。</p></div>
+      <div class="demo-notice"><span class="notice-mark">i</span><p><strong>合成示例 · 规则基线</strong> 企业与事实均为虚构。身份为暂定归属，未作权威工商核验；此处不展示真实银行数据或 Qwen 实测效果。</p><a href="assets/demo.json" download="bei-synthetic-demo.json">示例 JSON <span aria-hidden="true">↓</span></a></div>
+      <div class="evidence-workspace">
+        <aside class="entity-list"><p class="overline">企业样例</p><div id="entity-buttons"></div><div class="demo-totals" id="demo-totals" aria-live="polite">载入示例…</div><p>来源覆盖：未知<br>信用评分：未生成</p></aside>
+        <div class="entity-detail"><div class="entity-heading"><div><span class="small-tag">PROVISIONAL ENTITY</span><h3 id="entity-name">合成企业画像</h3><p id="entity-address">正在读取可复现的示例数据。</p></div><span class="entity-avatar" aria-hidden="true">企</span></div><div class="event-filter" role="group" aria-label="事件过滤"><button data-filter="all" aria-pressed="true">全部事件</button><button data-filter="innovation" aria-pressed="false">科技认定</button><button data-filter="administrative_penalty" aria-pressed="false">行政处罚</button></div><div class="event-timeline" id="event-timeline" aria-live="polite"></div><p class="evidence-note">“拟认定”保留拟议状态；未观察到某类事件不代表该类事件不存在。</p></div>
+      </div>
+      <div class="evidence-marginal"><span><i class="line-icon" aria-hidden="true">↳</i> 标签来自事实，事实连回证据。</span><span>原文件 → 工作表 → 记录编号 → 原文单元格</span></div>
+    </section>
+
+    <section class="section shell architecture" id="pipeline" aria-labelledby="pipeline-title">
+      <div class="section-intro"><div><p class="eyebrow">A SMALL, COMPLETE WORKFLOW</p><h2 id="pipeline-title">理解交给模型，<br>读取与核对交给程序。</h2></div><p>一个 Python 工程，串起准备、抽取、归并和导出。原始数据、模型权重与处理结果留在私有环境。</p></div>
+      <div class="pipeline-track"><div><span>01</span><strong>文件与工作表</strong><small>格式识别 · 来源与哈希</small></div><i aria-hidden="true">→</i><div><span>02</span><strong>本地 Qwen</strong><small>文件筛选 · 角色与事件理解</small></div><i aria-hidden="true">→</i><div><span>03</span><strong>程序核验</strong><small>Schema · 证据 · 记录覆盖</small></div><i aria-hidden="true">→</i><div><span>04</span><strong>企业与标签</strong><small>身份归属 · 事件 · 来源索引</small></div></div>
+      <div class="architecture-bottom"><div><span class="bracket">[ LOCAL ]</span><p>Qwen3-8B 是当前方案的起点。真实模型质量与运行兼容性待验证，参数和提示词随评测固定版本。</p></div><div><span class="bracket">[ TRACEABLE ]</span><p>SQLite 保存记录与处理状态，JSON 导出事实和来源。失败、排除和待复核记录分别留存。</p></div><div><span class="bracket">[ INCREMENTAL ]</span><p>文件内容或配置变化后重新处理相应任务。扩展依据实测误差与瓶颈，逐步增加向量和复杂文件支持。</p></div></div>
+    </section>
+
+    <section class="section release-section" id="release" aria-labelledby="release-title"><div class="shell">
+      <div class="section-intro"><div><p class="eyebrow">WHERE THE PROJECT STANDS</p><h2 id="release-title">把已完成与待验证，写清楚。</h2></div><p>项目正在从可运行骨架走向真实数据验证。页面不报告未经评测的准确率或全量处理成果。</p></div>
+      <div class="release-grid"><div class="release-column"><span class="status-label"><i class="dot sage"></i> 已有实现</span><h3>可运行的 v0.1</h3><ul><li>CSV / Excel / JSON / RDF 读取与文件卡片</li><li>规则基线与本地模型调用路径</li><li>证据核对、记录覆盖、保守身份关联</li><li>事实、画像、来源及复核队列导出</li></ul></div><div class="release-column"><span class="status-label"><i class="dot sand"></i> 下一步验证</span><h3>真实数据与模型效果</h3><ul><li>全量文件盘点与异常格式处理</li><li>本地 Qwen 部署和小批次兼容性验证</li><li>文件筛选与字段抽取的人工标注评估</li><li>漏提、错配、吞吐与复核负担分析</li></ul></div><div class="release-column"><span class="status-label"><i class="dot blue"></i> 后续扩展</span><h3>用实验选择增量</h3><ul><li>向量召回对候选匹配的实际增益</li><li>长记录分段、复杂子表与 OCR</li><li>跨事件阶段关联与增量更新</li><li>真实结果的交互查询与复核</li></ul></div></div>
+      <a class="release-source" href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/main/docs/validation.md" target="_blank" rel="noopener">查看仓库验证记录 <span aria-hidden="true">↗</span></a>
+    </div></section>
+
+    <section class="section shell reproduce" id="reproduce" aria-labelledby="reproduce-title"><div><p class="eyebrow">OPEN SOURCE / REPRODUCIBLE</p><h2 id="reproduce-title">从一份可复现的<br>小样例开始。</h2><p>离线规则 Demo 可在 CPU 运行。先查看原始输入与中间结果，再接入私有环境中的本地模型。</p><a class="text-link" href="https://github.com/chaomacv/beijing-enterprise-intelligence#安装" target="_blank" rel="noopener">完整安装与运行说明 <span aria-hidden="true">↗</span></a></div><div class="terminal"><div class="terminal-top"><span>QUICK START / PYTHON 3.10+</span><button id="copy-command" type="button">复制命令</button></div><pre id="quickstart-code">git clone https://github.com/chaomacv/beijing-enterprise-intelligence.git
+cd beijing-enterprise-intelligence
+python -m pip install -e .
+bank-data demo --work-dir ../demo_process_work</pre><p id="copy-status" role="status">仅生成合成示例，无需 GPU、模型权重或 API Key。</p></div></section>
+    <div class="closing shell"><span class="closing-mark" aria-hidden="true">↳</span><p>让数据有来处，<br><span>让判断有依据。</span></p><a href="#top" aria-label="回到顶部">↑</a></div>
+  </main>
+  <footer class="footer shell"><a class="brand" href="#top"><img src="assets/mark.svg" width="25" height="25" alt=""><span>Beijing Enterprise Intelligence</span></a><span>工程实践 · 2026</span><a href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">源码与文档 ↗</a></footer>
+  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><span class="overline">SOURCE INSPECTOR / SYNTHETIC</span><button id="close-source" aria-label="关闭原始证据" type="button">×</button></div><h2 id="source-title">原始证据</h2><div id="source-content"></div><button class="button primary dialog-close" type="button">返回企业画像 <span aria-hidden="true">↗</span></button></dialog>
+</body>
+</html>

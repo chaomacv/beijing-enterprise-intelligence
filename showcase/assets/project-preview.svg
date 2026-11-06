@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="450" viewBox="0 0 1200 450">
+  <rect width="1200" height="450" rx="12" fill="#f3f5eb"/>
+  <defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".65" fill="#d6ddcc"/></pattern></defs>
+  <rect x="600" y="35" width="560" height="365" fill="url(#grid)"/>
+  <g font-family="Segoe UI,Microsoft YaHei,sans-serif">
+    <rect x="55" y="40" width="31" height="31" rx="8" fill="#254f3d"/><g fill="#dce8bc"><rect x="63" y="48" width="4" height="4"/><rect x="70" y="48" width="4" height="4"/><rect x="77" y="48" width="4" height="4"/><rect x="63" y="55" width="4" height="4"/><rect x="70" y="55" width="4" height="4"/><rect x="63" y="62" width="4" height="4"/></g>
+    <text x="100" y="62" fill="#4b6247" font-size="16">BEIJING ENTERPRISE INTELLIGENCE</text>
+    <text x="55" y="157" font-size="46" fill="#26352e">分散的数据，</text>
+    <text x="55" y="223" font-size="46" fill="#456b46">有据可查的企业情报。</text>
+    <text x="57" y="270" font-size="15" fill="#839176">本地模型理解文件 · 程序保留记录 · 每条事实可追溯</text>
+    <rect x="55" y="314" width="170" height="40" rx="4" fill="#254f3d"/>
+    <text x="73" y="339" fill="#f1f5e5" font-size="13">探索交互式项目页面 ↗</text>
+    <text x="57" y="399" fill="#8c9a7e" font-size="11">OPEN SOURCE  /  LOCAL FIRST  /  EVIDENCE LINKED</text>
+    <g fill="none" stroke-width="1.5"><path d="M715 110C810 110 785 215 880 215" stroke="#92ab7d"/><path d="M685 215H880" stroke="#bd9c7b"/><path d="M715 320C810 320 785 215 880 215" stroke="#8ca6b2"/><path d="M880 215C970 215 960 140 1045 140" stroke="#6b926d"/><path d="M880 215C970 215 960 295 1045 295" stroke="#8ca6b2"/></g>
+    <g><rect x="645" y="85" width="85" height="51" rx="4" fill="#e1eacc"/><rect x="615" y="190" width="85" height="51" rx="4" fill="#f1e3d4"/><rect x="645" y="295" width="85" height="51" rx="4" fill="#dfe9ed"/></g>
+    <g stroke-width="3"><path d="M660 100H715M660 110H715M660 120H697" stroke="#a0b68b"/><path d="M630 205H685M630 215H685M630 225H667" stroke="#caa786"/><path d="M660 310H715M660 320H715M660 330H697" stroke="#9ab4c0"/></g>
+    <circle cx="880" cy="215" r="52" fill="#f4f7ed" stroke="#d0dcc0"/><circle cx="880" cy="215" r="36" fill="#254f3d"/>
+    <g fill="none" stroke="#dce8bc" stroke-width="3"><path d="M862 204H897M862 214H884M862 224H891"/><path d="m890 214 6 6 10-14"/></g>
+    <circle cx="1045" cy="140" r="29" fill="#dce8bc"/><circle cx="1045" cy="295" r="29" fill="#dce7ec"/>
+    <g fill="#6d8c58"><circle cx="1045" cy="134" r="6"/><path d="M1034 151q11-14 22 0"/></g><g fill="#7897a5"><circle cx="1045" cy="289" r="6"/><path d="M1034 306q11-14 22 0"/></g>
+    <text x="880" y="297" text-anchor="middle" font-size="12" fill="#7f926d">筛选 / 抽取 / 核验</text>
+    <text x="1045" y="189" text-anchor="middle" font-size="11" fill="#8c9d79">企业与事件</text><text x="1045" y="344" text-anchor="middle" font-size="11" fill="#8c9d79">标签与证据</text>
+    <text x="1120" y="399" text-anchor="end" font-size="9" fill="#a2ad95">方法示意 · 合成案例</text>
+  </g>
+</svg>

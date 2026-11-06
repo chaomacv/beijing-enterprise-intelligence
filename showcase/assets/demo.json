@@ -1,0 +1,747 @@
+{
+  "provenance": {
+    "kind": "synthetic",
+    "backend": "rules-v1-explicit-baseline",
+    "generator": "scripts/build_showcase_demo.py",
+    "description": "合成企业与虚构事实；现有 Python 规则基线的实际输出，不是 Qwen 推理或全量运行结果。"
+  },
+  "summary": {
+    "backend": "rules-v1-explicit-baseline",
+    "run_key": "8df43f62d77f9cc7230bec43",
+    "records": 5,
+    "status_coverage_complete": true,
+    "entities": 2,
+    "events": 3,
+    "review_records": 0,
+    "excluded_records": 1,
+    "semantic_accuracy_evaluated": false,
+    "rule_baseline": true
+  },
+  "files": [
+    {
+      "scope_id": "7ec2c7d49b6472fca39057b1",
+      "file_id": "9922c34347d2b1a67744c988",
+      "filename": "合成示例_高新技术认定.csv",
+      "sheet": "csv",
+      "row_count": 2,
+      "columns": [
+        "事件内容",
+        "企业名称",
+        "处罚决定文书号",
+        "日期",
+        "注册地址",
+        "状态",
+        "统一社会信用代码"
+      ],
+      "sampling": {
+        "seed": 42,
+        "method": "head/middle/tail + deterministic random; not a semantic recall guarantee"
+      },
+      "quality_flags": [],
+      "source": {},
+      "sample": [
+        {
+          "record_id": "5ce9e22f513b3e7e6b976e31",
+          "sheet": "csv",
+          "row": 2,
+          "cells": {
+            "企业名称": "合成示例甲科技有限公司",
+            "统一社会信用代码": "",
+            "注册地址": "北京市测试区示例路1号",
+            "事件内容": "高新技术企业认定",
+            "状态": "已认定",
+            "日期": "2026-02-01",
+            "处罚决定文书号": ""
+          },
+          "context": {
+            "original_header": [
+              "企业名称",
+              "统一社会信用代码",
+              "注册地址",
+              "事件内容",
+              "状态",
+              "日期",
+              "处罚决定文书号"
+            ],
+            "header_record": 1,
+            "preamble": [],
+            "header_uncertain": false,
+            "width_mismatch": false
+          }
+        },
+        {
+          "record_id": "3cd2f1892aa4b8ac587db9bb",
+          "sheet": "csv",
+          "row": 3,
+          "cells": {
+            "企业名称": "合成示例乙科技有限公司",
+            "统一社会信用代码": "",
+            "注册地址": "北京市测试区示例路2号",
+            "事件内容": "高新技术企业拟认定",
+            "状态": "拟认定",
+            "日期": "2026-02-02",
+            "处罚决定文书号": ""
+          },
+          "context": {
+            "original_header": [
+              "企业名称",
+              "统一社会信用代码",
+              "注册地址",
+              "事件内容",
+              "状态",
+              "日期",
+              "处罚决定文书号"
+            ],
+            "header_record": 1,
+            "preamble": [],
+            "header_uncertain": false,
+            "width_mismatch": false
+          }
+        }
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "scope_id": "94ddb87daf0459666f14b095",
+      "file_id": "d39f8095c49fd96dcdfa67ad",
+      "filename": "合成示例_行政处罚.csv",
+      "sheet": "csv",
+      "row_count": 2,
+      "columns": [
+        "事件内容",
+        "企业名称",
+        "处罚决定文书号",
+        "日期",
+        "注册地址",
+        "状态",
+        "统一社会信用代码"
+      ],
+      "sampling": {
+        "seed": 42,
+        "method": "head/middle/tail + deterministic random; not a semantic recall guarantee"
+      },
+      "quality_flags": [],
+      "source": {},
+      "sample": [
+        {
+          "record_id": "7219536b6c9dd3d1404d6f20",
+          "sheet": "csv",
+          "row": 2,
+          "cells": {
+            "企业名称": "合成示例甲科技有限公司",
+            "统一社会信用代码": "",
+            "注册地址": "北京市测试区示例路1号",
+            "事件内容": "行政处罚：罚款",
+            "状态": "已处罚",
+            "日期": "2026-01-01",
+            "处罚决定文书号": "SYNTHETIC-P-001"
+          },
+          "context": {
+            "original_header": [
+              "企业名称",
+              "统一社会信用代码",
+              "注册地址",
+              "事件内容",
+              "状态",
+              "日期",
+              "处罚决定文书号"
+            ],
+            "header_record": 1,
+            "preamble": [],
+            "header_uncertain": false,
+            "width_mismatch": false
+          }
+        },
+        {
+          "record_id": "e21a26db839c3ae3e7843efb",
+          "sheet": "csv",
+          "row": 3,
+          "cells": {
+            "企业名称": "合成示例乙科技有限公司",
+            "统一社会信用代码": "",
+            "注册地址": "北京市测试区示例路2号",
+            "事件内容": "检查合格",
+            "状态": "合格",
+            "日期": "2026-01-02",
+            "处罚决定文书号": ""
+          },
+          "context": {
+            "original_header": [
+              "企业名称",
+              "统一社会信用代码",
+              "注册地址",
+              "事件内容",
+              "状态",
+              "日期",
+              "处罚决定文书号"
+            ],
+            "header_record": 1,
+            "preamble": [],
+            "header_uncertain": false,
+            "width_mismatch": false
+          }
+        }
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "scope_id": "f4164e9d3a641af72aed70e4",
+      "file_id": "b84630b1072a65cb4ec2756d",
+      "filename": "合成示例_树木统计.csv",
+      "sheet": "csv",
+      "row_count": 1,
+      "columns": [
+        "公园",
+        "序号",
+        "树木数量"
+      ],
+      "sampling": {
+        "seed": 42,
+        "method": "head/middle/tail + deterministic random; not a semantic recall guarantee"
+      },
+      "quality_flags": [],
+      "source": {},
+      "sample": [
+        {
+          "record_id": "6c46fc1d2dba60d89aa5a5a7",
+          "sheet": "csv",
+          "row": 2,
+          "cells": {
+            "序号": "1",
+            "公园": "虚构公园",
+            "树木数量": "10"
+          },
+          "context": {
+            "original_header": [
+              "序号",
+              "公园",
+              "树木数量"
+            ],
+            "header_record": 1,
+            "preamble": [],
+            "header_uncertain": false,
+            "width_mismatch": false
+          }
+        }
+      ],
+      "decision": "DROP"
+    }
+  ],
+  "records": [
+    {
+      "record_id": "5ce9e22f513b3e7e6b976e31",
+      "sheet": "csv",
+      "row": 2,
+      "cells": {
+        "企业名称": "合成示例甲科技有限公司",
+        "统一社会信用代码": "",
+        "注册地址": "北京市测试区示例路1号",
+        "事件内容": "高新技术企业认定",
+        "状态": "已认定",
+        "日期": "2026-02-01",
+        "处罚决定文书号": ""
+      },
+      "context": {
+        "original_header": [
+          "企业名称",
+          "统一社会信用代码",
+          "注册地址",
+          "事件内容",
+          "状态",
+          "日期",
+          "处罚决定文书号"
+        ],
+        "header_record": 1,
+        "preamble": [],
+        "header_uncertain": false,
+        "width_mismatch": false
+      },
+      "file_id": "9922c34347d2b1a67744c988",
+      "filename": "合成示例_高新技术认定.csv"
+    },
+    {
+      "record_id": "3cd2f1892aa4b8ac587db9bb",
+      "sheet": "csv",
+      "row": 3,
+      "cells": {
+        "企业名称": "合成示例乙科技有限公司",
+        "统一社会信用代码": "",
+        "注册地址": "北京市测试区示例路2号",
+        "事件内容": "高新技术企业拟认定",
+        "状态": "拟认定",
+        "日期": "2026-02-02",
+        "处罚决定文书号": ""
+      },
+      "context": {
+        "original_header": [
+          "企业名称",
+          "统一社会信用代码",
+          "注册地址",
+          "事件内容",
+          "状态",
+          "日期",
+          "处罚决定文书号"
+        ],
+        "header_record": 1,
+        "preamble": [],
+        "header_uncertain": false,
+        "width_mismatch": false
+      },
+      "file_id": "9922c34347d2b1a67744c988",
+      "filename": "合成示例_高新技术认定.csv"
+    },
+    {
+      "record_id": "7219536b6c9dd3d1404d6f20",
+      "sheet": "csv",
+      "row": 2,
+      "cells": {
+        "企业名称": "合成示例甲科技有限公司",
+        "统一社会信用代码": "",
+        "注册地址": "北京市测试区示例路1号",
+        "事件内容": "行政处罚：罚款",
+        "状态": "已处罚",
+        "日期": "2026-01-01",
+        "处罚决定文书号": "SYNTHETIC-P-001"
+      },
+      "context": {
+        "original_header": [
+          "企业名称",
+          "统一社会信用代码",
+          "注册地址",
+          "事件内容",
+          "状态",
+          "日期",
+          "处罚决定文书号"
+        ],
+        "header_record": 1,
+        "preamble": [],
+        "header_uncertain": false,
+        "width_mismatch": false
+      },
+      "file_id": "d39f8095c49fd96dcdfa67ad",
+      "filename": "合成示例_行政处罚.csv"
+    },
+    {
+      "record_id": "e21a26db839c3ae3e7843efb",
+      "sheet": "csv",
+      "row": 3,
+      "cells": {
+        "企业名称": "合成示例乙科技有限公司",
+        "统一社会信用代码": "",
+        "注册地址": "北京市测试区示例路2号",
+        "事件内容": "检查合格",
+        "状态": "合格",
+        "日期": "2026-01-02",
+        "处罚决定文书号": ""
+      },
+      "context": {
+        "original_header": [
+          "企业名称",
+          "统一社会信用代码",
+          "注册地址",
+          "事件内容",
+          "状态",
+          "日期",
+          "处罚决定文书号"
+        ],
+        "header_record": 1,
+        "preamble": [],
+        "header_uncertain": false,
+        "width_mismatch": false
+      },
+      "file_id": "d39f8095c49fd96dcdfa67ad",
+      "filename": "合成示例_行政处罚.csv"
+    },
+    {
+      "record_id": "6c46fc1d2dba60d89aa5a5a7",
+      "sheet": "csv",
+      "row": 2,
+      "cells": {
+        "序号": "1",
+        "公园": "虚构公园",
+        "树木数量": "10"
+      },
+      "context": {
+        "original_header": [
+          "序号",
+          "公园",
+          "树木数量"
+        ],
+        "header_record": 1,
+        "preamble": [],
+        "header_uncertain": false,
+        "width_mismatch": false
+      },
+      "file_id": "b84630b1072a65cb4ec2756d",
+      "filename": "合成示例_树木统计.csv"
+    }
+  ],
+  "record_results": [
+    {
+      "record_id": "5ce9e22f513b3e7e6b976e31",
+      "status": "EXTRACTED",
+      "entities": [
+        {
+          "role": "subject",
+          "name": {
+            "field": "企业名称",
+            "value": "合成示例甲科技有限公司"
+          },
+          "credit_code": null,
+          "address": {
+            "field": "注册地址",
+            "value": "北京市测试区示例路1号"
+          }
+        }
+      ],
+      "events": [
+        {
+          "subject_index": 0,
+          "event_type": "innovation",
+          "status": "confirmed",
+          "date": {
+            "field": "日期",
+            "value": "2026-02-01"
+          },
+          "amount": null,
+          "document_no": null,
+          "evidence": [
+            {
+              "field": "事件内容",
+              "value": "高新技术企业认定"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "record_id": "3cd2f1892aa4b8ac587db9bb",
+      "status": "EXTRACTED",
+      "entities": [
+        {
+          "role": "subject",
+          "name": {
+            "field": "企业名称",
+            "value": "合成示例乙科技有限公司"
+          },
+          "credit_code": null,
+          "address": {
+            "field": "注册地址",
+            "value": "北京市测试区示例路2号"
+          }
+        }
+      ],
+      "events": [
+        {
+          "subject_index": 0,
+          "event_type": "innovation",
+          "status": "proposed",
+          "date": {
+            "field": "日期",
+            "value": "2026-02-02"
+          },
+          "amount": null,
+          "document_no": null,
+          "evidence": [
+            {
+              "field": "事件内容",
+              "value": "高新技术企业拟认定"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "record_id": "7219536b6c9dd3d1404d6f20",
+      "status": "EXTRACTED",
+      "entities": [
+        {
+          "role": "subject",
+          "name": {
+            "field": "企业名称",
+            "value": "合成示例甲科技有限公司"
+          },
+          "credit_code": null,
+          "address": {
+            "field": "注册地址",
+            "value": "北京市测试区示例路1号"
+          }
+        }
+      ],
+      "events": [
+        {
+          "subject_index": 0,
+          "event_type": "administrative_penalty",
+          "status": "confirmed",
+          "date": {
+            "field": "日期",
+            "value": "2026-01-01"
+          },
+          "amount": null,
+          "document_no": {
+            "field": "处罚决定文书号",
+            "value": "SYNTHETIC-P-001"
+          },
+          "evidence": [
+            {
+              "field": "事件内容",
+              "value": "行政处罚：罚款"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "record_id": "e21a26db839c3ae3e7843efb",
+      "status": "NO_EVENT",
+      "entities": [
+        {
+          "role": "subject",
+          "name": {
+            "field": "企业名称",
+            "value": "合成示例乙科技有限公司"
+          },
+          "credit_code": null,
+          "address": {
+            "field": "注册地址",
+            "value": "北京市测试区示例路2号"
+          }
+        }
+      ],
+      "events": []
+    },
+    {
+      "record_id": "6c46fc1d2dba60d89aa5a5a7",
+      "status": "REVIEW",
+      "entities": [],
+      "events": [],
+      "processing_status": "FILE_EXCLUDED"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "a186c7d5d74cf7a11e221a81",
+      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "subject_index": 0,
+      "event_type": "innovation",
+      "status": "confirmed",
+      "date": {
+        "field": "日期",
+        "value": "2026-02-01"
+      },
+      "amount": null,
+      "document_no": null,
+      "evidence": [
+        {
+          "field": "事件内容",
+          "value": "高新技术企业认定"
+        }
+      ],
+      "sources": [
+        {
+          "record_id": "5ce9e22f513b3e7e6b976e31",
+          "file_id": "9922c34347d2b1a67744c988",
+          "sheet": "csv",
+          "row": 2,
+          "source": {},
+          "evidence": [
+            {
+              "field": "事件内容",
+              "value": "高新技术企业认定"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "event_id": "287dcbcd0a65cafa44f671e1",
+      "entity_id": "E_367f1678b817e1099b93e6c7",
+      "subject_index": 0,
+      "event_type": "innovation",
+      "status": "proposed",
+      "date": {
+        "field": "日期",
+        "value": "2026-02-02"
+      },
+      "amount": null,
+      "document_no": null,
+      "evidence": [
+        {
+          "field": "事件内容",
+          "value": "高新技术企业拟认定"
+        }
+      ],
+      "sources": [
+        {
+          "record_id": "3cd2f1892aa4b8ac587db9bb",
+          "file_id": "9922c34347d2b1a67744c988",
+          "sheet": "csv",
+          "row": 3,
+          "source": {},
+          "evidence": [
+            {
+              "field": "事件内容",
+              "value": "高新技术企业拟认定"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "event_id": "17c49ec70d217861eaef70ec",
+      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "subject_index": 0,
+      "event_type": "administrative_penalty",
+      "status": "confirmed",
+      "date": {
+        "field": "日期",
+        "value": "2026-01-01"
+      },
+      "amount": null,
+      "document_no": {
+        "field": "处罚决定文书号",
+        "value": "SYNTHETIC-P-001"
+      },
+      "evidence": [
+        {
+          "field": "事件内容",
+          "value": "行政处罚：罚款"
+        }
+      ],
+      "sources": [
+        {
+          "record_id": "7219536b6c9dd3d1404d6f20",
+          "file_id": "d39f8095c49fd96dcdfa67ad",
+          "sheet": "csv",
+          "row": 2,
+          "source": {},
+          "evidence": [
+            {
+              "field": "事件内容",
+              "value": "行政处罚：罚款"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "entity_id": "E_367f1678b817e1099b93e6c7",
+      "credit_code": null,
+      "names": [
+        "合成示例乙科技有限公司"
+      ],
+      "addresses": [
+        "北京市测试区示例路2号"
+      ],
+      "identity_status": "provisional",
+      "tags": [
+        {
+          "label": "拟议：存在科技认定记录",
+          "event_status": "proposed",
+          "evidence_event_id": "287dcbcd0a65cafa44f671e1"
+        }
+      ],
+      "event_ids": [
+        "287dcbcd0a65cafa44f671e1"
+      ],
+      "coverage": "unknown",
+      "credit_score": null,
+      "note": "Observed source facts only; no lending decision or absence-of-risk inference."
+    },
+    {
+      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "credit_code": null,
+      "names": [
+        "合成示例甲科技有限公司"
+      ],
+      "addresses": [
+        "北京市测试区示例路1号"
+      ],
+      "identity_status": "provisional",
+      "tags": [
+        {
+          "label": "存在科技认定记录",
+          "event_status": "confirmed",
+          "evidence_event_id": "a186c7d5d74cf7a11e221a81"
+        },
+        {
+          "label": "存在行政处罚记录",
+          "event_status": "confirmed",
+          "evidence_event_id": "17c49ec70d217861eaef70ec"
+        }
+      ],
+      "event_ids": [
+        "a186c7d5d74cf7a11e221a81",
+        "17c49ec70d217861eaef70ec"
+      ],
+      "coverage": "unknown",
+      "credit_score": null,
+      "note": "Observed source facts only; no lending decision or absence-of-risk inference."
+    }
+  ],
+  "match_decisions": [
+    {
+      "mention_id": "287dcbcd0a65cafa44f671e1",
+      "entity_id": "E_367f1678b817e1099b93e6c7",
+      "decision": "NEW",
+      "reason": "insufficient_identity_evidence",
+      "raw_code": null,
+      "valid_code": null,
+      "candidate_overflow": false,
+      "candidates": []
+    },
+    {
+      "mention_id": "4fc7ba8a6dae238c1432efcd",
+      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "decision": "REVIEW",
+      "reason": "insufficient_identity_evidence",
+      "raw_code": null,
+      "valid_code": null,
+      "candidate_overflow": false,
+      "candidates": [
+        {
+          "entity_id": "E_367f1678b817e1099b93e6c7",
+          "name_similarity": 0.9091,
+          "decision": "REVIEW",
+          "credit_code_conflict": false
+        }
+      ]
+    },
+    {
+      "mention_id": "99f280af77deed8e90f46334",
+      "entity_id": "E_367f1678b817e1099b93e6c7",
+      "decision": "MATCH",
+      "reason": "exact_name_and_address",
+      "raw_code": null,
+      "valid_code": null,
+      "candidate_overflow": false,
+      "candidates": [
+        {
+          "entity_id": "E_64d23a63fdec4450d3b1e447",
+          "name_similarity": 0.9091,
+          "decision": "REVIEW",
+          "credit_code_conflict": false
+        }
+      ]
+    },
+    {
+      "mention_id": "a186c7d5d74cf7a11e221a81",
+      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "decision": "MATCH",
+      "reason": "exact_name_and_address",
+      "raw_code": null,
+      "valid_code": null,
+      "candidate_overflow": false,
+      "candidates": [
+        {
+          "entity_id": "E_367f1678b817e1099b93e6c7",
+          "name_similarity": 0.9091,
+          "decision": "REVIEW",
+          "credit_code_conflict": false
+        }
+      ]
+    }
+  ]
+}
