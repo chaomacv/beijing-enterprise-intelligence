@@ -9,7 +9,7 @@ import threading
 import time
 
 from .bulk_client import BatchClient
-from .bulk_rows import derived,write_line
+from .bulk_rows import derived,write_line,TRACE_FIELDS
 from .common import dump,ontology,resource,stable_id,file_hash
 from .extract import review_result,source_bound_schema,validate_results
 
@@ -190,7 +190,7 @@ def finalize_validation(profiles,root):
                     result=saved['result'];rid=result['record_id']
                     if rid!=task['record_id'] or rid in seen:raise ValueError('Missing/duplicate model record')
                     seen.add(rid);statuses[result['status']]+=1;methods['local_llm_record']+=1
-                    trace={k:task[k] for k in ['file_id','root_file_id','scope_id','sheet','row']}
+                    trace={k:task.get(k) for k in TRACE_FIELDS}
                     write_line(streams['record_results'],{**trace,**result,'method':'local_llm_record','reason':saved['errors']})
                     mentions,events=derived(result,trace,[])
                     for item in mentions:write_line(streams['mentions'],item)

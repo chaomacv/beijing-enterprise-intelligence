@@ -36,6 +36,12 @@ class BulkTests(unittest.TestCase):
             self.assertEqual(text,value[start:end]);coverage.update(range(start,end));self.assertLessEqual(len(text),2000)
         self.assertEqual(len(coverage),len(value))
 
+    def test_budget_reduction_retains_head_middle_tail_samples(self):
+        from bank_data.bulk_plan import reduce_sample
+        rows=list(range(13));selected=reduce_sample(rows)
+        self.assertEqual(selected[0],0);self.assertEqual(selected[-1],12)
+        self.assertIn(6,selected)
+
     def test_archive_byte_names_preserve_original_encoding(self):
         original='目录/企业名单.csv'.encode('gb18030')
         name,metadata=member_name(original)
@@ -128,7 +134,7 @@ class BulkTests(unittest.TestCase):
     @unittest.skipUnless(importlib.util.find_spec('duckdb'),'bulk SQL runtime not installed')
     def test_streamed_mapping_matching_exports_and_coverage(self):
         path=self.raw/'合成高新认定.csv'
-        path.write_text('企业名称,地址,事件内容,日期\n合成甲公司,示例路1号,已认定,2026-01-01\n合成甲公司,示例路1号,已认定,2026-02-01\n',encoding='utf-8')
+        path.write_text('企业名称,地址,事件内容,日期,__text_source__,__ocr_min_confidence__\n合成甲公司,示例路1号,已认定,2026-01-01,rapidocr_cpu,0.42\n合成甲公司,示例路1号,已认定,2026-02-01,pdf_native_text,1.0\n',encoding='utf-8')
         profiles,_=scan(self.raw,self.work/'02_profiles');card=profiles[0]['cards'][0]
         dump(self.work/'04_plans/scopes'/(card['scope_id']+'.json'),{'signature':'synthetic','plan':mapping()})
         materialize(profiles,self.work,workers=1)
@@ -139,6 +145,12 @@ class BulkTests(unittest.TestCase):
         self.assertEqual(result['counts']['events'],2)
         self.assertEqual(result['counts']['record_ledger'],2)
         self.assertTrue((self.work/'08_results/profiles.parquet').exists())
+        import duckdb
+        db=duckdb.connect(str(self.work/'07_entities/results.duckdb'),read_only=True)
+        try:
+            self.assertEqual(db.execute("SELECT count(*) FROM event_sources WHERE source_quality='OCR_UNVERIFIED' AND ocr_min_confidence=0.42").fetchone()[0],1)
+            self.assertIn('OCR_UNVERIFIED',db.execute('SELECT observed_source_quality FROM profiles').fetchone()[0])
+        finally:db.close()
 
 
 if __name__=='__main__':unittest.main()

@@ -44,4 +44,3 @@ def overviews(root,profiles):
         columns=['file_id','status','expected_records','raw_records','mapped_records','pending_llm','excluded_records','final_records',
             'record_statuses','methods','error']
         write_csv(root/destination,columns,([v.get(k) for k in columns] for v in values))
-

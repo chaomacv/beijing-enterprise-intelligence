@@ -15,6 +15,8 @@ FACT_COLUMNS={'fact_id':'VARCHAR','record_id':'VARCHAR','subject_mention_id':'VA
     'scope_id':'VARCHAR','sheet':'VARCHAR','row':'BIGINT'}
 RESULT_COLUMNS={'record_id':'VARCHAR','file_id':'VARCHAR','root_file_id':'VARCHAR','scope_id':'VARCHAR','sheet':'VARCHAR',
     'row':'BIGINT','status':'VARCHAR','method':'VARCHAR','reason':'JSON'}
+for columns in [MENTION_COLUMNS,FACT_COLUMNS,RESULT_COLUMNS]:
+    columns.update(source_quality='VARCHAR',source_kind='VARCHAR',ocr_min_confidence='DOUBLE')
 
 
 def literal(value):return "'"+str(value).replace("'","''")+"'"
@@ -82,11 +84,13 @@ def aggregate(root,profiles):
             roles AS (SELECT entity_id,list(role ORDER BY role) AS roles FROM
               (SELECT DISTINCT entity_id,role FROM entity_mentions) GROUP BY entity_id),
             kinds AS (SELECT entity_id,list(kind ORDER BY kind) AS kinds FROM
-              (SELECT DISTINCT entity_id,kind FROM entity_mentions) GROUP BY entity_id)
-            SELECT base.*,names.names,addresses.addresses,roles.roles,kinds.kinds,
+              (SELECT DISTINCT entity_id,kind FROM entity_mentions) GROUP BY entity_id),
+            quality AS (SELECT entity_id,list(source_quality ORDER BY source_quality) AS observed_source_quality FROM
+              (SELECT DISTINCT entity_id,source_quality FROM entity_mentions) GROUP BY entity_id)
+            SELECT base.*,names.names,addresses.addresses,roles.roles,kinds.kinds,quality.observed_source_quality,
               CASE WHEN valid_code IS NOT NULL THEN 'code_checksum_only_not_registry_verified' ELSE 'provisional' END AS identity_status
             FROM base LEFT JOIN names USING(entity_id) LEFT JOIN addresses USING(entity_id)
-              LEFT JOIN roles USING(entity_id) LEFT JOIN kinds USING(entity_id)''')
+              LEFT JOIN roles USING(entity_id) LEFT JOIN kinds USING(entity_id) LEFT JOIN quality USING(entity_id)''')
         checkpoint('resolve_event_sources')
         db.execute('''CREATE OR REPLACE TABLE event_sources AS
             SELECT f.*,m.entity_id,

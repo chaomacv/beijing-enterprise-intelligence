@@ -12,6 +12,7 @@ from .resolve import normalize,valid_code
 
 EMPTY={'','-','--','—','/','null','none','nan','暂无','不详','无'}
 ORG_MARKERS=('公司','企业','合作社','事务所','研究院','研究所','中心','医院','学校','学院','大学','商店','商行','工厂','厂','工作室','经营部','服务部','书店','饭店','餐厅','宾馆','酒店','局','委员会','协会','基金会')
+TRACE_FIELDS=['file_id','root_file_id','scope_id','sheet','row','source_quality','source_kind','ocr_min_confidence']
 
 
 def empty(value):return value is None or str(value).strip().casefold() in EMPTY
@@ -145,6 +146,9 @@ def materialize_file(args):
             per_record={k:v for k,v in context.items() if k not in base}
             row={'record_id':rid,'sheet':sheet,'row':ordinal,'cells':cells,'context':context}
             trace={'file_id':fid,'root_file_id':profile.get('root_file_id') or fid,'scope_id':scope,'sheet':sheet,'row':ordinal}
+            trace.update(source_quality='OCR_UNVERIFIED' if cells.get('__text_source__')=='rapidocr_cpu' else 'NATIVE_EXTRACTED',
+                source_kind=cells.get('__text_source__') or profile.get('source',{}).get('source_kind') or context.get('source_kind') or profile['kind'],
+                ocr_min_confidence=float(cells['__ocr_min_confidence__']) if cells.get('__text_source__')=='rapidocr_cpu' else None)
             offset=write_line(streams['raw'],{**trace,'record_id':rid,'cells':cells,'context_id':context_id,'context':per_record})
             raw_count+=1;chunk.append(rid)
             try:result,reason,kinds=apply_plan(row,card,plan)
