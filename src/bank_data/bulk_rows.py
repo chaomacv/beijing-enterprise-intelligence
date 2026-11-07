@@ -9,9 +9,10 @@ from .common import dump,file_hash,ontology,stable_id
 from .extract import review_result,validate_results
 from .readers import read_records
 from .resolve import normalize,valid_code
+from . import subject_guards
+from .subject_guards import ORG_MARKERS,recognizable_organization
 
 EMPTY={'','-','--','—','/','null','none','nan','暂无','不详','无'}
-ORG_MARKERS=('公司','企业','合作社','事务所','研究院','研究所','中心','医院','学校','学院','大学','商店','商行','工厂','厂','工作室','经营部','服务部','书店','饭店','餐厅','宾馆','酒店','局','委员会','协会','基金会')
 TRACE_FIELDS=['file_id','root_file_id','scope_id','sheet','row','source_quality','source_kind','ocr_min_confidence']
 
 
@@ -44,6 +45,10 @@ def apply_plan(row,card,plan):
         if name is None:continue
         if name['value'].strip() in set(card['columns'])|set(ontology()['name_fields']):
             return {'record_id':rid,'status':'NO_EVENT','entities':[],'events':[]},'structural_header_record',[]
+        if mapping['kind']=='person':return review_result(rid),'personal_subject_not_enterprise_fact',[]
+        if mapping['name_field'].strip() in {'项目名称','工程名称','单体工程','单体工程名称'}:
+            return review_result(rid),'project_field_cannot_directly_identify_organization',[]
+        if not recognizable_organization(name['value']):return review_result(rid),'subject_name_not_recognizable_requires_review',[]
         code=reference(mapping['code_field'],row)
         if mapping['kind']=='unknown' and not (code and valid_code(code['value'])) and not any(k in name['value'] for k in ORG_MARKERS):
             return review_result(rid),'subject_kind_uncertain',[]
@@ -119,7 +124,7 @@ def materialize_file(args):
             excluded=decision.exists() and json.loads(decision.read_text(encoding='utf-8'))['decision']['decision']=='DROP'
             plans[scope]={'mode':'exclude' if excluded else 'review',
                 'reason':'screen_excluded' if excluded else 'missing_field_plan','entities':[],'events':[]}
-    key=stable_id('materializer-v2',file_hash(__file__),fid,plans,signatures)
+    key=stable_id('materializer-v3-subject-guard',file_hash(__file__),file_hash(subject_guards.__file__),fid,plans,signatures)
     prior=outdir/'mapping_summary.json'
     if prior.exists():
         value=json.loads(prior.read_text(encoding='utf-8'))

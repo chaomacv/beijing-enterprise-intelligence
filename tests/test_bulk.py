@@ -137,6 +137,34 @@ class BulkTests(unittest.TestCase):
         plan=mapping();plan['events'][0]['status_rules']=[{'field':'状态','contains':'已处罚','status':'proposed'}]
         with self.assertRaises(ValueError):validate_plan(plan,card)
 
+    def test_basic_personal_names_do_not_become_enterprise_profiles(self):
+        plan=mapping();plan['mode']='entity_only';plan['events']=[];plan['entities'][0]['kind']='person'
+        row={'record_id':'synthetic-person','cells':{'企业名称':'合成人员甲'}}
+        result,reason,kinds=apply_plan(row,{'filename':'合成先进个人.csv','columns':['企业名称']},plan)
+        self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[]);self.assertEqual(kinds,[])
+        self.assertEqual(reason,'personal_subject_not_enterprise_fact')
+
+    def test_a_business_mapping_cannot_turn_project_or_category_values_into_organizations(self):
+        for name in ['合成美术制作技艺','合成广场扩建项目','中小企业','合成高新技术企业认定']:
+            result,reason,_=apply_plan({'record_id':'synthetic-project','cells':{'企业名称':name}},
+                {'filename':'合成名单.csv','columns':['企业名称']},mapping())
+            self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[])
+            self.assertEqual(reason,'subject_name_not_recognizable_requires_review')
+
+    def test_basic_school_uses_the_same_name_guard_as_model_extraction(self):
+        plan=mapping();plan.update(mode='entity_only',events=[]);plan['entities'][0]['kind']='institution'
+        result,_,kinds=apply_plan({'record_id':'synthetic-school','cells':{'企业名称':'合成第二中学'}},
+            {'filename':'合成学校名单.csv','columns':['企业名称']},plan)
+        self.assertEqual(result['status'],'NO_EVENT');self.assertEqual(kinds,['institution'])
+        self.assertEqual(result['entities'][0]['name']['value'],'合成第二中学')
+
+    def test_project_column_cannot_be_copied_as_a_whole_organization_name(self):
+        plan=mapping();plan['entities'][0]['name_field']='项目名称'
+        result,reason,_=apply_plan({'record_id':'synthetic-project','cells':{'项目名称':'合成甲公司新建项目'}},
+            {'filename':'合成项目名录.csv','columns':['项目名称']},plan)
+        self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[])
+        self.assertEqual(reason,'project_field_cannot_directly_identify_organization')
+
     def test_effective_plan_omits_unused_mappings_without_changing_raw_reply(self):
         card={'filename':'合成统计.csv','columns':['企业名称','地址','事件内容','日期']}
         raw=mapping();raw['mode']='exclude'
