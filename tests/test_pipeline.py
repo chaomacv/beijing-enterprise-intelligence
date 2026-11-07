@@ -121,6 +121,15 @@ class PipelineTests(unittest.TestCase):
         entity['name']={'field':'__filename__','value':'拟认定名单'}
         with self.assertRaises(ValueError):validate_results({'results':[result]},[row],card)
 
+    def test_removed_and_revoked_facts_remain_visible_in_tag_labels(self):
+        (self.input/'经营异常.csv').write_text('企业名称,事件内容\n合成甲公司,移出经营异常名录\n合成乙公司,撤销经营异常决定\n',encoding='utf-8')
+        prepare(self.store,self.input)
+        run(self.store,RuleBaseline())
+        profiles=json.loads((self.work/'profiles.json').read_text(encoding='utf-8'))
+        labels=[tag['label'] for profile in profiles for tag in profile['tags']]
+        self.assertTrue(any(v.startswith('已移出：') for v in labels))
+        self.assertTrue(any(v.startswith('已撤销：') for v in labels))
+
     def test_truncated_batches_split_then_keep_review_for_single_failure(self):
         class Backend:
             def extract(self, records, card):

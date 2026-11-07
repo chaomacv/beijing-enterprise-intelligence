@@ -15,22 +15,26 @@ class RequestError(ValueError):
 
 
 class TransformersBackend:
-    def __init__(self, model_dir, model_id, device='cuda:0', context=8192):
+    def __init__(self, model_dir, model_id, device='cuda:0', context=8192, cpu_threads=4):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
         if not torch.cuda.is_available():
             raise RuntimeError('A CUDA-enabled PyTorch environment and available GPU are required')
+        torch.set_num_threads(cpu_threads)
         self.torch, self.model_id, self.context = torch, model_id, context
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir, local_files_only=True, trust_remote_code=False)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_dir, local_files_only=True, trust_remote_code=False, use_safetensors=True,
             torch_dtype=torch.bfloat16, device_map={'': device}, attn_implementation='sdpa').eval()
+        from lmformatenforcer.integrations.transformers import build_token_enforcer_tokenizer_data
+        self.tokenizer_data = build_token_enforcer_tokenizer_data(self.tokenizer)
         self.lock = threading.Lock()
 
     def metadata(self):
         return {'model': self.model_id, 'backend': 'transformers-schema', 'context': self.context,
                 'torch': self.torch.__version__, 'cuda': self.torch.version.cuda,
-                'gpu': self.torch.cuda.get_device_name(self.model.device)}
+                'gpu': self.torch.cuda.get_device_name(self.model.device),
+                'cpu_threads':self.torch.get_num_threads()}
 
     def generate(self, request):
         from jsonschema import Draft202012Validator
@@ -67,7 +71,7 @@ class TransformersBackend:
             prompt_tokens = inputs['input_ids'].shape[-1]
             if prompt_tokens + maximum + 256 > self.context:
                 raise RequestError('Request exceeds the input/output context budget')
-            prefix = build_transformers_prefix_allowed_tokens_fn(self.tokenizer, JsonSchemaParser(schema))
+            prefix = build_transformers_prefix_allowed_tokens_fn(self.tokenizer_data, JsonSchemaParser(schema))
             options = {'max_new_tokens': maximum, 'do_sample': temperature > 0,
                        'prefix_allowed_tokens_fn': prefix, 'pad_token_id': self.tokenizer.eos_token_id}
             if temperature > 0: options.update(temperature=temperature, top_p=top_p)
@@ -150,14 +154,15 @@ def main():
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--device', default='cuda:0')
     parser.add_argument('--context', type=int, default=8192)
+    parser.add_argument('--cpu-threads',type=int,default=4)
     args = parser.parse_args()
     if not ipaddress.ip_address(args.host).is_loopback:
         raise ValueError('The model service must bind to a loopback address')
-    if not args.model_dir.is_dir() or args.context < 1024:
+    if not args.model_dir.is_dir() or args.context < 1024 or not 1 <= args.cpu_threads <= 128:
         raise ValueError('Invalid local model path or context')
     os.environ['HF_HUB_OFFLINE'] = '1'
     os.environ['TRANSFORMERS_OFFLINE'] = '1'
-    backend = TransformersBackend(args.model_dir, args.model_id, args.device, args.context)
+    backend = TransformersBackend(args.model_dir, args.model_id, args.device, args.context,args.cpu_threads)
     server = ThreadingHTTPServer((args.host, args.port), handler_for(backend, os.environ.get('BANK_LLM_API_KEY')))
     print(json.dumps({'event': 'ready', 'host': args.host, 'port': args.port, **backend.metadata()}), flush=True)
     try: server.serve_forever()

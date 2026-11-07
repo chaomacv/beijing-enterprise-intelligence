@@ -46,6 +46,8 @@ class LocalQwen:
         if context <= max_output + 256: raise ValueError('Insufficient context budget')
         self.store, self.model = store, model
         self.context, self.max_output = context, max_output
+        # Reserve an initial 512 output tokens per structured record, then split on failure.
+        self.batch_size = min(12,max(1,max_output//512))
         self.name = 'local-qwen-' + stable_id(model, str(Path(tokenizer_dir).resolve()), context, max_output,
                                              resource('screen.md'), resource('extract.md'), ontology(),
                                              SCREEN_SCHEMA, EXTRACTION_SCHEMA)

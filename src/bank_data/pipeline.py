@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 
 from .common import dump, ontology, stable_id
-from .extract import review_result, validate_results, validate_screen
+from .extract import CONTRACT_VERSION, review_result, validate_results, validate_screen
 from .resolve import resolve_results
 from .llm import ModelUnavailable
 
@@ -20,14 +20,26 @@ def extract_batch(backend, records, card):
             right, b = extract_batch(backend, records[split:], card)
             return left + right, a + b
         row = records[0]
-        return [review_result(row['record_id'])], [{'record_id': row['record_id'], 'reason': type(error).__name__}]
+        return [review_result(row['record_id'])], [{'record_id': row['record_id'],
+                'reason': type(error).__name__, 'detail': str(error)[:240]}]
 
 
 def run(store, backend):
     cards = [(r['id'], json.loads(r['card'])) for r in store.active_scopes()]
-    run_key = stable_id('pipeline-v1', backend.name, ontology(), [card for _, card in cards])
+    run_key = stable_id(CONTRACT_VERSION, backend.name, ontology(), [card for _, card in cards])
     all_results, record_sources, issues, screening = [], {}, [], []
     expected = set()
+    total = store.db.execute('SELECT COUNT(*) FROM records r JOIN active_files a ON r.file_id=a.id').fetchone()[0]
+    last_progress = None
+    def progress():
+        nonlocal last_progress
+        if last_progress == len(all_results): return
+        last_progress = len(all_results)
+        value = {'stage':'extract','completed_records':len(all_results),'total_records':total,
+                 'final_exports_ready':False}
+        dump(store.root/'progress.json',value)
+        print(json.dumps(value),flush=True)
+    progress()
     for scope_id, card in cards:
         for row in store.scope_records(scope_id):
             expected.add(row['record_id'])
@@ -45,6 +57,7 @@ def run(store, backend):
         screening.append({'scope_id': scope_id, **decision})
         if decision['decision'] != 'KEEP':
             all_results.extend({**review_result(r['record_id']), 'processing_status': 'FILE_EXCLUDED' if decision['decision'] == 'DROP' else 'REVIEW'} for r in store.scope_records(scope_id))
+            progress()
             continue
         pending = []
         def process_pending(batch):
@@ -54,15 +67,17 @@ def run(store, backend):
                 store.db.execute('INSERT OR REPLACE INTO extractions VALUES(?,?,?)', (result['record_id'], run_key, json.dumps(result, ensure_ascii=False)))
             all_results.extend(results)
             store.db.commit()
+            progress()
         for row in store.scope_records(scope_id):
             cached = store.db.execute('SELECT result FROM extractions WHERE record_id=? AND backend=?', (row['record_id'], run_key)).fetchone()
             if cached and json.loads(cached['result'])['status'] != 'REVIEW':
                 all_results.append(json.loads(cached['result']))
             else:
                 pending.append(row)
-            if len(pending) >= 12:
+            if len(pending) >= getattr(backend,'batch_size',12):
                 process_pending(pending); pending = []
         if pending: process_pending(pending)
+        progress()
     store.db.commit()
     observed = [r['record_id'] for r in all_results]
     if set(observed) != expected or len(observed) != len(set(observed)):
@@ -95,7 +110,8 @@ def run(store, backend):
         for event_id in by_entity[eid]:
             event = events[event_id]
             base = ontology()['events'][event['event_type']]['tag']
-            label = ('拟议：' + base) if event['status'] == 'proposed' else base
+            prefix = {'proposed':'拟议：','removed':'已移出：','revoked':'已撤销：','unknown':'阶段未明：'}.get(event['status'],'')
+            label = prefix + base
             tags.append({'label': label, 'event_status': event['status'], 'evidence_event_id': event_id})
         profiles.append({**entity, 'tags': tags, 'event_ids': by_entity[eid],
                          'coverage': 'unknown', 'credit_score': None,
@@ -111,4 +127,6 @@ def run(store, backend):
                'excluded_records': sum(r.get('processing_status') == 'FILE_EXCLUDED' for r in all_results),
                'semantic_accuracy_evaluated': False, 'rule_baseline': backend.name.startswith('rules')}
     dump(store.root / 'run_summary.json', summary)
+    dump(store.root/'progress.json',{'stage':'done','completed_records':len(all_results),
+                                    'total_records':total,'final_exports_ready':True})
     return summary

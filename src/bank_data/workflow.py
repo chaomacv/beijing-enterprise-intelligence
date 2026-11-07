@@ -17,6 +17,7 @@ class ScreenedBackend:
     def __init__(self, backend, decisions):
         self.backend, self.decisions = backend, decisions
         self.name = backend.name + '-screen-' + stable_id(decisions)
+        self.batch_size = getattr(backend,'batch_size',12)
 
     def screen(self, card):
         return self.decisions.get(card['scope_id'], {'decision':'REVIEW','event_types':[],
@@ -68,6 +69,8 @@ def workflow(input_dir, work_dir, backend_factory, through='run', workers=1, ret
                                   'statuses':dict(Counter(p['status'] for p in file_decisions))}),flush=True)
         report.update(stage='screen',backend=backend.name,file_status_counts=dict(Counter(p['status'] for p in file_decisions)),
                       kept_files=sum(p['status']=='KEEP' for p in file_decisions))
+        report['file_record_counts'] = {status:sum(p['records'] for p in file_decisions if p['status']==status)
+                                        for status in sorted({p['status'] for p in file_decisions})}
         dump(root/'workflow_summary.json',report)
         if through == 'screen': return report
         kept = [p['path'] for p in file_decisions if p['status']=='KEEP']

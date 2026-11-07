@@ -6,6 +6,7 @@ from .common import ontology, text
 STATUSES = {'EXTRACTED', 'NO_EVENT', 'REVIEW'}
 EVENT_STATUSES = {'confirmed', 'proposed', 'removed', 'revoked', 'unknown'}
 ROLES = {'subject', 'supplier', 'buyer', 'authority', 'other'}
+CONTRACT_VERSION = 'extraction-v2-source-title'
 
 
 def obj(properties):
@@ -70,6 +71,9 @@ def validate_results(data, records, card=None):
                 raise ValueError('Unknown event type/status')
             if not event['evidence']: raise ValueError('Missing event evidence')
             for ref in event['evidence']: validate_ref(ref, row, (card or {}).get('filename'))
+            if (any(ref['field']=='__filename__' for ref in event['evidence'])
+                    and result['entities'][index]['name'] not in event['evidence']):
+                raise ValueError('Filename evidence also requires the row subject name')
             for field in ('date', 'amount', 'document_no'):
                 if event[field] is not None: validate_ref(event[field], row)
     return data['results']
