@@ -65,6 +65,31 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(rows[0][2]['统一社会信用代码'], '0000123')
         self.assertEqual(rows[0][3]['header_record'], 2)
 
+    def test_xlsx_oversized_dimensions_do_not_become_phantom_fields(self):
+        import openpyxl
+        book=openpyxl.Workbook();sheet=book.active
+        sheet.append(['企业名称','状态']);sheet.append(['合成甲公司','正常'])
+        sheet.cell(row=2,column=16384).number_format='0.00'
+        path=self.input/'styled.xlsx';book.save(path);book.close()
+        rows=list(read_records(path,'xlsx'))
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0][2],{'企业名称':'合成甲公司','状态':'正常'})
+        self.assertFalse(rows[0][3]['width_mismatch'])
+
+    def test_xlsx_underreported_dimensions_do_not_truncate_records(self):
+        import openpyxl,re,zipfile
+        book=openpyxl.Workbook();sheet=book.active
+        sheet.append(['企业名称','状态']);sheet.append(['合成甲公司','正常']);sheet.append(['合成乙公司','正常'])
+        original=self.root/'original.xlsx';path=self.input/'undersized.xlsx';book.save(original);book.close()
+        with zipfile.ZipFile(original) as source,zipfile.ZipFile(path,'w') as target:
+            for name in source.namelist():
+                value=source.read(name)
+                if name=='xl/worksheets/sheet1.xml':value=re.sub(rb'<dimension ref="[^"]+"',b'<dimension ref="A1:A1"',value)
+                target.writestr(name,value)
+        rows=list(read_records(path,'xlsx'))
+        self.assertEqual([row[1] for row in rows],[2,3])
+        self.assertEqual([row[2]['企业名称'] for row in rows],['合成甲公司','合成乙公司'])
+
     def test_failed_file_does_not_publish_partial_records(self):
         p = self.input / 'broken.csv'
         p.write_text('企业名称,状态\n示例甲有限公司,正常\n"unterminated,字段', encoding='utf-8')
@@ -129,6 +154,15 @@ class PipelineTests(unittest.TestCase):
         labels=[tag['label'] for profile in profiles for tag in profile['tags']]
         self.assertTrue(any(v.startswith('已移出：') for v in labels))
         self.assertTrue(any(v.startswith('已撤销：') for v in labels))
+
+    def test_shared_document_number_does_not_collapse_distinct_payment_facts(self):
+        (self.input/'项目补贴.csv').write_text('企业名称,地址,事件内容,项目编号,日期,金额\n合成甲公司,测试路1号,已拨付,TEST-1,2026-01-01,100\n合成甲公司,测试路1号,已拨付,TEST-1,2026-02-01,200\n',encoding='utf-8')
+        prepare(self.store,self.input)
+        report=run(self.store,RuleBaseline())
+        self.assertEqual(report['entities'],1)
+        self.assertEqual(report['events'],2)
+        events=json.loads((self.work/'events.json').read_text(encoding='utf-8'))
+        self.assertEqual({e['amount']['value'] for e in events},{'100','200'})
 
     def test_truncated_batches_split_then_keep_review_for_single_failure(self):
         class Backend:

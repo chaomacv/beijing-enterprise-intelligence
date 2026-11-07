@@ -98,7 +98,7 @@ def run(store, backend):
             entity_id = lookup[(result['record_id'], event['subject_index'])]
             doc = event['document_no']['value'] if event['document_no'] else None
             # Without a strong event number, keep source-specific facts rather than guessing duplicates.
-            key = stable_id(entity_id, event['event_type'], doc, event['status']) if doc else stable_id(result['record_id'], index)
+            key = stable_id(entity_id,event['event_type'],doc,event['status'],event['date'],event['amount'],event['evidence']) if doc else stable_id(result['record_id'], index)
             if key not in events:
                 events[key] = {'event_id': key, 'entity_id': entity_id, **event, 'sources': []}
                 by_entity[entity_id].append(key)

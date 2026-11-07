@@ -4,7 +4,7 @@ from collections import Counter
 from pathlib import Path
 
 from .common import dump, file_hash, stable_id
-from .readers import READER_VERSION, detect, discover, read_records
+from .readers import detect, discover, read_records, reader_version
 
 
 def source_metadata(path):
@@ -50,17 +50,19 @@ def prepare(store, input_dir, selected_paths=None):
     store.db.commit()
     for path in files:
         sha = file_hash(path)
-        fid = stable_id(READER_VERSION, path.relative_to(input_dir).as_posix(), sha)
+        kind, detection_error = 'unknown', None
+        try: kind = detect(path)
+        except Exception as error: detection_error = error
+        fid = stable_id(reader_version(kind), path.relative_to(input_dir).as_posix(), sha)
         store.db.execute('INSERT OR IGNORE INTO active_files VALUES(?)', (fid,))
         store.db.commit()
         previous = store.db.execute('SELECT status,source,path FROM files WHERE id=?', (fid,)).fetchone()
         metadata = {}
         name = path.name
-        kind = 'unknown'
         try:
             metadata = source_metadata(path)
             name = metadata.get('file_name', metadata.get('expected_name', path.name))
-            kind = detect(path)
+            if detection_error: raise detection_error
             if metadata.get('sha256') and metadata['sha256'] != sha:
                 raise ValueError('Source checksum differs from provenance manifest')
             if (previous and previous['status'] == 'prepared' and previous['path'] == str(path)

@@ -136,6 +136,8 @@ def handler_for(backend, api_key=None):
                 payload = json.loads(self.rfile.read(length))
                 if not isinstance(payload, dict): raise RequestError('Expected a JSON object')
                 self.reply(200, backend.generate(payload))
+            except (BrokenPipeError, ConnectionResetError):
+                print(json.dumps({'event':'client_disconnected'}),flush=True)
             except BlockingIOError:
                 self.reply(503, {'error': {'type': 'model_busy'}})
             except (ValueError, TypeError, KeyError):

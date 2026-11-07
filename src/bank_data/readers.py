@@ -10,6 +10,12 @@ from .common import ontology, text
 
 SUPPORTED = {'.csv', '.xlsx', '.xls', '.json', '.jsonl', '.ndjson', '.xml', '.rdf'}
 READER_VERSION = 'reader-v2'
+
+
+def reader_version(kind):
+    return 'reader-v3-xlsx-dimensions' if kind == 'xlsx' else READER_VERSION
+
+
 CONTROL_FILES = {'provenance.json', 'datasets.json', 'normalized-catalog.json', 'catalog-change.json'}
 SKIP_DIRS = {'catalog', 'runtime', 'cache', 'driver-cache', 'browser-profile', 'chrome-profile',
              'recovery', 'interrupted', 'temp', '.git', '.venv', '__pycache__'}
@@ -85,7 +91,7 @@ def cells_as_text(values):
     return ['' if v is None else str(v) for v in values]
 
 
-def table_records(rows, sheet):
+def table_records(rows, sheet, pad_missing=False):
     top = list(itertools.islice(rows, 20))
     if not top:
         return
@@ -110,6 +116,7 @@ def table_records(rows, sheet):
                'preamble': [cells_as_text(r) for r in top[:index]], 'header_uncertain': header_uncertain}
     for number, values in enumerate(itertools.chain(top[index + 1:], rows), index + 2):
         values = cells_as_text(values)
+        if pad_missing and len(values) < len(keys): values.extend([''] * (len(keys)-len(values)))
         if not any(v.strip() for v in values):
             continue
         if values == original_header:
@@ -135,7 +142,15 @@ def read_records(path, kind):
             book = openpyxl.load_workbook(f, read_only=True, data_only=True)
             try:
                 for sheet in book:
-                    yield from table_records(sheet.iter_rows(values_only=True), sheet.title)
+                    # Declared dimensions can span a million styled but empty rows/columns,
+                    # or incorrectly omit populated cells. Read actual XML coordinates.
+                    sheet.reset_dimensions()
+                    def trimmed_rows():
+                        for values in sheet.iter_rows(values_only=True):
+                            values = list(values)
+                            while values and values[-1] is None: values.pop()
+                            yield values
+                    yield from table_records(trimmed_rows(), sheet.title, pad_missing=True)
             finally:
                 book.close()
     elif kind == 'xls':

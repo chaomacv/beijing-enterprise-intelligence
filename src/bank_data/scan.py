@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .common import dump, file_hash, stable_id
 from .prepare import source_metadata
-from .readers import READER_VERSION, detect, discover, read_records
+from .readers import READER_VERSION, detect, discover, read_records, reader_version
 
 PROFILE_VERSION = 'profile-v1-head3-middle3-tail3-reservoir5'
 KINDS = {'csv', 'xlsx', 'xls', 'json', 'jsonl', 'ndjson', 'xml', 'rdf'}
@@ -23,7 +23,11 @@ def profile_file(path, relative, cache_dir, retry_review=False):
         return {'file_id':stable_id(READER_VERSION,relative,'unreadable'),'relative_path':relative,
                 'path':str(path),'sha256':None,'bytes':None,'filename':path.name,'source':{},
                 'cards':[],'records':0,'status':'REVIEW','error':type(error).__name__}
-    fid = stable_id(READER_VERSION, relative, digest)
+    kind, detection_error = 'unknown', None
+    try: kind = detect(path)
+    except Exception as error: detection_error = error
+    version = reader_version(kind)
+    fid = stable_id(version, relative, digest)
     key = stable_id(PROFILE_VERSION, fid, source)
     cache = cache_dir / (key + '.json')
     if cache.exists():
@@ -32,11 +36,11 @@ def profile_file(path, relative, cache_dir, retry_review=False):
             return {**previous,'path':str(path)}
     profile = {'file_id': fid, 'relative_path': relative, 'path': str(path), 'sha256': digest,
                'bytes': path.stat().st_size, 'filename': source.get('file_name', path.name),
-               'source': source, 'reader_version': READER_VERSION, 'cards': [], 'records': 0}
+               'source': source, 'reader_version': version, 'cards': [], 'records': 0}
     try:
         if source.get('sha256') and source['sha256'] != digest:
             raise ValueError('Input differs from its provenance checksum')
-        kind = detect(path)
+        if detection_error: raise detection_error
         profile['kind'] = kind
         if kind not in KINDS: raise ValueError('Reader not enabled for format: ' + kind)
         scopes = {}
@@ -110,6 +114,7 @@ def scan(input_dir, work_dir, workers=1, retry_review=False):
     report = {'files':len(profiles),'status_counts':dict(Counter(p['status'] for p in profiles)),
               'profiled_records':sum(p['records'] for p in profiles),
               'scopes':sum(len(p['cards']) for p in profiles),'seconds':round(time.monotonic()-started,2),
-              'reader_version':READER_VERSION,'raw_record_store_created':False,'llm_called':False}
+              'reader_versions':sorted({p.get('reader_version',READER_VERSION) for p in profiles}),
+              'raw_record_store_created':False,'llm_called':False}
     dump(work_dir/'scan_summary.json', report)
     return profiles, report
