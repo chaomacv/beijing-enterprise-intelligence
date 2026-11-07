@@ -68,10 +68,12 @@ def detect(path):
         if probe.startswith((b'{', b'[')): return 'json'
         if probe.lower().startswith((b'<html',b'<!doctype html')):return 'html'
         try:
-            value = probe.decode('utf-8-sig')
+            encoding = encoding_for(path)
+            # The bounded probe may end inside a multibyte character.
+            value = codecs.getincrementaldecoder(encoding)().decode(probe,final=False)
             csv.Sniffer().sniff(value, delimiters=',\t;|')
             return 'csv'
-        except (UnicodeDecodeError, csv.Error): pass
+        except (ValueError, csv.Error): pass
     return path.suffix.lower().lstrip('.')
 
 
