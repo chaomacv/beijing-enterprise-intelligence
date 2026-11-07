@@ -26,6 +26,24 @@ python -m bank_data.bulk_run \
 
 已有原始扫描可用 `--profiles /private/previous/file_profiles.json` 代替 `--input`。重复运行同一个工作目录即可续跑。推理服务不可用会停止，不会把剩余语料全部伪装成语义复核。实际启动参数、源码副本和 SHA256 在每次运行的 `01_inputs/run_attempts` 与 `code_snapshots` 中保存。
 
+## 可选的 vLLM 服务
+
+服务器案例使用原始 BF16 Qwen3-8B 权重。vLLM 提供同一批量协议、前缀缓存与 CUDA Graph；`--enforce-eager` 可关闭 Graph。每个服务最多同时处理 4 个独立请求，服务绑定 loopback，禁用使用统计与在线模型下载。
+
+CUDA 11.8 安装案例使用独立环境，并按 [核心组件约束](../scripts/vllm-cu118.constraints.txt) 安装。官方安装包 SHA256 为 `54230c11150a8d6314fb9d4856b045b3d5bf80092fa1901f3e1ef3b9afcd6e3f`，由 [官方发布包核对工作流](https://github.com/chaomacv/beijing-enterprise-intelligence/actions/runs/42392558379) 实际计算；镜像下载也须核对相同哈希。安装方法参考 [vLLM 0.8.5 官方 GPU 文档](https://docs.vllm.ai/en/v0.8.5/getting_started/installation/gpu.html)。
+
+```bash
+python -m pip install -c scripts/vllm-cu118.constraints.txt \
+  'https://github.com/vllm-project/vllm/releases/download/v0.8.5/vllm-0.8.5%2Bcu118-cp38-abi3-manylinux1_x86_64.whl' \
+  --extra-index-url https://download.pytorch.org/whl/cu118
+CUDA_VISIBLE_DEVICES=0 python -m bank_data.serve_vllm \
+  --model-dir /private/models/Qwen3-8B --model-id YOUR_CHECKPOINT_ID --port 18080
+```
+
+该版本 XGrammar 对数组长度和数值范围的支持有限。解码时使用其支持的结构约束，每条候选输出随后仍按**完整原始 JSON Schema**校验，再执行原文引用、主体和记录 ID 校验。失败输出仍走重试或复核。完整 Schema 保持原值并保存在请求中；单元测试覆盖超界输出被拒绝、独立约束、截断及日志不输出业务值。
+
+8 个相同的合成请求在原服务、vLLM eager、vLLM Graph 上分别耗时 49.090、17.469、15.209 秒；各自另有预热。三者均通过 8 项业务检查，原服务有 2 个请求需要来源校验重试。输出 token 数不同，这些时间只能描述该组测试，不能外推全量吞吐或真实数据准确率。实际依赖冻结、请求、回复和比较结果保留在私有运行目录。
+
 ## 九步产物
 
 | 目录 | 处理 | 可检查的中间结果 |

@@ -1,0 +1,11 @@
+# Tested Linux / RTX 4090 runtime. Install CUDA wheels from the official index.
+vllm==0.8.5+cu118
+torch==2.6.0+cu118
+torchvision==0.21.0+cu118
+torchaudio==2.6.0+cu118
+xformers==0.0.29.post2
+transformers==4.51.3
+xgrammar==0.1.18
+outlines==0.1.11
+lm-format-enforcer==0.11.3
+jsonschema==4.23.0

@@ -22,6 +22,7 @@ jobs:
           curl --fail --location --retry 2 --max-time 480 "$url" --output runtime.whl
           test "$(stat -c %s runtime.whl)" = 213618745
           sha256sum runtime.whl | tee runtime.sha256
+          echo '54230c11150a8d6314fb9d4856b045b3d5bf80092fa1901f3e1ef3b9afcd6e3f  runtime.whl' | sha256sum --check
           {
             echo 'Official vLLM 0.8.5 CUDA 11.8 wheel; downloaded over HTTPS and hashed without executing package code.'
             echo '```text'
