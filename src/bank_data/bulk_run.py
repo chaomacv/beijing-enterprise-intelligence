@@ -32,7 +32,7 @@ def report(root,state):
     lines.extend('| '+name+' | '+state.get('steps',{}).get(name,{}).get('status','PENDING')+' | '+title+' | '+outputs+' |' for name,title,outputs in STEPS)
     lines+=['','## 每一步的数量与状态','']
     for name in ['02_profiles/native_summary.json','02_profiles/summary.json','03_screen/summary.json',
-                 '04_plans/summary.json','06_validation/mapping_summary.json','06_validation/llm_summary.json',
+        '04_plans/summary.json','06_validation/mapping_summary.json','06_validation/dedup_summary.json','06_validation/llm_summary.json',
                  '06_validation/summary.json','08_results/summary.json','audit.json']:
         path=root/name
         if path.exists():
@@ -147,8 +147,9 @@ def run(args):
         from .bulk_rows import materialize
         materialize(profiles,root,args.workers)
         stage('06_validation')
-        from .bulk_semantics import resolve_pending,finalize_validation
-        resolve_pending(profiles,root,args.endpoints,args.model,args.tokenizer_dir)
+        from .bulk_dedup import resolve_pending
+        from .bulk_semantics import finalize_validation
+        resolve_pending(profiles,root,args.endpoints,args.model,args.tokenizer_dir,workers=args.workers)
         finalize_validation(profiles,root)
         overviews(root,profiles)
         stage('07_entities')
