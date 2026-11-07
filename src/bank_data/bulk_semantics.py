@@ -76,10 +76,11 @@ def infer(client,records,card,depth=0,feedback=None):
         return [review_result(row['record_id'])],[{'record_id':row['record_id'],'reason':message}]
 
 
-def resolve_pending(profiles,root,endpoints,model,tokenizer_dir):
+def resolve_pending(profiles,root,endpoints,model,tokenizer_dir,client_class=BatchClient):
     root=Path(root);directory=root/'06_validation';mapping=json.loads((directory/'mapping_files.json').read_text(encoding='utf-8'))
     scope_cards={c['scope_id']:c for p in profiles for c in p['cards']}
-    signature=stable_id('corpus-record-llm-v2',file_hash(__file__),model,resource('extract.md'),ontology(),2048,0)
+    strategy=client_class.cache_signature() if hasattr(client_class,'cache_signature') else 'canonical-source-refs-v2'
+    signature=stable_id('corpus-record-llm-v3',file_hash(__file__),model,resource('extract.md'),ontology(),2048,0,strategy)
     tasks=queue.Queue(maxsize=256);lock=threading.Lock();completed=0;total=sum(v.get('pending_llm',0) for v in mapping);start=time.monotonic()
     error_flag=threading.Event()
     def enqueue(value):
@@ -120,10 +121,11 @@ def resolve_pending(profiles,root,endpoints,model,tokenizer_dir):
                 if not enqueue(None):
                     try:tasks.put_nowait(None)
                     except queue.Full:pass
-    def save(task,result,errors):
+    def save(task,result,errors,client):
         nonlocal completed
         if result['record_id']!=task['record_id']:raise ValueError('Record assignment mismatch')
-        value={'signature':signature,'task':task,'result':result,'errors':errors,'method':'local_llm_record'}
+        value={'signature':signature,'task':task,'result':result,'errors':errors,'method':getattr(client_class,'method','local_llm_record'),
+            'strategy_signature':strategy,'model_provenance':getattr(client,'record_provenance',{}).pop(task['record_id'],None)}
         dump(target(task),value)
         with lock:
             completed+=1
@@ -131,7 +133,7 @@ def resolve_pending(profiles,root,endpoints,model,tokenizer_dir):
                 progress={'stage':'06_record_llm','completed_records':completed,'total_records':total,'seconds':round(time.monotonic()-start,1)}
                 dump(directory/'llm_progress.json',progress);print(json.dumps(progress),flush=True)
     def worker(endpoint):
-        client=BatchClient(endpoint,model,tokenizer_dir,root/'model_cache')
+        client=client_class(endpoint,model,tokenizer_dir,root/'model_cache')
         try:
             while True:
                 group=tasks.get()
@@ -148,7 +150,7 @@ def resolve_pending(profiles,root,endpoints,model,tokenizer_dir):
                     try:request=extract_request(client,records,card)
                     except ValueError:
                         results,errors=infer(client,records,card)
-                        for task,result in zip(group,results):save(task,result,errors)
+                        for task,result in zip(group,results):save(task,result,errors,client)
                         continue
                     requests.append(request);pending.append((group,records,card))
                 if not requests:continue
@@ -158,18 +160,21 @@ def resolve_pending(profiles,root,endpoints,model,tokenizer_dir):
                         checked=validate_results(client.content(response),records,card);by_id={r['record_id']:r for r in checked}
                         results=[by_id[r['record_id']] for r in records];errors=[]
                     except (ValueError,TypeError,KeyError):results,errors=infer(client,records,card)
-                    for task,result in zip(group,results):save(task,result,errors)
+                    for task,result in zip(group,results):save(task,result,errors,client)
         except Exception:error_flag.set();raise
     with ThreadPoolExecutor(max_workers=len(endpoints)+1) as pool:
         produce=pool.submit(producer);workers=[pool.submit(worker,endpoint) for endpoint in endpoints]
         for f in workers:f.result()
         produce.result()
-    summary={'complete':True,'signature':signature,'records':total,'completed_records':completed,'seconds':round(time.monotonic()-start,2)}
+    summary={'complete':True,'signature':signature,'strategy_signature':strategy,'method':getattr(client_class,'method','local_llm_record'),
+        'records':total,'completed_records':completed,'seconds':round(time.monotonic()-start,2)}
     dump(directory/'llm_summary.json',summary);return summary
 
 
 def finalize_validation(profiles,root):
     root=Path(root);stage=root/'06_validation';mapping=json.loads((stage/'mapping_files.json').read_text(encoding='utf-8'))
+    model_summary=stage/'llm_summary.json'
+    expected_signature=json.loads(model_summary.read_text(encoding='utf-8'))['signature'] if model_summary.exists() else None
     totals=Counter();summaries=[]
     for value in mapping:
         if value['status']!='MAPPED':summaries.append(value);continue
@@ -187,12 +192,15 @@ def finalize_validation(profiles,root):
             with pending.open(encoding='utf-8') as f:
                 for line in f:
                     task=json.loads(line);saved=json.loads((path/'llm_results'/(task['record_id']+'.json')).read_text(encoding='utf-8'))
+                    if expected_signature and saved.get('signature')!=expected_signature:raise ValueError('Model checkpoint belongs to another extraction strategy')
                     result=saved['result'];rid=result['record_id']
                     if rid!=task['record_id'] or rid in seen:raise ValueError('Missing/duplicate model record')
-                    seen.add(rid);statuses[result['status']]+=1;methods['local_llm_record']+=1
+                    method=saved.get('method','local_llm_record')
+                    seen.add(rid);statuses[result['status']]+=1;methods[method]+=1
                     trace={k:task.get(k) for k in TRACE_FIELDS}
-                    write_line(streams['record_results'],{**trace,**result,'method':'local_llm_record','reason':saved['errors']})
-                    mentions,events=derived(result,trace,[])
+                    provenance={key:saved[key] for key in ['model_provenance','strategy_signature','representative_record_id','content_key'] if key in saved}
+                    write_line(streams['record_results'],{**trace,**result,'method':method,'reason':saved['errors'],**provenance})
+                    mentions,events=derived(result,trace,(saved.get('model_provenance') or {}).get('entity_kinds',[]))
                     for item in mentions:write_line(streams['mentions'],item)
                     for item in events:write_line(streams['events'],item)
             if len(seen)!=value['raw_records']:raise ValueError('Record coverage mismatch')

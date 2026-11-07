@@ -9,6 +9,7 @@ import time
 from .common import dump,file_hash,stable_id
 from .extract import validate_results
 from .bulk_semantics import load_row,resolve_pending as resolve_unique
+from .bulk_references import ReferenceClient
 
 VERSION='exact-content-same-scope-context-v1'
 RELATIVE=('同上','同前','上述','前述','上行','下行','上一条','下一条','上条','该企业','该公司','该单位')
@@ -114,6 +115,7 @@ def expand_file(args):
             validate_results({'results':[result]},[row],card)
             dump(target,{'signature':signature,'task':task,'result':result,'errors':source.get('errors',[]),
                 'method':'local_llm_exact_content_reuse','representative_record_id':index['representative_record_id'],
+                'model_provenance':source.get('model_provenance'),'strategy_signature':source.get('strategy_signature'),
                 'content_key':index['content_key'],'source_cells_and_context_identical':True})
             count+=1;reused+=1
     if count!=info['source_records']:raise ValueError('Incomplete source-record expansion')
@@ -126,11 +128,13 @@ def resolve_pending(profiles,root,endpoints,model,tokenizer_dir,workers=6):
     dump(stage/'dedup_progress.json',{'phase':'local_model','unique_model_records':summary['unique_model_records'],'source_records':summary['source_records'],
         'model_progress':summary['model_progress']})
     with ThreadPoolExecutor(max_workers=1) as monitor:
-        future=monitor.submit(resolve_unique,profiles,view,endpoints,model,tokenizer_dir)
+        future=monitor.submit(resolve_unique,profiles,view,endpoints,model,tokenizer_dir,client_class=ReferenceClient)
         while not future.done():
             progress=view/'06_validation/llm_progress.json'
             if progress.exists():
                 value=json.loads(progress.read_text(encoding='utf-8'))
+                if value['total_records']!=summary['unique_model_records']:
+                    time.sleep(5);continue
                 dump(stage/'llm_progress.json',{'stage':'06_unique_content_llm','completed_unique_records':value['completed_records'],
                     'total_unique_records':value['total_records'],'source_records_total':summary['source_records'],'seconds':value['seconds']})
             time.sleep(5)

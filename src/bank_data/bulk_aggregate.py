@@ -15,7 +15,8 @@ FACT_COLUMNS={'fact_id':'VARCHAR','record_id':'VARCHAR','subject_mention_id':'VA
     'date':'JSON','amount':'JSON','document_no':'JSON','evidence':'JSON','file_id':'VARCHAR','root_file_id':'VARCHAR',
     'scope_id':'VARCHAR','sheet':'VARCHAR','row':'BIGINT'}
 RESULT_COLUMNS={'record_id':'VARCHAR','file_id':'VARCHAR','root_file_id':'VARCHAR','scope_id':'VARCHAR','sheet':'VARCHAR',
-    'row':'BIGINT','status':'VARCHAR','method':'VARCHAR','reason':'JSON'}
+    'row':'BIGINT','status':'VARCHAR','method':'VARCHAR','reason':'JSON','model_provenance':'JSON',
+    'strategy_signature':'VARCHAR','representative_record_id':'VARCHAR','content_key':'VARCHAR'}
 for columns in [MENTION_COLUMNS,FACT_COLUMNS,RESULT_COLUMNS]:
     columns.update(source_quality='VARCHAR',source_kind='VARCHAR',ocr_min_confidence='DOUBLE')
 

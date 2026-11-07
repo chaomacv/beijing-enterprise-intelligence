@@ -29,7 +29,8 @@ class ExactDedupTests(unittest.TestCase):
             value['events']=[{'subject_index':0,'event_type':'innovation','status':'proposed','date':{'field':'日期','value':row['cells']['日期']},
                 'amount':None,'document_no':None,'evidence':[{'field':'__filename__','value':self.card['filename']}]}]
         dump(self.work/'06_validation'/fid/'llm_results'/(task['record_id']+'.json'),
-            {'signature':'synthetic','task':task,'result':value,'errors':[],'method':'local_llm_record'})
+            {'signature':'synthetic','task':task,'result':value,'errors':[],'method':'local_llm_record',
+             'model_provenance':{'model_cache_key':'synthetic','entity_kinds':[] if review else ['business']}})
         return task
 
     def test_index_infers_one_content_and_preserves_all_three_source_records(self):
@@ -71,6 +72,24 @@ class ExactDedupTests(unittest.TestCase):
         lines[-1]=json.dumps(last,ensure_ascii=False);path.write_bytes(('\n'.join(lines)+'\n').encode('utf-8'))
         _,third,summary=prepare_view(self.profiles,self.work)
         self.assertNotEqual(first[0]['fingerprint'],third[0]['fingerprint']);self.assertEqual(summary['unique_model_records'],2)
+
+    def test_alias_methods_and_model_provenance_survive_disk_aggregation(self):
+        from bank_data.bulk_aggregate import aggregate
+        import duckdb
+        view,manifests,_=prepare_view(self.profiles,self.work);self.checkpoint(view)
+        expand_file((str(self.work),manifests[0],{self.card['scope_id']:self.card},'synthetic'))
+        dump(self.work/'06_validation/llm_summary.json',{'signature':'synthetic'})
+        finalize_validation(self.profiles,self.work);aggregate(self.work,self.profiles)
+        with duckdb.connect(str(self.work/'07_entities/results.duckdb'),read_only=True) as db:
+            self.assertEqual(dict(db.execute('SELECT method,count(*) FROM record_ledger GROUP BY 1').fetchall()),{'local_llm_record':1,'local_llm_exact_content_reuse':2})
+            self.assertEqual(db.execute('SELECT count(*) FROM record_ledger WHERE representative_record_id IS NOT NULL').fetchone()[0],2)
+            self.assertEqual(db.execute("SELECT count(*) FROM record_ledger WHERE json_extract_string(model_provenance,'$.model_cache_key')='synthetic'").fetchone()[0],3)
+            self.assertEqual(db.execute("SELECT count(*) FROM entity_mentions WHERE kind='business'").fetchone()[0],3)
+
+    def test_finalization_rejects_a_checkpoint_from_another_strategy(self):
+        view,_,_=prepare_view(self.profiles,self.work);self.checkpoint(view)
+        dump(self.work/'06_validation/llm_summary.json',{'signature':'different-strategy'})
+        with self.assertRaisesRegex(ValueError,'another extraction strategy'):finalize_validation(self.profiles,self.work)
 
 
 if __name__=='__main__':unittest.main()
