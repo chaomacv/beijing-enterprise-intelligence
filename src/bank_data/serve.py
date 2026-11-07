@@ -82,13 +82,18 @@ class TransformersBackend:
             eos = self.model.generation_config.eos_token_id
             eos = eos if isinstance(eos, list) else [eos]
             stopped = len(generated) < maximum or (len(generated) and int(generated[-1]) in eos)
+            repaired=False;raw_content=content
             if stopped:
-                Draft202012Validator(schema).validate(json.loads(content))
+                from .common import decode_model_json
+                value,repaired=decode_model_json(content)
+                Draft202012Validator(schema).validate(value)
+                content=json.dumps(value,ensure_ascii=False)
             response = {'object': 'chat.completion', 'model': self.model_id,
                         'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': content},
                                      'finish_reason': 'stop' if stopped else 'length'}],
                         'usage': {'prompt_tokens': prompt_tokens, 'completion_tokens': len(generated),
                                   'total_tokens': prompt_tokens + len(generated)}}
+            if repaired:response.update(json_string_controls_escaped=True,raw_generation=raw_content)
             print(json.dumps({'event': 'inference', 'model': self.model_id, **response['usage'],
                               'seconds': round(time.monotonic()-started, 3)}), flush=True)
             return response

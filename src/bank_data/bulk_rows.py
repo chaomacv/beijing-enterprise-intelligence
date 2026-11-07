@@ -118,7 +118,7 @@ def materialize_file(args):
             excluded=decision.exists() and json.loads(decision.read_text(encoding='utf-8'))['decision']['decision']=='DROP'
             plans[scope]={'mode':'exclude' if excluded else 'review',
                 'reason':'screen_excluded' if excluded else 'missing_field_plan','entities':[],'events':[]}
-    key=stable_id('materializer-v1',fid,plans,signatures)
+    key=stable_id('materializer-v2',file_hash(__file__),fid,plans,signatures)
     prior=outdir/'mapping_summary.json'
     if prior.exists():
         value=json.loads(prior.read_text(encoding='utf-8'))

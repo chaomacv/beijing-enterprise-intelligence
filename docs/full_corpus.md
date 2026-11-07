@@ -29,7 +29,7 @@ python -m bank_data.bulk_run \
 | 目录 | 处理 | 可检查的中间结果 |
 | --- | --- | --- |
 | 01_inputs | 固定输入，展开容器，保留转换来源 | input_ledger.json、archive_members.json、expanded/、ocr_cache/、xml_tables/、geodatabase_tables/ |
-| 02_profiles | 流式盘点与抽样 | original_profiles.json、all_profiles.json、all_profiles_native.json、file_cards.jsonl、summary.json |
+| 02_profiles | 流式盘点与抽样 | original_profiles.json、all_profiles.json、all_profiles_native.json、file_cards.jsonl / file_cards_native.jsonl、summary.json |
 | 03_screen | 本地模型筛选每个逻辑表 | scopes/ 中的逐表判断及模型原回复、files.json、prompt.md、methods/、summary.json |
 | 04_plans | 模型选择主体、事实字段、条件和阶段 | scopes/ 中的映射、输入卡片哈希、校验错误与模型回复；config.json、prompt.md、summary.json |
 | 05_records | 按完整记录读取保留内容 | 每个 file_id 的 rows.jsonl、contexts.json、chunks.jsonl，保留 sheet / row / record_id |

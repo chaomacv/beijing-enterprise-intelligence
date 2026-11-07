@@ -203,6 +203,9 @@ def enrich(profiles,root,workers=6):
                 dump(root/'02_profiles/native_progress.json',value);print(json.dumps(value),flush=True)
     output=sorted({p['file_id']:p for p in output}.values(),key=lambda p:p['relative_path'])
     dump(root/'02_profiles/all_profiles_native.json',output)
+    with (root/'02_profiles/file_cards_native.jsonl').open('w',encoding='utf-8') as stream:
+        for profile in output:
+            for card in profile['cards']:stream.write(json.dumps(card,ensure_ascii=False)+'\n')
     summary={'complete':True,'logical_files':len(output),'scopes':sum(len(p['cards']) for p in output),
         'statuses':dict(Counter(p['status'] for p in output)),'records':sum(p['records'] for p in output),'seconds':round(time.monotonic()-start,2)}
     dump(root/'02_profiles/native_summary.json',summary);print(json.dumps(summary),flush=True);return output

@@ -10,7 +10,7 @@ import time
 
 from .bulk_client import BatchClient
 from .bulk_rows import derived,write_line
-from .common import dump,ontology,resource,stable_id
+from .common import dump,ontology,resource,stable_id,file_hash
 from .extract import review_result,source_bound_schema,validate_results
 
 
@@ -79,7 +79,7 @@ def infer(client,records,card,depth=0,feedback=None):
 def resolve_pending(profiles,root,endpoints,model,tokenizer_dir):
     root=Path(root);directory=root/'06_validation';mapping=json.loads((directory/'mapping_files.json').read_text(encoding='utf-8'))
     scope_cards={c['scope_id']:c for p in profiles for c in p['cards']}
-    signature=stable_id('corpus-record-llm-v1',model,resource('extract.md'),ontology(),2048,0)
+    signature=stable_id('corpus-record-llm-v2',file_hash(__file__),model,resource('extract.md'),ontology(),2048,0)
     tasks=queue.Queue(maxsize=256);lock=threading.Lock();completed=0;total=sum(v.get('pending_llm',0) for v in mapping);start=time.monotonic()
     error_flag=threading.Event()
     def enqueue(value):

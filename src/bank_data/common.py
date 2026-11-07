@@ -36,3 +36,13 @@ def dump(path, value):
 
 def text(value):
     return value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+
+
+def decode_model_json(content):
+    """Keep literal string control characters, then serialize them with JSON escapes.
+
+    Multiline column enums can cause a constrained decoder to emit raw newlines.
+    strict=False permits string controls only; schema validation remains mandatory.
+    """
+    try:return json.loads(content),False
+    except json.JSONDecodeError:return json.loads(content,strict=False),True

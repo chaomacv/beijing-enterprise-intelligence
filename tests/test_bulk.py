@@ -43,6 +43,15 @@ class BulkTests(unittest.TestCase):
         self.assertEqual(name,'目录/企业名单.csv')
         self.assertEqual(base64.b64decode(metadata['pathname_bytes_base64']),original)
 
+    def test_multiline_model_json_keeps_column_values_and_rejects_broken_syntax(self):
+        from bank_data.common import decode_model_json
+        raw='{"field":"多行'+chr(10)+'表头","value":"制表'+chr(9)+'原值"}'
+        data,repaired=decode_model_json(raw)
+        self.assertTrue(repaired)
+        self.assertEqual(data['field'],'多行\n表头')
+        self.assertEqual(json.loads(json.dumps(data,ensure_ascii=False)),data)
+        with self.assertRaises(json.JSONDecodeError):decode_model_json('{"field":}')
+
     def test_document_table_and_paragraphs_keep_source_structure(self):
         path=self.raw/'synthetic.docx'
         xml='''<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>

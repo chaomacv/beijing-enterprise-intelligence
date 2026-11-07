@@ -8,6 +8,7 @@ from http.server import ThreadingHTTPServer
 from pathlib import Path
 
 from .serve import RequestError, TransformersBackend, handler_for
+from .common import decode_model_json
 
 
 class BatchBackend(TransformersBackend):
@@ -50,12 +51,22 @@ class BatchBackend(TransformersBackend):
                 content=self.tokenizer.decode(tokens,skip_special_tokens=True)
                 finish='stop' if tokens and tokens[-1] in eos else 'length'
                 try:
-                    if finish=='stop':Draft202012Validator(schemas[index]).validate(json.loads(content))
+                    repaired=False;raw_content=content
+                    if finish=='stop':
+                        value,repaired=decode_model_json(content)
+                        Draft202012Validator(schemas[index]).validate(value)
+                        content=json.dumps(value,ensure_ascii=False)
                     prompt=int(inputs['attention_mask'][index].sum())
                     items.append({'ok':True,'response':{'model':self.model_id,
                         'choices':[{'message':{'role':'assistant','content':content},'finish_reason':finish}],
-                        'usage':{'prompt_tokens':prompt,'completion_tokens':len(tokens),'total_tokens':prompt+len(tokens)}}})
-                except Exception as error:items.append({'ok':False,'error':type(error).__name__})
+                        'usage':{'prompt_tokens':prompt,'completion_tokens':len(tokens),'total_tokens':prompt+len(tokens)}},
+                        'json_string_controls_escaped':repaired,
+                        **({'raw_generation':raw_content} if repaired else {})})
+                except Exception as error:
+                    # Returned only over loopback and retained in the private stage output.
+                    # Do not log the failed generation or source payload.
+                    items.append({'ok':False,'error':type(error).__name__,'invalid_content':content,
+                        'validation_position':getattr(error,'pos',None)})
             print(json.dumps({'event':'batch_inference','items':len(items),'seconds':round(time.monotonic()-start,3),
                               'completion_tokens':sum(x.get('response',{}).get('usage',{}).get('completion_tokens',0) for x in items)}),flush=True)
             return {'items':items}
