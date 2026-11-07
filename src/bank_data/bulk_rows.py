@@ -48,6 +48,7 @@ def apply_plan(row,card,plan):
         if mapping['kind']=='person':return review_result(rid),'personal_subject_not_enterprise_fact',[]
         if mapping['name_field'].strip() in {'项目名称','工程名称','单体工程','单体工程名称'}:
             return review_result(rid),'project_field_cannot_directly_identify_organization',[]
+        if mapping['name_field'].strip()=='案件名称':return review_result(rid),'case_title_cannot_directly_identify_organization',[]
         if not recognizable_organization(name['value']):return review_result(rid),'subject_name_not_recognizable_requires_review',[]
         code=reference(mapping['code_field'],row)
         if mapping['kind']=='unknown' and not (code and valid_code(code['value'])) and not any(k in name['value'] for k in ORG_MARKERS):

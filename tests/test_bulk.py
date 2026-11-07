@@ -165,6 +165,13 @@ class BulkTests(unittest.TestCase):
         self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[])
         self.assertEqual(reason,'project_field_cannot_directly_identify_organization')
 
+    def test_case_title_containing_a_company_is_not_itself_an_organization_name(self):
+        plan=mapping();plan['entities'][0]['name_field']='案件名称'
+        result,reason,_=apply_plan({'record_id':'synthetic-case','cells':{'案件名称':'合成甲公司未按规定办理手续案'}},
+            {'filename':'合成行政处罚.csv','columns':['案件名称']},plan)
+        self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[]);self.assertEqual(result['events'],[])
+        self.assertEqual(reason,'case_title_cannot_directly_identify_organization')
+
     def test_effective_plan_omits_unused_mappings_without_changing_raw_reply(self):
         card={'filename':'合成统计.csv','columns':['企业名称','地址','事件内容','日期']}
         raw=mapping();raw['mode']='exclude'
