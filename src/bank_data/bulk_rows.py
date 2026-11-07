@@ -166,7 +166,7 @@ def materialize_file(args):
         if sum(seen.values())!=profile['records']:raise ValueError('Record count differs from profile')
         if chunk:write_line(streams['chunks'],{'chunk':raw_count//1000+1,'records':len(chunk),'first_record_id':chunk[0],'last_record_id':chunk[-1]})
         for stream in streams.values():stream.close()
-        for key,path in outputs.items():path.with_name(path.name+'.part').replace(path)
+        for output_path in outputs.values():output_path.with_name(output_path.name+'.part').replace(output_path)
         dump(rawdir/'contexts.json',contexts)
         value={'file_id':fid,'key':key,'status':'MAPPED','expected_records':profile['records'],'raw_records':raw_count,
             'mapped_records':sum(statuses.values()),'record_statuses':dict(statuses),'pending_llm':pending,
