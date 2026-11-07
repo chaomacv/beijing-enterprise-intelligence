@@ -7,7 +7,7 @@ import urllib.parse
 import urllib.request
 
 from .common import ontology, resource, stable_id
-from .extract import EXTRACTION_SCHEMA, SCREEN_SCHEMA, validate_results, validate_screen
+from .extract import EXTRACTION_SCHEMA, SCREEN_SCHEMA, source_bound_schema, validate_results, validate_screen
 
 
 class ModelFailure(RuntimeError): pass
@@ -117,7 +117,8 @@ class LocalQwen:
         return validate_screen(data, card)
 
     def extract(self, records, card):
+        if not records:return []
         context = {k: card[k] for k in ('filename', 'sheet', 'columns', 'source')}
         payload = {'context': context, 'event_types': ontology()['events'], 'records': records}
-        data = self.call('extract', payload, EXTRACTION_SCHEMA)
+        data = self.call('extract', payload, source_bound_schema(records))
         return validate_results(data, records, card)

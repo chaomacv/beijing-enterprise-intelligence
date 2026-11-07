@@ -28,6 +28,24 @@ SCREEN_SCHEMA = obj({'decision': {'type': 'string', 'enum': ['KEEP', 'REVIEW', '
                      'reason': {'type': 'string'}, 'evidence_fields': {'type': 'array', 'items': {'type': 'string'}}})
 
 
+def source_bound_schema(records):
+    # JSON cloning intentionally removes shared REF aliases before field-specific binding.
+    schema = json.loads(json.dumps(EXTRACTION_SCHEMA))
+    fields = sorted({key for row in records for key in row['cells']})
+    results = schema['properties']['results']
+    results.update(minItems=len(records),maxItems=len(records))
+    results['items']['properties']['record_id']['enum'] = [r['record_id'] for r in records]
+    def bind(node, filename=False):
+        if isinstance(node,dict):
+            if set(node.get('properties',{})) == {'field','value'}:
+                node['properties']['field']['enum'] = fields + (['__filename__'] if filename else []) or ['__no_source_field__']
+            for key,value in node.items():bind(value,filename or key=='evidence')
+        elif isinstance(node,list):
+            for value in node:bind(value,filename)
+    bind(schema)
+    return schema
+
+
 def validate_ref(ref, row, filename=None):
     if not isinstance(ref, dict) or set(ref) != {'field', 'value'}:
         raise ValueError('Invalid source reference')

@@ -1,10 +1,10 @@
 {
-  "version": "1",
+  "version": "2",
   "events": {
     "administrative_penalty": {"keywords": ["行政处罚", "处罚决定", "罚款"], "tag": "存在行政处罚记录"},
     "business_abnormal": {"keywords": ["经营异常"], "tag": "存在经营异常记录"},
-    "qualification": {"keywords": ["资质", "许可证", "行政许可"], "tag": "存在许可或资质记录"},
-    "innovation": {"keywords": ["高新技术", "专精特新", "创新型中小企业", "小巨人"], "tag": "存在科技认定记录"},
+    "qualification": {"keywords": ["资质", "许可证", "行政许可"], "tag": "存在许可或资质记录", "definition": "行业准入或行政许可资质，如水利检测资格、经营许可证。高新技术、专精特新、创新型中小企业及小巨人认定统一归 innovation，不归 qualification。"},
+    "innovation": {"keywords": ["高新技术", "专精特新", "创新型中小企业", "小巨人"], "tag": "存在科技认定记录", "definition": "高新技术企业、专精特新、创新型中小企业、小巨人等科技创新认定；拟认定也属于本类，阶段为 proposed。培训不等于取得认定。"},
     "subsidy": {"keywords": ["补助", "补贴", "贴息", "拟支持"], "tag": "存在政策支持记录"},
     "procurement": {"keywords": ["中标", "采购合同", "政府采购"], "tag": "存在政府采购或中标记录"},
     "tax_credit": {"keywords": ["纳税信用", "欠税", "税收违法", "税务信用"], "tag": "存在税务或纳税信用记录"},

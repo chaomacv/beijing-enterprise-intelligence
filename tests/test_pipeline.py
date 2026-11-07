@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from bank_data.cli import demo_input
-from bank_data.extract import RuleBaseline, validate_results
+from bank_data.extract import RuleBaseline, source_bound_schema, validate_results
 from bank_data.llm import validate_endpoint
 from bank_data.pipeline import extract_batch, run
 from bank_data.prepare import prepare
@@ -106,6 +106,16 @@ class PipelineTests(unittest.TestCase):
         good = {'record_id': 'r1', 'status': 'NO_EVENT', 'entities': [], 'events': []}
         with self.assertRaises(ValueError): validate_results({'results': [good, good]}, [row])
         with self.assertRaises(ValueError): validate_results({'results': [{**good, 'status':'EXTRACTED'}]}, [row])
+
+    def test_generation_schema_rejects_foreign_ids_fields_and_wrong_record_count(self):
+        from jsonschema import validate, ValidationError
+        rows=[{'record_id':'r1','cells':{'企业名称':'合成甲公司'}}]
+        schema=source_bound_schema(rows)
+        good={'record_id':'r1','status':'NO_EVENT','entities':[],'events':[]}
+        validate({'results':[good]},schema)
+        for value in [{'results':[]},{'results':[{**good,'record_id':'foreign'}]},
+                      {'results':[{**good,'entities':[{'role':'subject','name':{'field':'__filename__','value':'伪造'},'credit_code':None,'address':None}]}]}]:
+            with self.assertRaises(ValidationError):validate(value,schema)
 
     def test_changed_provenance_invalidates_preparation_and_bad_checksum_quarantines_old_rows(self):
         demo_input(self.input)
