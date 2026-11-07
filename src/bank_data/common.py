@@ -1,5 +1,6 @@
 import hashlib
 import json
+from functools import lru_cache
 from importlib.resources import files
 from pathlib import Path
 
@@ -8,6 +9,7 @@ def resource(name):
     return files('bank_data').joinpath('resources', name).read_text(encoding='utf-8')
 
 
+@lru_cache(maxsize=1)
 def ontology():
     return json.loads(resource('ontology.json'))
 
