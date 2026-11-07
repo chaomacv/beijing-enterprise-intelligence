@@ -55,5 +55,21 @@ class SourceViewTests(unittest.TestCase):
         value={'records':{'r0':{'status':'NO_EVENT','entities':[{'role':'subject','kind':'business','name':{'field':'正文','value':'合成甲公司'}}]},'r1':{'status':'NO_EVENT'}}}
         with self.assertRaisesRegex(ValueError,'model view'):unpack(value,rows,{'filename':'合成公告'})
 
+    def test_schema_projects_original_html_once_even_when_its_text_contains_encoded_markup(self):
+        from bank_data.bulk_references import ReferenceClient
+        from pathlib import Path
+        import tempfile
+        from unittest.mock import patch
+        row={'record_id':'encoded','cells':{'正文':'<p>&lt;p&gt;合成甲公司&lt;/p&gt;&lt;p&gt;已处罚&lt;/p&gt;</p>'},'context':{}}
+        class Transport:
+            def __init__(self,*args,**kwargs):self.cache=Path(args[3])
+            def request(self,system,payload,contract,maximum):return {'payload':payload,'contract':contract}
+        with tempfile.TemporaryDirectory() as temporary,patch('bank_data.bulk_references.BatchClient',Transport):
+            client=ReferenceClient(None,None,None,Path(temporary)/'model_cache')
+            request=client.request('unused',{'context':{'filename':'合成公告'},'records':[row]},{},2048)
+            fields=request['contract']['properties']['records']['properties']['r0']['properties']['entities']['items']['properties']['name']['properties']['field']['enum']
+            self.assertEqual(fields,[PREFIX+'正文'])
+            self.assertEqual(set(request['payload']['records'][0]['cells']),set(fields))
+
 
 if __name__=='__main__':unittest.main()

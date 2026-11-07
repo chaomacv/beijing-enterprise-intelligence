@@ -103,7 +103,7 @@ class ReferenceClient:
         p={**payload,'records':[{**row,'record_key':'r'+str(i)} for i,row in enumerate(model_records)]}
         prompt=PROMPT
         if views:prompt+='\n__html_text__::字段是本行原HTML的结构文本视图，保留文字、注释、脚本数据及非展示属性，原HTML留在本地。引用视图中的明确原文子串，不把标签、样式、网址或项目标题当企业。若是招标/采购公告，资格要求和法律条款不代表具体主体已经取得资质、受到处罚或已经中标；采购人、代理机构与潜在供应商分开，没有实际供应商名称不得猜测。日期、地址和代码必须属于该主体或事件，不把开标地点当采购人的注册地址。'
-        request=self.transport.request(prompt,p,schema(model_records),maximum);self.bindings[stable_id(request)]=(records,payload['context'],views)
+        request=self.transport.request(prompt,p,schema(records),maximum);self.bindings[stable_id(request)]=(records,payload['context'],views)
         dump(self.audit_root/'model_requests'/(stable_id('batch-greedy-v1',request)+'.json'),request)
         return request
     def call(self,requests):
