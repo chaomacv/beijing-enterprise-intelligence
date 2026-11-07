@@ -63,7 +63,7 @@
       </div>
     </section>
 
-    <div class="principle-strip shell"><span><b>01</b> 先理解文件</span><span><b>02</b> 逐条保留证据</span><span><b>03</b> 谨慎归并企业</span><a href="#release">当前版本 v0.1 <span aria-hidden="true">↗</span></a></div>
+    <div class="principle-strip shell"><span><b>01</b> 先理解文件</span><span><b>02</b> 逐条保留证据</span><span><b>03</b> 谨慎归并企业</span><a href="#release">当前版本 v0.2 <span aria-hidden="true">↗</span></a></div>
 
     <section class="section shell" id="approach" aria-labelledby="approach-title">
       <div class="section-intro"><div><p class="eyebrow">THE ENGINEERING QUESTION</p><h2 id="approach-title">每一种方法，<br>都对应一个具体困难。</h2></div><p>数千份表格，字段各异，信息分散。项目关注如何组合已有工具，以及如何验证这些选择是否有效。</p></div>
@@ -108,12 +108,18 @@
     <section class="section shell architecture" id="pipeline" aria-labelledby="pipeline-title">
       <div class="section-intro"><div><p class="eyebrow">A SMALL, COMPLETE WORKFLOW</p><h2 id="pipeline-title">理解交给模型，<br>读取与核对交给程序。</h2></div><p>一个 Python 工程，串起准备、抽取、归并和导出。原始数据、模型权重与处理结果留在私有环境。</p></div>
       <div class="pipeline-track"><div><span>01</span><strong>文件与工作表</strong><small>格式识别 · 来源与哈希</small></div><i aria-hidden="true">→</i><div><span>02</span><strong>本地 Qwen</strong><small>文件筛选 · 角色与事件理解</small></div><i aria-hidden="true">→</i><div><span>03</span><strong>程序核验</strong><small>Schema · 证据 · 记录覆盖</small></div><i aria-hidden="true">→</i><div><span>04</span><strong>企业与标签</strong><small>身份归属 · 事件 · 来源索引</small></div></div>
-      <div class="architecture-bottom"><div><span class="bracket">[ LOCAL ]</span><p>Qwen3-8B 是当前方案的起点。真实模型质量与运行兼容性待验证，参数和提示词随评测固定版本。</p></div><div><span class="bracket">[ TRACEABLE ]</span><p>SQLite 保存记录与处理状态，JSON 导出事实和来源。失败、排除和待复核记录分别留存。</p></div><div><span class="bracket">[ INCREMENTAL ]</span><p>文件内容或配置变化后重新处理相应任务。扩展依据实测误差与瓶颈，逐步增加向量和复杂文件支持。</p></div></div>
+      <div class="architecture-bottom"><div><span class="bracket">[ LOCAL ]</span><p>Qwen3-8B 已在私有 RTX 4090 上完成实际推理。Schema 约束格式，程序核对证据；语义效果仍需独立标注评估。</p></div><div><span class="bracket">[ TRACEABLE ]</span><p>SQLite 保存记录与处理状态，JSON 导出事实和来源。失败、排除和待复核记录分别留存。</p></div><div><span class="bracket">[ INCREMENTAL ]</span><p>文件内容或配置变化后重新处理相应任务。扩展依据实测误差与瓶颈，逐步增加向量和复杂文件支持。</p></div></div>
+    </section>
+
+    <section class="section shell validation-section" id="validation" aria-labelledby="validation-title">
+      <div class="section-intro"><div><p class="eyebrow">MEASURED / 2026.11.07</p><h2 id="validation-title">先把实际处理范围，<br>摆到桌面上。</h2></div><p>以下数字来自私有环境的文件扫描，只公开汇总。业务原文与处理结果留在服务器，网页交互仍使用可复现的合成示例。</p></div>
+      <div class="validation-grid"><article><span>已接收并校验</span><strong>5,200</strong><p>原始附件 · SHA-256 核对</p></article><article><span>成功生成文件卡片</span><strong>5,050</strong><p>另有 147 份待复核，3 份为空</p></article><article><span>读取并计数</span><strong>4,348<span>万</span></strong><p>逻辑记录 · 不是企业或事件去重数</p></article><article><span>本地模型已运行</span><strong>Qwen3<span>-8B</span></strong><p>RTX 4090 · BF16 · CUDA 11.8</p></article></div>
+      <div class="validation-note"><span class="bracket">[ SCOPE ]</span><p>完整目录已扫描；模型端到端验证限于合成回归与真实小样本。全量文件的 LLM 筛选、抽取及独立准确率评测尚未完成。文件卡片保留首、中、尾和随机样本，不能保证罕见事件召回。</p><a href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/main/docs/validation.md" target="_blank" rel="noopener">查看验证范围 ↗</a></div>
     </section>
 
     <section class="section release-section" id="release" aria-labelledby="release-title"><div class="shell">
-      <div class="section-intro"><div><p class="eyebrow">WHERE THE PROJECT STANDS</p><h2 id="release-title">把已完成与待验证，写清楚。</h2></div><p>项目正在从可运行骨架走向真实数据验证。页面不报告未经评测的准确率或全量处理成果。</p></div>
-      <div class="release-grid"><div class="release-column"><span class="status-label"><i class="dot sage"></i> 已有实现</span><h3>可运行的 v0.1</h3><ul><li>CSV / Excel / JSON / RDF 读取与文件卡片</li><li>规则基线与本地模型调用路径</li><li>证据核对、记录覆盖、保守身份关联</li><li>事实、画像、来源及复核队列导出</li></ul></div><div class="release-column"><span class="status-label"><i class="dot sand"></i> 下一步验证</span><h3>真实数据与模型效果</h3><ul><li>全量文件盘点与异常格式处理</li><li>本地 Qwen 部署和小批次兼容性验证</li><li>文件筛选与字段抽取的人工标注评估</li><li>漏提、错配、吞吐与复核负担分析</li></ul></div><div class="release-column"><span class="status-label"><i class="dot blue"></i> 后续扩展</span><h3>用实验选择增量</h3><ul><li>向量召回对候选匹配的实际增益</li><li>长记录分段、复杂子表与 OCR</li><li>跨事件阶段关联与增量更新</li><li>真实结果的交互查询与复核</li></ul></div></div>
+      <div class="section-intro"><div><p class="eyebrow">WHERE THE PROJECT STANDS</p><h2 id="release-title">把已完成与待验证，写清楚。</h2></div><p>全量文件盘点已完成，本地模型已跑通小样本闭环。分别记录输入范围、待复核项和尚未完成的全量抽取。</p></div>
+      <div class="release-grid"><div class="release-column"><span class="status-label"><i class="dot sage"></i> 已有实现</span><h3>可验证的 v0.2</h3><ul><li>5,200 个附件全量盘点与工作表文件卡片</li><li>本地 Qwen3-8B 服务与 JSON Schema 输出约束</li><li>证据核对、记录覆盖、保守身份关联</li><li>事实、画像、来源及复核队列导出</li></ul></div><div class="release-column"><span class="status-label"><i class="dot sand"></i> 下一步验证</span><h3>真实数据与模型效果</h3><ul><li>独立标注的文件筛选与字段抽取评测</li><li>排除文件抽查与罕见事件漏采分析</li><li>超大表的聚合内存与吞吐测量</li><li>人工复核反馈与跨来源错配分析</li></ul></div><div class="release-column"><span class="status-label"><i class="dot blue"></i> 后续扩展</span><h3>用实验选择增量</h3><ul><li>向量召回对候选匹配的实际增益</li><li>长记录分段、复杂子表与 OCR</li><li>跨事件阶段关联与增量更新</li><li>真实结果的交互查询与复核</li></ul></div></div>
       <a class="release-source" href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/main/docs/validation.md" target="_blank" rel="noopener">查看仓库验证记录 <span aria-hidden="true">↗</span></a>
     </div></section>
 

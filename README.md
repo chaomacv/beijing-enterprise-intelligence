@@ -15,13 +15,13 @@
 
 1. 接收独立下载器的工作目录，或服务器上的原始文件目录；按内容哈希盘点并保存处理状态。
 2. 识别 CSV、Excel、JSON/JSONL、RDF/XML。识别“扩展名是 CSV、实际是 Excel”的文件，读取全部工作表。
-3. 为每个工作表生成首/中/尾加固定种子随机样本的文件卡片。原始记录保存在 SQLite，采样只用于文件筛选。
+3. 流式扫描全目录，生成首/中/尾与固定种子随机样本的文件卡片；筛选前不建立原始记录事实库。
 4. 生成按完整记录划分的准备块；使用本地模型时，再以实际 tokenizer 和聊天模板检查输入/输出预算。
-5. 用本地模型筛选文件、逐块抽取主体和事件，验证原文引用、主体索引与逐条 ID 覆盖。截断或验证失败时递归缩小批次，单条仍失败则进入复核。
+5. 用本地模型筛选文件；保留文件的完整记录进入 SQLite，再逐块抽取主体和事件。验证原文引用、主体索引与逐条 ID 覆盖；截断或验证失败时递归缩小批次，单条仍失败则进入复核。
 6. 使用信用代码校验、名称和地址做保守实体关联；名称相似只生成复核候选，不直接合并。
 7. 导出事实事件、标签、画像、匹配依据、复核队列和来源索引。保留 proposed/confirmed/removed/revoked/unknown 状态，不生成授信评分。
 
-这是 v0.1 可运行起点。已提供真实文件准备路径、规则基线和本地模型调用代码；**尚未部署模型或验证真实 LLM 抽取质量，也不宣称已完成全量数据处理或准确率评测**。
+当前版本 **v0.2**。已校验接收 5,200 个附件，完成全量文件卡片扫描；Qwen3-8B 已在私有 RTX 4090 上运行并完成小样本端到端验证。**全量 LLM 抽取和独立准确率评测尚未完成。** [实测范围与结果](docs/validation.md) · [GitHub 交付记录](https://github.com/chaomacv/beijing-enterprise-intelligence/pull/2)
 
 ## 安装
 
@@ -34,10 +34,27 @@ python3.10 -m venv .venv
 
 文件准备和规则 Demo 不需要 GPU、浏览器、平台登录或云 API。
 
+## v0.2 完整流程入口
+
+先生成文件卡片，再由本地模型筛选；只有保留文件的记录进入事实库。阶段结果与缓存支持重复运行。
+
+```bash
+python -m pip install -e '.[llm]'
+bank-data workflow --input /private/raw --work-dir /private/results --through scan --workers 4
+bank-data workflow --input /private/raw --work-dir /private/results \
+  --backend local --endpoint http://127.0.0.1:8000/v1 \
+  --model YOUR_LOCAL_MODEL_ID --tokenizer-dir /private/models/Qwen3-8B
+```
+
+[完整流程与状态说明](docs/workflow.md) · [本地模型服务与部署](docs/local_inference.md)
+
+[为什么这样选工具和方法](docs/method_decisions.md) 将真实失败、当前修正和后续实验的触发条件放在一起。
+
 ## 先运行离线闭环
 
 ```bash
 .venv/bin/bank-data demo --work-dir ../demo_process_work
+.venv/bin/python -m pip install -e '.[test]'
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
@@ -65,20 +82,26 @@ Demo 输入由代码生成并明确标注为合成示例，所有企业名称和
 
 ## 使用本地 Qwen
 
-先在服务器的独立推理环境中准备并验证 Qwen3-8B 服务，模型权重放在仓库外。GPU 驱动与推理框架版本必须实测兼容，不由本项目自动升级。服务只开放给本机/私有网络，推荐本机 `127.0.0.1:8000`。
+先按 [部署说明](docs/local_inference.md) 在独立推理环境安装 CUDA 版 PyTorch 和 `.[serve]`，模型权重放在仓库外。服务绑定本机 `127.0.0.1:8000`，不自动升级系统驱动。
 
 ```bash
-.venv/bin/python -m pip install -e '.[llm]'
-.venv/bin/bank-data run \
+python -m bank_data.serve --model-dir /private/models/Qwen3-8B \
+  --model-id qwen3-8b-checkpoint-v1 --device cuda:0 --port 8000
+```
+
+在另一个终端运行：
+
+```bash
+bank-data workflow \
   --input /opt/data/private/mc/Bank/data/raw/full-catalog \
   --work-dir /opt/data/private/mc/Bank/process_work \
   --backend local \
   --endpoint http://127.0.0.1:8000/v1 \
-  --model Qwen/Qwen3-8B \
+  --model qwen3-8b-checkpoint-v1 \
   --tokenizer-dir /path/to/local/Qwen3-8B
 ```
 
-tokenizer 只从本地读取，不下载远程代码。端点只允许 loopback/RFC1918 地址，禁用代理及重定向，没有云 API 回退。模型接口需要支持 `response_format=json_schema` 和 Qwen 的 `enable_thinking=false`；不同服务实现需先做小规模兼容性验证。
+tokenizer 和权重只从本地读取，不下载远程代码。客户端只允许 loopback/RFC1918 地址，禁用代理及重定向，没有云 API 回退。内置服务通过 JSON Schema 约束输出并关闭思考模式；格式约束不保证语义正确。
 
 明确选择规则对照：
 
@@ -90,15 +113,15 @@ tokenizer 只从本地读取，不下载远程代码。端点只允许 loopback/
 
 `record_results.json` 给每条已解析记录一个处理结果；`FILE_EXCLUDED`、`REVIEW` 和 `NO_EVENT` 含义不同。`run_summary.json` 的状态覆盖检查只说明台账完整，不代表语义召回率为 100%。
 
-`source_index.json` 将结果关联回原文件、工作表和逻辑记录序号；事件的 evidence 必须是指定单元格中的原文。文件、模型配置或提示词变化会影响缓存键；更换模型权重时应使用不同的服务模型名或新的工作目录，避免复用旧模型结果。
+`source_index.json` 将结果关联回原文件、工作表和逻辑记录序号。事件证据必须来自指定单元格，或受校验的 `__filename__` 原始标题；事件通过主体下标关联本行已校验的名称引用。文件、模型配置、本体和提示词变化会影响缓存键；更换权重时使用新的服务模型名。来源清单变化会重新准备文件，校验失败则隔离旧记录。
 
 `entities.json`、`entity_mentions.json`、`match_decisions.json` 保留实体来源和匹配理由。不同且可信的信用代码不会自动合并；同名无地址的记录保留独立主体和候选。信用代码校验只证明形式/校验位正确，不等于权威工商身份核验。
 
 ## 当前边界
 
 - 文件抽样不能保证发现罕见事件；排除文件仍需独立抽查与标注评估。
-- 多行表头采用可检查的启发式。复杂子表、公式、脚注继承、图像、PDF/OCR、压缩包和超大普通 JSON 暂进入复核，不能宣称已支持所有文件。
-- SQLite 读取层可流式接入，但 v0.1 的提取结果聚合与实体匹配仍在内存中进行；先做小批次验证。亿级数据需要后续分区、SQL 聚合和独立评测。
+- 多行表头采用可检查的启发式。Excel 读取单元格缓存值，复杂子表、公式缓存和脚注语义需要抽查；PDF/OCR、压缩包及超大普通 JSON 显式进入复核，不能宣称已支持所有文件。
+- 文件扫描使用固定数量的行样本；提取结果聚合与实体匹配仍在内存中进行。亿级数据需要后续分区、SQL 聚合和独立评测。
 - 超长单条记录目前进入复核；跨段重叠与 fragment 级合并是下一阶段工作。
 - 没有可靠事件编号时保守保留不同源事件，不把语义相似直接当成重复。尚未实现跨事件阶段的自动关联。
 - 向量召回、概率匹配、关系图、人工复核界面、实体撤销合并等属于下一阶段，不作为本轮已交付能力。

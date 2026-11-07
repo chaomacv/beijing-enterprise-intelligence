@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from bank_data.cli import demo_input
-from bank_data.extract import RuleBaseline, validate_results
+from bank_data.extract import RuleBaseline, source_bound_schema, validate_results
 from bank_data.llm import validate_endpoint
 from bank_data.pipeline import extract_batch, run
 from bank_data.prepare import prepare
@@ -65,6 +65,31 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(rows[0][2]['统一社会信用代码'], '0000123')
         self.assertEqual(rows[0][3]['header_record'], 2)
 
+    def test_xlsx_oversized_dimensions_do_not_become_phantom_fields(self):
+        import openpyxl
+        book=openpyxl.Workbook();sheet=book.active
+        sheet.append(['企业名称','状态']);sheet.append(['合成甲公司','正常'])
+        sheet.cell(row=2,column=16384).number_format='0.00'
+        path=self.input/'styled.xlsx';book.save(path);book.close()
+        rows=list(read_records(path,'xlsx'))
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0][2],{'企业名称':'合成甲公司','状态':'正常'})
+        self.assertFalse(rows[0][3]['width_mismatch'])
+
+    def test_xlsx_underreported_dimensions_do_not_truncate_records(self):
+        import openpyxl,re,zipfile
+        book=openpyxl.Workbook();sheet=book.active
+        sheet.append(['企业名称','状态']);sheet.append(['合成甲公司','正常']);sheet.append(['合成乙公司','正常'])
+        original=self.root/'original.xlsx';path=self.input/'undersized.xlsx';book.save(original);book.close()
+        with zipfile.ZipFile(original) as source,zipfile.ZipFile(path,'w') as target:
+            for name in source.namelist():
+                value=source.read(name)
+                if name=='xl/worksheets/sheet1.xml':value=re.sub(rb'<dimension ref="[^"]+"',b'<dimension ref="A1:A1"',value)
+                target.writestr(name,value)
+        rows=list(read_records(path,'xlsx'))
+        self.assertEqual([row[1] for row in rows],[2,3])
+        self.assertEqual([row[2]['企业名称'] for row in rows],['合成甲公司','合成乙公司'])
+
     def test_failed_file_does_not_publish_partial_records(self):
         p = self.input / 'broken.csv'
         p.write_text('企业名称,状态\n示例甲有限公司,正常\n"unterminated,字段', encoding='utf-8')
@@ -80,6 +105,74 @@ class PipelineTests(unittest.TestCase):
         with self.assertRaises(ValueError): validate_results({'results': []}, [row])
         good = {'record_id': 'r1', 'status': 'NO_EVENT', 'entities': [], 'events': []}
         with self.assertRaises(ValueError): validate_results({'results': [good, good]}, [row])
+        with self.assertRaises(ValueError): validate_results({'results': [{**good, 'status':'EXTRACTED'}]}, [row])
+
+    def test_generation_schema_rejects_foreign_ids_fields_and_wrong_record_count(self):
+        from jsonschema import validate, ValidationError
+        rows=[{'record_id':'r1','cells':{'企业名称':'合成甲公司'}}]
+        schema=source_bound_schema(rows)
+        good={'record_id':'r1','status':'NO_EVENT','entities':[],'events':[]}
+        validate({'results':[good]},schema)
+        for value in [{'results':[]},{'results':[{**good,'record_id':'foreign'}]},
+                      {'results':[{**good,'entities':[{'role':'subject','name':{'field':'__filename__','value':'伪造'},'credit_code':None,'address':None}]}]}]:
+            with self.assertRaises(ValidationError):validate(value,schema)
+
+    def test_changed_provenance_invalidates_preparation_and_bad_checksum_quarantines_old_rows(self):
+        demo_input(self.input)
+        prepare(self.store,self.input)
+        sidecar=self.input/'provenance.json'
+        sidecar.write_text(json.dumps({'dataset_url':'https://example.test/revised'}),encoding='utf-8')
+        prepare(self.store,self.input)
+        cards=[json.loads(r['card']) for r in self.store.active_scopes()]
+        self.assertTrue(all(c['source']['dataset_url'].endswith('/revised') for c in cards))
+        sidecar.write_text(json.dumps({'sha256':'incorrect'}),encoding='utf-8')
+        report=prepare(self.store,self.input)
+        self.assertEqual(report['records'],0)
+        self.assertEqual(report['status_counts'],{'review':3})
+        self.assertEqual(list(self.store.active_scopes()),[])
+
+    def test_semantic_review_is_exported_to_review_queue(self):
+        demo_input(self.input)
+        prepare(self.store,self.input)
+        class Uncertain(RuleBaseline):
+            name='uncertain-test'
+            def extract(self,records,card):
+                return [{'record_id':r['record_id'],'status':'REVIEW','entities':[],'events':[]} for r in records]
+        report=run(self.store,Uncertain())
+        queue=json.loads((self.work/'review_queue.json').read_text(encoding='utf-8'))
+        self.assertEqual(report['review_records'],4)
+        self.assertEqual(len(queue),4)
+
+    def test_filename_evidence_is_source_bound_and_only_allowed_for_events(self):
+        row={'record_id':'r','cells':{'企业名称':'合成甲公司'}}
+        name={'field':'企业名称','value':'合成甲公司'}
+        entity={'role':'subject','name':name,'credit_code':None,'address':None}
+        event={'subject_index':0,'event_type':'innovation','status':'proposed','date':None,
+               'amount':None,'document_no':None,'evidence':[name,{'field':'__filename__','value':'拟认定名单'}]}
+        result={'record_id':'r','status':'EXTRACTED','entities':[entity],'events':[event]}
+        card={'filename':'合成_创新型企业拟认定名单.csv'}
+        validate_results({'results':[result]},[row],card)
+        with self.assertRaises(ValueError):validate_results({'results':[result]},[row],{'filename':'其他.csv'})
+        entity['name']={'field':'__filename__','value':'拟认定名单'}
+        with self.assertRaises(ValueError):validate_results({'results':[result]},[row],card)
+
+    def test_removed_and_revoked_facts_remain_visible_in_tag_labels(self):
+        (self.input/'经营异常.csv').write_text('企业名称,事件内容\n合成甲公司,移出经营异常名录\n合成乙公司,撤销经营异常决定\n',encoding='utf-8')
+        prepare(self.store,self.input)
+        run(self.store,RuleBaseline())
+        profiles=json.loads((self.work/'profiles.json').read_text(encoding='utf-8'))
+        labels=[tag['label'] for profile in profiles for tag in profile['tags']]
+        self.assertTrue(any(v.startswith('已移出：') for v in labels))
+        self.assertTrue(any(v.startswith('已撤销：') for v in labels))
+
+    def test_shared_document_number_does_not_collapse_distinct_payment_facts(self):
+        (self.input/'项目补贴.csv').write_text('企业名称,地址,事件内容,项目编号,日期,金额\n合成甲公司,测试路1号,已拨付,TEST-1,2026-01-01,100\n合成甲公司,测试路1号,已拨付,TEST-1,2026-02-01,200\n',encoding='utf-8')
+        prepare(self.store,self.input)
+        report=run(self.store,RuleBaseline())
+        self.assertEqual(report['entities'],1)
+        self.assertEqual(report['events'],2)
+        events=json.loads((self.work/'events.json').read_text(encoding='utf-8'))
+        self.assertEqual({e['amount']['value'] for e in events},{'100','200'})
 
     def test_truncated_batches_split_then_keep_review_for_single_failure(self):
         class Backend:

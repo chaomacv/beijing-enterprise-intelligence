@@ -4,7 +4,7 @@
 
 输入文件多而异构，第一步把“模型要理解的内容”压缩为文件卡片；保留文件仍逐条处理。大表的分块保留完整行与表头上下文；结果先存事实，再聚合成企业标签。所有判定需要回答“引用了什么来源”。
 
-`record_id = hash(file_id, sheet, logical_record_ordinal)`；`file_id = hash(relative_path, content_sha256)`。CSV 逻辑记录序号不等于物理文本行号。每个文件版本独立留存，重复运行不产生新版本。
+`record_id = hash(file_id, sheet, logical_record_ordinal)`；`file_id = hash(reader_version, relative_path, content_sha256)`。CSV 逻辑记录序号不等于物理文本行号。每个文件版本独立留存，重复运行不产生新版本。
 
 SQLite 保存已解析记录与文件状态。`active_files` 代表本轮输入快照，历史文件版本不会因为新文件替换而混入当前画像；历史记录仍可审查。
 
@@ -12,7 +12,11 @@ SQLite 保存已解析记录与文件状态。`active_files` 代表本轮输入�
 
 实体和事件字段不由模型自由抄写到不可验证的字符串。每项引用包含 `field` 和 `value`，且值必须存在于指定源单元格中。该机制防止无来源的字段进入结果，但无法证明模型选对了主体角色或完整提取了语义，因此仍需人工标注评测。
 
+事件的 `evidence` 也可引用 `__filename__`，值必须是当前文件原始标题的子串；`subject_index` 必须指向本行中名称引用已经校验的主体，不要求在 evidence 中再次重复名称。这让只有“序号/企业名称”的拟认定名单保留标题语义。主体、信用代码、地址、日期、金额仍只引用本行单元格，不能从标题补造。文件标题和行内容冲突时应复核。
+
 每个保留记录返回 EXTRACTED / NO_EVENT / REVIEW。模型缺失 ID、重复 ID、跨行引用、未知类别、错误主体下标、非正常结束都会触发缩块或复核。文件被筛除另用 FILE_EXCLUDED，不能视为企业没有事件。
+
+生成 Schema 按当前批次绑定可用 record_id、结果条数和字段名候选；标题引用只允许用于事件证据。程序仍检查 ID 唯一性、引用值是否出现在对应行和主体下标，不能将格式约束当作语义校验。行业行政许可归 qualification，高新技术、专精特新及创新型中小企业认定归 innovation；拟认定保留 proposed。
 
 行政机关、被处罚企业、供应商和采购人的角色不能混用。金额和日期保存原文，不把“拟支持”写成资金到账。当前不计算金额总和，也不将 source update date 当成 event date。
 
@@ -28,8 +32,8 @@ SQLite 保存已解析记录与文件状态。`active_files` 代表本轮输入�
 
 第一版案例使用 [Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B)。关闭思考模式用于批量结构化处理，接口与部署方式参考 [Qwen vLLM 文档](https://qwen.readthedocs.io/en/latest/deployment/vllm.html)。这属于工程选择，尚没有本项目上的模型质量比较结果。
 
-本仓库提供推理客户端，不包含模型权重或运行中的推理服务。离线 Demo 的 backend=rules 必须在输出中明确标识，不能用它推断 Qwen 的效果。
+本仓库提供推理客户端和 `python -m bank_data.serve` 服务入口；权重放在仓库之外。私有 RTX 4090 环境已经完成实际推理与小样本验证，范围见 [validation.md](validation.md)。离线 Demo 的 backend=rules 必须在输出中明确标识，不能用它推断 Qwen 的效果。
 
 ## 下一阶段
 
-先验证本地 Qwen 小样本端到端、建立排除文件和事件抽取标注集，再比较文件筛选、分块和实体匹配方法。之后根据具体误差引入 schema 复用、超长片段合并、向量召回和事件阶段关联。每一项扩展都要有实际失败案例与实验支持。
+下一步建立独立的排除文件和事件抽取标注集，比较文件筛选、分块和实体匹配方法。之后根据具体误差引入 schema 复用、超长片段合并、向量召回和事件阶段关联。合成回归用于发现实现与提示词退化，不能替代独立标注集。每一项扩展都应有实际失败案例与实验支持。

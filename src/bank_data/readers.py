@@ -9,6 +9,13 @@ from pathlib import Path
 from .common import ontology, text
 
 SUPPORTED = {'.csv', '.xlsx', '.xls', '.json', '.jsonl', '.ndjson', '.xml', '.rdf'}
+READER_VERSION = 'reader-v2'
+
+
+def reader_version(kind):
+    return 'reader-v3-xlsx-dimensions' if kind == 'xlsx' else READER_VERSION
+
+
 CONTROL_FILES = {'provenance.json', 'datasets.json', 'normalized-catalog.json', 'catalog-change.json'}
 SKIP_DIRS = {'catalog', 'runtime', 'cache', 'driver-cache', 'browser-profile', 'chrome-profile',
              'recovery', 'interrupted', 'temp', '.git', '.venv', '__pycache__'}
@@ -44,14 +51,30 @@ def detect(path):
     if prefix.startswith(b'PK\x03\x04'):
         import zipfile
         with zipfile.ZipFile(path) as z:
-            return 'xlsx' if 'xl/workbook.xml' in z.namelist() else 'unsupported_archive'
+            names = set(z.namelist())
+            if 'xl/workbook.xml' in names: return 'xlsx'
+            if 'word/document.xml' in names: return 'docx'
+            return 'unsupported_archive'
     if prefix.startswith(b'\xd0\xcf\x11\xe0'):
+        if path.suffix.lower() == '.doc': return 'legacy_word'
         return 'xls'
+    if prefix.startswith(b'%PDF-'): return 'pdf'
+    if not path.suffix:
+        with path.open('rb') as stream: probe = stream.read(8192).lstrip(b'\xef\xbb\xbf \r\n\t')
+        if probe.startswith((b'<?xml', b'<rdf:', b'<RDF')): return 'xml'
+        if probe.startswith((b'{', b'[')): return 'json'
+        try:
+            value = probe.decode('utf-8-sig')
+            csv.Sniffer().sniff(value, delimiters=',\t;|')
+            return 'csv'
+        except (UnicodeDecodeError, csv.Error): pass
     return path.suffix.lower().lstrip('.')
 
 
 def encoding_for(path):
-    for encoding in ('utf-8-sig', 'gb18030'):
+    with path.open('rb') as stream: bom = stream.read(2)
+    encodings = ('utf-16',) if bom in (b'\xff\xfe', b'\xfe\xff') else ('utf-8-sig', 'gb18030')
+    for encoding in encodings:
         decoder = codecs.getincrementaldecoder(encoding)()
         try:
             with path.open('rb') as f:
@@ -68,7 +91,7 @@ def cells_as_text(values):
     return ['' if v is None else str(v) for v in values]
 
 
-def table_records(rows, sheet):
+def table_records(rows, sheet, pad_missing=False):
     top = list(itertools.islice(rows, 20))
     if not top:
         return
@@ -93,6 +116,7 @@ def table_records(rows, sheet):
                'preamble': [cells_as_text(r) for r in top[:index]], 'header_uncertain': header_uncertain}
     for number, values in enumerate(itertools.chain(top[index + 1:], rows), index + 2):
         values = cells_as_text(values)
+        if pad_missing and len(values) < len(keys): values.extend([''] * (len(keys)-len(values)))
         if not any(v.strip() for v in values):
             continue
         if values == original_header:
@@ -118,7 +142,15 @@ def read_records(path, kind):
             book = openpyxl.load_workbook(f, read_only=True, data_only=True)
             try:
                 for sheet in book:
-                    yield from table_records(sheet.iter_rows(values_only=True), sheet.title)
+                    # Declared dimensions can span a million styled but empty rows/columns,
+                    # or incorrectly omit populated cells. Read actual XML coordinates.
+                    sheet.reset_dimensions()
+                    def trimmed_rows():
+                        for values in sheet.iter_rows(values_only=True):
+                            values = list(values)
+                            while values and values[-1] is None: values.pop()
+                            yield values
+                    yield from table_records(trimmed_rows(), sheet.title, pad_missing=True)
             finally:
                 book.close()
     elif kind == 'xls':
@@ -147,10 +179,11 @@ def read_records(path, kind):
             yield 'json', n, {k: text(v) for k, v in row.items()}, {}
     elif kind in ('rdf', 'xml'):
         from defusedxml.ElementTree import iterparse
-        ordinal = 0
+        ordinal, nonempty = 0, False
         for _, element in iterparse(str(path), events=('end',)):
             tag = element.tag.rsplit('}', 1)[-1]
-            if tag not in ('Description', 'record', 'row'):
+            if element.text and element.text.strip(): nonempty = True
+            if tag not in ('Description', 'record', 'row') and '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about' not in element.attrib:
                 continue
             cells = {}
             for child in element:
@@ -161,5 +194,7 @@ def read_records(path, kind):
                 ordinal += 1
                 yield 'xml', ordinal, cells, {'xml_tag': tag}
             element.clear()
+        if not ordinal and nonempty:
+            raise ValueError('Nonempty XML has an unrecognized record structure; review required')
     else:
         raise ValueError('Unsupported format; OCR/archive handling is not enabled')

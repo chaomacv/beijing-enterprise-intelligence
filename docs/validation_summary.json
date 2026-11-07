@@ -1,0 +1,218 @@
+{
+  "date": "2026-11-07",
+  "kind": "aggregate_only_no_business_rows",
+  "model_client_source_commit": "404f6b29a0d8bc51e3ad81537d669e782cb11df2",
+  "scan_source_commit": "690c721218dde16a955f5ff8f56b45ae41d8a981",
+  "received": {
+    "files": 5200,
+    "bytes": 8447438913,
+    "unique_sha256": 5077,
+    "format_mismatches": 333,
+    "download_failed_tasks": 22,
+    "unresolved_dataset_pages": 4
+  },
+  "scan": {
+    "files": 5200,
+    "status_counts": {
+      "PROFILED": 5050,
+      "REVIEW": 147,
+      "EMPTY": 3
+    },
+    "profiled_records": 43477852,
+    "scopes": 5403,
+    "seconds": 222.61,
+    "reader_versions": [
+      "reader-v2",
+      "reader-v3-xlsx-dimensions"
+    ],
+    "raw_record_store_created": false,
+    "llm_called": false
+  },
+  "initial_scan": {
+    "files": 5200,
+    "status_counts": {
+      "PROFILED": 5050,
+      "REVIEW": 147,
+      "EMPTY": 3
+    },
+    "profiled_records": 43477852,
+    "scopes": 5403,
+    "seconds": 1485.96,
+    "reader_version": "reader-v2",
+    "raw_record_store_created": false,
+    "llm_called": false
+  },
+  "xlsx_dimension_test": {
+    "records": 15,
+    "columns": 6,
+    "seconds": 2.155,
+    "sample_nonempty_cells_unchanged": true,
+    "old_flags": [
+      [
+        "very_wide_schema"
+      ]
+    ],
+    "new_flags": [
+      []
+    ]
+  },
+  "sample_records": 68679,
+  "quality_flags": {
+    "header_uncertain": 2054,
+    "width_mismatch": 344,
+    "very_wide_schema": 34
+  },
+  "review_formats": {
+    "unsupported_archive": 76,
+    "legacy_word": 8,
+    "csv": 2,
+    "rdf": 6,
+    "pdf": 41,
+    "rar": 3,
+    "docx": 7,
+    "xls": 1,
+    "unknown": 3
+  },
+  "model_runtime": {
+    "model": "qwen3-8b-5e21045a496a",
+    "backend": "transformers-schema",
+    "context": 8192,
+    "torch": "2.6.0+cu118",
+    "cuda": "11.8",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "cpu_threads": 4
+  },
+  "synthetic": {
+    "stage": "run",
+    "input_files": 3,
+    "scan": {
+      "files": 3,
+      "status_counts": {
+        "PROFILED": 3
+      },
+      "profiled_records": 5,
+      "scopes": 3,
+      "seconds": 0.0,
+      "reader_versions": [
+        "reader-v2"
+      ],
+      "raw_record_store_created": false,
+      "llm_called": false
+    },
+    "extraction_complete": true,
+    "semantic_accuracy_evaluated": false,
+    "backend": "local-qwen-9f3b3603ec5647af6c27c671",
+    "file_status_counts": {
+      "DROP": 1,
+      "KEEP": 2
+    },
+    "kept_files": 2,
+    "file_record_counts": {
+      "DROP": 1,
+      "KEEP": 4
+    },
+    "preparation": {
+      "files": 2,
+      "status_counts": {
+        "prepared": 2
+      },
+      "records": 4,
+      "llm_called": false,
+      "note": "Byte-bounded preparation chunks are rechecked with the actual chat tokenizer before LLM inference."
+    },
+    "result": {
+      "backend": "local-qwen-9f3b3603ec5647af6c27c671-screen-e77409c949ab08904b373944",
+      "run_key": "b01fb0f45ea81408f3fdd410",
+      "records": 4,
+      "status_coverage_complete": true,
+      "entities": 2,
+      "events": 3,
+      "review_records": 0,
+      "excluded_records": 0,
+      "semantic_accuracy_evaluated": false,
+      "rule_baseline": false
+    },
+    "seconds": 63.34,
+    "unresolved_files": 0,
+    "review_records": 0,
+    "completed_with_review": false
+  },
+  "synthetic_regression": {
+    "kind": "synthetic_regression_not_accuracy_benchmark",
+    "checks": {
+      "file_dispositions": true,
+      "all_four_selected_records": true,
+      "one_passed_inspection_without_event": true,
+      "no_unresolved_selected_records": true,
+      "exact_event_types_and_stages": true
+    },
+    "passed": true
+  },
+  "real": {
+    "stage": "run",
+    "input_files": 4,
+    "scan": {
+      "files": 4,
+      "status_counts": {
+        "PROFILED": 4
+      },
+      "profiled_records": 24,
+      "scopes": 4,
+      "seconds": 0.0,
+      "reader_versions": [
+        "reader-v2"
+      ],
+      "raw_record_store_created": false,
+      "llm_called": false
+    },
+    "extraction_complete": true,
+    "semantic_accuracy_evaluated": false,
+    "backend": "local-qwen-9f3b3603ec5647af6c27c671",
+    "file_status_counts": {
+      "KEEP": 4
+    },
+    "kept_files": 4,
+    "file_record_counts": {
+      "KEEP": 24
+    },
+    "preparation": {
+      "files": 4,
+      "status_counts": {
+        "prepared": 4
+      },
+      "records": 24,
+      "llm_called": false,
+      "note": "Byte-bounded preparation chunks are rechecked with the actual chat tokenizer before LLM inference."
+    },
+    "result": {
+      "backend": "local-qwen-9f3b3603ec5647af6c27c671-screen-4a5e37072da9270f072bceda",
+      "run_key": "9429a63caf8d00e867db32e3",
+      "records": 24,
+      "status_coverage_complete": true,
+      "entities": 24,
+      "events": 23,
+      "review_records": 1,
+      "excluded_records": 0,
+      "semantic_accuracy_evaluated": false,
+      "rule_baseline": false
+    },
+    "seconds": 392.15,
+    "unresolved_files": 0,
+    "review_records": 1,
+    "completed_with_review": true
+  },
+  "real_record_statuses": {
+    "EXTRACTED": 23,
+    "REVIEW": 1
+  },
+  "real_event_statuses": {
+    "qualification/confirmed": 10,
+    "administrative_penalty/confirmed": 3,
+    "innovation/proposed": 10
+  },
+  "real_review_reasons": {
+    "ModelFailure": 1
+  },
+  "full_corpus_llm_completed": false,
+  "independent_semantic_accuracy_evaluated": false
+}

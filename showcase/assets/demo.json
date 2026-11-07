@@ -7,7 +7,7 @@
   },
   "summary": {
     "backend": "rules-v1-explicit-baseline",
-    "run_key": "8df43f62d77f9cc7230bec43",
+    "run_key": "fa72120cea9e343ca7c73ac9",
     "records": 5,
     "status_coverage_complete": true,
     "entities": 2,
@@ -19,8 +19,8 @@
   },
   "files": [
     {
-      "scope_id": "7ec2c7d49b6472fca39057b1",
-      "file_id": "9922c34347d2b1a67744c988",
+      "scope_id": "0afd2e0784ed92870d5bd4b6",
+      "file_id": "79ae7d04b7cdae962ec80aae",
       "filename": "合成示例_高新技术认定.csv",
       "sheet": "csv",
       "row_count": 2,
@@ -41,7 +41,7 @@
       "source": {},
       "sample": [
         {
-          "record_id": "5ce9e22f513b3e7e6b976e31",
+          "record_id": "dea0850c983eedda0a8728ed",
           "sheet": "csv",
           "row": 2,
           "cells": {
@@ -70,7 +70,7 @@
           }
         },
         {
-          "record_id": "3cd2f1892aa4b8ac587db9bb",
+          "record_id": "807b60e345d8d13679f3d50a",
           "sheet": "csv",
           "row": 3,
           "cells": {
@@ -102,8 +102,8 @@
       "decision": "KEEP"
     },
     {
-      "scope_id": "94ddb87daf0459666f14b095",
-      "file_id": "d39f8095c49fd96dcdfa67ad",
+      "scope_id": "8acd34dab70e4abacd50d7df",
+      "file_id": "2bf6e5a76239a32c076a6d8e",
       "filename": "合成示例_行政处罚.csv",
       "sheet": "csv",
       "row_count": 2,
@@ -124,7 +124,7 @@
       "source": {},
       "sample": [
         {
-          "record_id": "7219536b6c9dd3d1404d6f20",
+          "record_id": "2b47bfac12fec31b9dce58ec",
           "sheet": "csv",
           "row": 2,
           "cells": {
@@ -153,7 +153,7 @@
           }
         },
         {
-          "record_id": "e21a26db839c3ae3e7843efb",
+          "record_id": "475c8b3d1b9cebf4fa855fe4",
           "sheet": "csv",
           "row": 3,
           "cells": {
@@ -185,8 +185,8 @@
       "decision": "KEEP"
     },
     {
-      "scope_id": "f4164e9d3a641af72aed70e4",
-      "file_id": "b84630b1072a65cb4ec2756d",
+      "scope_id": "bc8d16774c313d140633e55f",
+      "file_id": "2f7b21324376648706ff809b",
       "filename": "合成示例_树木统计.csv",
       "sheet": "csv",
       "row_count": 1,
@@ -203,7 +203,7 @@
       "source": {},
       "sample": [
         {
-          "record_id": "6c46fc1d2dba60d89aa5a5a7",
+          "record_id": "d30e105664c89ae64a9aa87f",
           "sheet": "csv",
           "row": 2,
           "cells": {
@@ -229,7 +229,7 @@
   ],
   "records": [
     {
-      "record_id": "5ce9e22f513b3e7e6b976e31",
+      "record_id": "dea0850c983eedda0a8728ed",
       "sheet": "csv",
       "row": 2,
       "cells": {
@@ -256,11 +256,11 @@
         "header_uncertain": false,
         "width_mismatch": false
       },
-      "file_id": "9922c34347d2b1a67744c988",
+      "file_id": "79ae7d04b7cdae962ec80aae",
       "filename": "合成示例_高新技术认定.csv"
     },
     {
-      "record_id": "3cd2f1892aa4b8ac587db9bb",
+      "record_id": "807b60e345d8d13679f3d50a",
       "sheet": "csv",
       "row": 3,
       "cells": {
@@ -287,11 +287,11 @@
         "header_uncertain": false,
         "width_mismatch": false
       },
-      "file_id": "9922c34347d2b1a67744c988",
+      "file_id": "79ae7d04b7cdae962ec80aae",
       "filename": "合成示例_高新技术认定.csv"
     },
     {
-      "record_id": "7219536b6c9dd3d1404d6f20",
+      "record_id": "2b47bfac12fec31b9dce58ec",
       "sheet": "csv",
       "row": 2,
       "cells": {
@@ -318,11 +318,11 @@
         "header_uncertain": false,
         "width_mismatch": false
       },
-      "file_id": "d39f8095c49fd96dcdfa67ad",
+      "file_id": "2bf6e5a76239a32c076a6d8e",
       "filename": "合成示例_行政处罚.csv"
     },
     {
-      "record_id": "e21a26db839c3ae3e7843efb",
+      "record_id": "475c8b3d1b9cebf4fa855fe4",
       "sheet": "csv",
       "row": 3,
       "cells": {
@@ -349,11 +349,11 @@
         "header_uncertain": false,
         "width_mismatch": false
       },
-      "file_id": "d39f8095c49fd96dcdfa67ad",
+      "file_id": "2bf6e5a76239a32c076a6d8e",
       "filename": "合成示例_行政处罚.csv"
     },
     {
-      "record_id": "6c46fc1d2dba60d89aa5a5a7",
+      "record_id": "d30e105664c89ae64a9aa87f",
       "sheet": "csv",
       "row": 2,
       "cells": {
@@ -372,13 +372,13 @@
         "header_uncertain": false,
         "width_mismatch": false
       },
-      "file_id": "b84630b1072a65cb4ec2756d",
+      "file_id": "2f7b21324376648706ff809b",
       "filename": "合成示例_树木统计.csv"
     }
   ],
   "record_results": [
     {
-      "record_id": "5ce9e22f513b3e7e6b976e31",
+      "record_id": "dea0850c983eedda0a8728ed",
       "status": "EXTRACTED",
       "entities": [
         {
@@ -415,7 +415,7 @@
       ]
     },
     {
-      "record_id": "3cd2f1892aa4b8ac587db9bb",
+      "record_id": "807b60e345d8d13679f3d50a",
       "status": "EXTRACTED",
       "entities": [
         {
@@ -452,7 +452,7 @@
       ]
     },
     {
-      "record_id": "7219536b6c9dd3d1404d6f20",
+      "record_id": "2b47bfac12fec31b9dce58ec",
       "status": "EXTRACTED",
       "entities": [
         {
@@ -492,7 +492,7 @@
       ]
     },
     {
-      "record_id": "e21a26db839c3ae3e7843efb",
+      "record_id": "475c8b3d1b9cebf4fa855fe4",
       "status": "NO_EVENT",
       "entities": [
         {
@@ -511,7 +511,7 @@
       "events": []
     },
     {
-      "record_id": "6c46fc1d2dba60d89aa5a5a7",
+      "record_id": "d30e105664c89ae64a9aa87f",
       "status": "REVIEW",
       "entities": [],
       "events": [],
@@ -520,8 +520,8 @@
   ],
   "events": [
     {
-      "event_id": "a186c7d5d74cf7a11e221a81",
-      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "event_id": "78fafba5a04ec15b998ae81e",
+      "entity_id": "E_a08f82a7415734b41bacbcaf",
       "subject_index": 0,
       "event_type": "innovation",
       "status": "confirmed",
@@ -539,8 +539,8 @@
       ],
       "sources": [
         {
-          "record_id": "5ce9e22f513b3e7e6b976e31",
-          "file_id": "9922c34347d2b1a67744c988",
+          "record_id": "dea0850c983eedda0a8728ed",
+          "file_id": "79ae7d04b7cdae962ec80aae",
           "sheet": "csv",
           "row": 2,
           "source": {},
@@ -554,8 +554,8 @@
       ]
     },
     {
-      "event_id": "287dcbcd0a65cafa44f671e1",
-      "entity_id": "E_367f1678b817e1099b93e6c7",
+      "event_id": "3f01d2139e6406d2d93c0f62",
+      "entity_id": "E_5430af2f0ba20e36717c1981",
       "subject_index": 0,
       "event_type": "innovation",
       "status": "proposed",
@@ -573,8 +573,8 @@
       ],
       "sources": [
         {
-          "record_id": "3cd2f1892aa4b8ac587db9bb",
-          "file_id": "9922c34347d2b1a67744c988",
+          "record_id": "807b60e345d8d13679f3d50a",
+          "file_id": "79ae7d04b7cdae962ec80aae",
           "sheet": "csv",
           "row": 3,
           "source": {},
@@ -588,8 +588,8 @@
       ]
     },
     {
-      "event_id": "17c49ec70d217861eaef70ec",
-      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "event_id": "a036ede81b3f3a6b8757bcaa",
+      "entity_id": "E_a08f82a7415734b41bacbcaf",
       "subject_index": 0,
       "event_type": "administrative_penalty",
       "status": "confirmed",
@@ -610,8 +610,8 @@
       ],
       "sources": [
         {
-          "record_id": "7219536b6c9dd3d1404d6f20",
-          "file_id": "d39f8095c49fd96dcdfa67ad",
+          "record_id": "2b47bfac12fec31b9dce58ec",
+          "file_id": "2bf6e5a76239a32c076a6d8e",
           "sheet": "csv",
           "row": 2,
           "source": {},
@@ -627,7 +627,7 @@
   ],
   "profiles": [
     {
-      "entity_id": "E_367f1678b817e1099b93e6c7",
+      "entity_id": "E_5430af2f0ba20e36717c1981",
       "credit_code": null,
       "names": [
         "合成示例乙科技有限公司"
@@ -640,18 +640,18 @@
         {
           "label": "拟议：存在科技认定记录",
           "event_status": "proposed",
-          "evidence_event_id": "287dcbcd0a65cafa44f671e1"
+          "evidence_event_id": "3f01d2139e6406d2d93c0f62"
         }
       ],
       "event_ids": [
-        "287dcbcd0a65cafa44f671e1"
+        "3f01d2139e6406d2d93c0f62"
       ],
       "coverage": "unknown",
       "credit_score": null,
       "note": "Observed source facts only; no lending decision or absence-of-risk inference."
     },
     {
-      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "entity_id": "E_a08f82a7415734b41bacbcaf",
       "credit_code": null,
       "names": [
         "合成示例甲科技有限公司"
@@ -664,17 +664,17 @@
         {
           "label": "存在科技认定记录",
           "event_status": "confirmed",
-          "evidence_event_id": "a186c7d5d74cf7a11e221a81"
+          "evidence_event_id": "78fafba5a04ec15b998ae81e"
         },
         {
           "label": "存在行政处罚记录",
           "event_status": "confirmed",
-          "evidence_event_id": "17c49ec70d217861eaef70ec"
+          "evidence_event_id": "a036ede81b3f3a6b8757bcaa"
         }
       ],
       "event_ids": [
-        "a186c7d5d74cf7a11e221a81",
-        "17c49ec70d217861eaef70ec"
+        "78fafba5a04ec15b998ae81e",
+        "a036ede81b3f3a6b8757bcaa"
       ],
       "coverage": "unknown",
       "credit_score": null,
@@ -683,8 +683,8 @@
   ],
   "match_decisions": [
     {
-      "mention_id": "287dcbcd0a65cafa44f671e1",
-      "entity_id": "E_367f1678b817e1099b93e6c7",
+      "mention_id": "3f01d2139e6406d2d93c0f62",
+      "entity_id": "E_5430af2f0ba20e36717c1981",
       "decision": "NEW",
       "reason": "insufficient_identity_evidence",
       "raw_code": null,
@@ -693,8 +693,8 @@
       "candidates": []
     },
     {
-      "mention_id": "4fc7ba8a6dae238c1432efcd",
-      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "mention_id": "78fafba5a04ec15b998ae81e",
+      "entity_id": "E_a08f82a7415734b41bacbcaf",
       "decision": "REVIEW",
       "reason": "insufficient_identity_evidence",
       "raw_code": null,
@@ -702,7 +702,7 @@
       "candidate_overflow": false,
       "candidates": [
         {
-          "entity_id": "E_367f1678b817e1099b93e6c7",
+          "entity_id": "E_5430af2f0ba20e36717c1981",
           "name_similarity": 0.9091,
           "decision": "REVIEW",
           "credit_code_conflict": false
@@ -710,8 +710,8 @@
       ]
     },
     {
-      "mention_id": "99f280af77deed8e90f46334",
-      "entity_id": "E_367f1678b817e1099b93e6c7",
+      "mention_id": "991c56d6388b70925601921e",
+      "entity_id": "E_5430af2f0ba20e36717c1981",
       "decision": "MATCH",
       "reason": "exact_name_and_address",
       "raw_code": null,
@@ -719,7 +719,7 @@
       "candidate_overflow": false,
       "candidates": [
         {
-          "entity_id": "E_64d23a63fdec4450d3b1e447",
+          "entity_id": "E_a08f82a7415734b41bacbcaf",
           "name_similarity": 0.9091,
           "decision": "REVIEW",
           "credit_code_conflict": false
@@ -727,8 +727,8 @@
       ]
     },
     {
-      "mention_id": "a186c7d5d74cf7a11e221a81",
-      "entity_id": "E_64d23a63fdec4450d3b1e447",
+      "mention_id": "eda718e1f6e5016b699c5fce",
+      "entity_id": "E_a08f82a7415734b41bacbcaf",
       "decision": "MATCH",
       "reason": "exact_name_and_address",
       "raw_code": null,
@@ -736,7 +736,7 @@
       "candidate_overflow": false,
       "candidates": [
         {
-          "entity_id": "E_367f1678b817e1099b93e6c7",
+          "entity_id": "E_5430af2f0ba20e36717c1981",
           "name_similarity": 0.9091,
           "decision": "REVIEW",
           "credit_code_conflict": false

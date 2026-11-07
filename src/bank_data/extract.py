@@ -6,6 +6,7 @@ from .common import ontology, text
 STATUSES = {'EXTRACTED', 'NO_EVENT', 'REVIEW'}
 EVENT_STATUSES = {'confirmed', 'proposed', 'removed', 'revoked', 'unknown'}
 ROLES = {'subject', 'supplier', 'buyer', 'authority', 'other'}
+CONTRACT_VERSION = 'extraction-v2-source-title'
 
 
 def obj(properties):
@@ -27,15 +28,34 @@ SCREEN_SCHEMA = obj({'decision': {'type': 'string', 'enum': ['KEEP', 'REVIEW', '
                      'reason': {'type': 'string'}, 'evidence_fields': {'type': 'array', 'items': {'type': 'string'}}})
 
 
-def validate_ref(ref, row):
+def source_bound_schema(records):
+    # JSON cloning intentionally removes shared REF aliases before field-specific binding.
+    schema = json.loads(json.dumps(EXTRACTION_SCHEMA))
+    fields = sorted({key for row in records for key in row['cells']})
+    results = schema['properties']['results']
+    results.update(minItems=len(records),maxItems=len(records))
+    results['items']['properties']['record_id']['enum'] = [r['record_id'] for r in records]
+    def bind(node, filename=False):
+        if isinstance(node,dict):
+            if set(node.get('properties',{})) == {'field','value'}:
+                node['properties']['field']['enum'] = fields + (['__filename__'] if filename else []) or ['__no_source_field__']
+            for key,value in node.items():bind(value,filename or key=='evidence')
+        elif isinstance(node,list):
+            for value in node:bind(value,filename)
+    bind(schema)
+    return schema
+
+
+def validate_ref(ref, row, filename=None):
     if not isinstance(ref, dict) or set(ref) != {'field', 'value'}:
         raise ValueError('Invalid source reference')
     value = ref['value']
-    if not isinstance(value, str) or not value or ref['field'] not in row['cells'] or value not in text(row['cells'][ref['field']]):
+    cells = {**row['cells'], **({'__filename__':filename} if filename else {})}
+    if not isinstance(value, str) or not value or ref['field'] not in cells or value not in text(cells[ref['field']]):
         raise ValueError('Evidence is absent from the cited source cell')
 
 
-def validate_results(data, records):
+def validate_results(data, records, card=None):
     if not isinstance(data, dict) or set(data) != {'results'} or not isinstance(data['results'], list):
         raise ValueError('Invalid extraction result')
     expected = {r['record_id']: r for r in records}
@@ -52,6 +72,8 @@ def validate_results(data, records):
             raise ValueError('Uncertain facts must not enter the confirmed fact store')
         if result['status'] == 'NO_EVENT' and result['events']:
             raise ValueError('NO_EVENT cannot contain events')
+        if result['status'] == 'EXTRACTED' and not result['events']:
+            raise ValueError('EXTRACTED requires at least one event')
         for entity in result['entities']:
             if set(entity) != {'role', 'name', 'credit_code', 'address'} or entity['role'] not in ROLES:
                 raise ValueError('Invalid entity contract')
@@ -66,7 +88,7 @@ def validate_results(data, records):
             if event['event_type'] not in ontology()['events'] or event['status'] not in EVENT_STATUSES:
                 raise ValueError('Unknown event type/status')
             if not event['evidence']: raise ValueError('Missing event evidence')
-            for ref in event['evidence']: validate_ref(ref, row)
+            for ref in event['evidence']: validate_ref(ref, row, (card or {}).get('filename'))
             for field in ('date', 'amount', 'document_no'):
                 if event[field] is not None: validate_ref(event[field], row)
     return data['results']
@@ -134,4 +156,4 @@ class RuleBaseline:
                                    'amount': first_ref(cells, ['金额', '罚款金额', '罚款金额（万元）']),
                                    'document_no': first_ref(cells, ont['document_fields']), 'evidence': [fact]})
             result.append({'record_id': row['record_id'], 'status': 'EXTRACTED' if events else 'NO_EVENT', 'entities': [entity], 'events': events})
-        return validate_results({'results': result}, records)
+        return validate_results({'results': result}, records, card)

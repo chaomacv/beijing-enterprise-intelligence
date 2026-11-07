@@ -1,0 +1,40 @@
+name: Release verified version
+on:
+  workflow_run:
+    workflows: [tests]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: write
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Read checked version
+        id: version
+        run: |
+          python -c "import tomllib; print('value='+tomllib.load(open('pyproject.toml','rb'))['project']['version'])" >> "$GITHUB_OUTPUT"
+      - name: Publish release after main CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          RELEASE_COMMIT: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if gh release view "v${RELEASE_VERSION}" >/dev/null 2>&1; then
+            echo "Release already exists; leaving it unchanged."
+            exit 0
+          fi
+          python -m pip wheel --no-deps . --wheel-dir dist
+          gh release create "v${RELEASE_VERSION}" --target "$RELEASE_COMMIT" \
+            --title "v${RELEASE_VERSION}" --notes-file "docs/releases/v${RELEASE_VERSION}.md" dist/*.whl
