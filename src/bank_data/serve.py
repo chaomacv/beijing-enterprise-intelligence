@@ -20,12 +20,12 @@ class TransformersBackend:
         from transformers import AutoModelForCausalLM, AutoTokenizer
         if not torch.cuda.is_available():
             raise RuntimeError('A CUDA-enabled PyTorch environment and available GPU are required')
-        torch.set_num_threads(cpu_threads)
         self.torch, self.model_id, self.context = torch, model_id, context
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir, local_files_only=True, trust_remote_code=False)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_dir, local_files_only=True, trust_remote_code=False, use_safetensors=True,
             torch_dtype=torch.bfloat16, device_map={'': device}, attn_implementation='sdpa').eval()
+        torch.set_num_threads(cpu_threads)
         from lmformatenforcer.integrations.transformers import build_token_enforcer_tokenizer_data
         self.tokenizer_data = build_token_enforcer_tokenizer_data(self.tokenizer)
         self.lock = threading.Lock()

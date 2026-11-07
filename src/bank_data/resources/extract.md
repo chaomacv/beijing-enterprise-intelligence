@@ -2,7 +2,7 @@
 每条 record_id 必须恰好输出一次，status 为 EXTRACTED/NO_EVENT/REVIEW。
 entities 中每个对象包含 role、name、credit_code、address。name 必须是来源引用，后两项可以是 null。
 引用结构为 {"field":"原始字段名","value":"该单元格中的原文子串"}。不能猜测或改写名称、代码、日期和金额。
-仅 events.evidence 还可引用 {"field":"__filename__","value":"context.filename 中的原文子串"}，用于名单标题明确表达的资质、拟认定等事实。必须同时引用该行的主体名称；主体、代码、地址、日期和金额仍必须来自本行单元格。
+仅 events.evidence 还可引用 {"field":"__filename__","value":"context.filename 中的原文子串"}，用于名单标题明确表达的资质、拟认定等事实。事件通过 subject_index 关联本行实体；实体 name 必须引用本行名称，代码、地址、日期和金额仍必须来自本行单元格。
 role 只能为 subject/supplier/buyer/authority/other。不同角色要分别识别。
 events 中每个对象包含 subject_index、event_type、status、date、amount、document_no、evidence。
 subject_index 对应同条记录中的实体下标；event_type 必须来自给定本体。
