@@ -9,7 +9,7 @@ import time
 from .common import dump,file_hash,stable_id
 from .extract import validate_results
 from .bulk_semantics import load_row,resolve_pending as resolve_unique
-from .bulk_references import ReferenceClient
+from .bulk_bounded import BoundedReferenceClient as ReferenceClient
 
 VERSION='exact-content-same-scope-context-v1'
 RELATIVE=('同上','同前','上述','前述','上行','下行','上一条','下一条','上条','该企业','该公司','该单位')

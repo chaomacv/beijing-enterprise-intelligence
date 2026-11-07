@@ -126,7 +126,7 @@ def resolve_pending(profiles,root,endpoints,model,tokenizer_dir,client_class=Bat
         if result['record_id']!=task['record_id']:raise ValueError('Record assignment mismatch')
         provenance=getattr(client,'record_provenance',{}).pop(task['record_id'],None)
         if provenance and provenance.get('guard_review_reason'):
-            errors=[*errors,{'record_id':task['record_id'],'reason':provenance['guard_review_reason'],'method':'per_record_subject_guard'}]
+            errors=[*errors,{'record_id':task['record_id'],'reason':provenance['guard_review_reason'],'method':'per_record_quality_guard'}]
         value={'signature':signature,'task':task,'result':result,'errors':errors,'method':getattr(client_class,'method','local_llm_record'),
             'strategy_signature':strategy,'model_provenance':provenance}
         dump(target(task),value)

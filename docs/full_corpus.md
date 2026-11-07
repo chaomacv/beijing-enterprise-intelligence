@@ -106,7 +106,15 @@ OCR 记录及其主体、事件会带 `source_quality=OCR_UNVERIFIED`、`source_
 
 主体歧义按条记录 REVIEW 及具体原因，同批其他已通过校验的记录继续使用，不让一条主体歧义触发整批拆分重试。缺少槽位、引用错行、原文不存在等失败仍走原有重试和来源校验。该取舍减少对不明确名称的反复推理，但不会把保守复核当作真实语义已经确认。
 
-`record_results.jsonl` 区分 `llm_field_plan`、`local_llm_sparse_source_references` 和 `local_llm_exact_content_reuse`。`model_provenance` 保存 request_path、raw_response_path 和 model_cache_key：根目录 `model_requests/<key>.json`、`model_responses/<key>.json` 是完整请求与原回复，`model_cache/<key>.json` 保存可重放的生成结果；重复内容还保存 representative_record_id 和 content_key。主体类型保留在该模型来源元数据中。原始回复留痕与已通过来源校验的结果分开，失败会重试或明确复核。
+大表中的 HTML 富文本会将大量预算消耗在标签和展示属性上。模型输入使用有版本的 `__html_text__::原字段名` 视图：保留文字、注释、脚本数据及非展示属性，合并行内标签分隔的文本，省去样式内容和展示属性。原始单元格完整保存在 `05_records`，不覆盖原 HTML。视图来源元数据保存原字段 SHA256、版本、前后字符数及省略量。引用验证按相同版本重建视图，再检查原文子串；派生视图的字段名不会冒充原 HTML 的逐字子串。该步骤改变展示表示，不保证保留全部页面布局含义。
+
+复杂抽取默认使用 `local_llm_bounded_source_references`。模型输出的实体、事件各采用最多八个命名槽位对象，证据采用字段名到布尔值的对象；程序再还原为统一业务数组并验证主体引用。这针对实际遇到的重复生成问题，避免依赖当前解码器不支持的数组长度约束。完全相同的候选去重并重映射主体下标。模型声明容量不足时整条 REVIEW，不发布截取的部分事实；槽位容量和模型未识别的遗漏仍是需要评测的限制，不能据此声称抽取召回完整。
+
+日期、代码、地址等缺失时允许 null；HTML 视图中的此类值必须给明确子串，不能用整个长文本代替。证据只选择来源字段，程序复制该字段全文。状态与候选事实矛盾、无证据事件等质量问题按条复核；原模型回复和具体原因继续留存。
+
+无效机构候选若只是未被任何事件引用的 authority，会剔除并在 `rejected_non_subject_candidates` 保存其原始下标与原因，同时重映射剩余主体及事件下标。该规则不用于事件主体；无效候选被事件引用时仍整条复核。模型不能因为结果标题包含“企业”等字样就把它当作具名机构。
+
+`record_results.jsonl` 区分 `llm_field_plan`、`local_llm_sparse_source_references`、`local_llm_bounded_source_references` 和 `local_llm_exact_content_reuse`。`model_provenance` 保存 request_path、raw_response_path 和 model_cache_key：根目录 `model_requests/<key>.json`、`model_responses/<key>.json` 是完整请求与原回复，`model_cache/<key>.json` 保存可重放的生成结果；重复内容还保存 representative_record_id 和 content_key。主体类型、派生字段视图和槽位映射保留在该模型来源元数据中。原始回复留痕与已通过来源校验的结果分开，失败会重试或明确复核。
 
 原文引用校验只能证明引用存在。模型仍可能把有来源的描述理解错，真实数据语义准确率需要独立标注评测，不能由 Schema 测试或同模型自检代替。
 

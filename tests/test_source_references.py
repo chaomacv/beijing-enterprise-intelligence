@@ -14,7 +14,7 @@ class SourceReferenceTests(unittest.TestCase):
                    {'record_id':'original-B','sheet':'Sheet1','row':3,'cells':{'描述':'道路垃圾堆积'},'context':{}}]
         self.card={'filename':'合成拟认定.csv','sheet':'Sheet1','columns':['企业名称','正文','日期','描述'],'source':{}}
         self.value={'records':{'r0':{'status':'EXTRACTED','entities':[{'role':'subject','kind':'business','name':{'field':'企业名称','value':'合成甲公司'}}],
-            'events':[{'subject_index':0,'event_type':'innovation','status':'proposed','date':'日期','evidence':[{'field':'正文','value':'拟认定为创新型中小企业'},'__filename__']}]},'r1':{'status':'NO_EVENT'}}}
+            'events':[{'subject_index':0,'event_type':'innovation','status':'proposed','date':'日期','evidence':['正文','__filename__']}]},'r1':{'status':'NO_EVENT'}}}
 
     def test_sparse_fields_expand_to_canonical_source_values_and_original_ids(self):
         values=unpack(self.value,self.rows,self.card)
@@ -46,7 +46,11 @@ class SourceReferenceTests(unittest.TestCase):
             if mode=='missing_event':row.pop('events')
             if mode=='wrong_subject':row['events'][0]['subject_index']=5
             if mode=='review_with_fact':row['status']='REVIEW'
-            with self.assertRaises(ValueError):unpack(value,self.rows,self.card)
+            if mode=='wrong_subject':
+                with self.assertRaises(ValueError):unpack(value,self.rows,self.card)
+            else:
+                issues={};result=unpack(value,self.rows,self.card,issues)[0]
+                self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['events'],[]);self.assertIn('original-A',issues)
 
     def test_basic_entities_are_preserved_without_inventing_events(self):
         value=copy.deepcopy(self.value);row=value['records']['r0'];row['status']='NO_EVENT';row.pop('events')
@@ -114,6 +118,54 @@ class SourceReferenceTests(unittest.TestCase):
         self.assertEqual([v['status'] for v in result],['EXTRACTED','REVIEW'])
         self.assertEqual(result[0]['entities'][0]['name']['value'],'合成甲公司')
         self.assertEqual(set(issues),{'original-B'})
+
+    def test_html_input_is_projected_and_the_response_remains_bound_to_its_raw_cell(self):
+        from bank_data.source_views import PREFIX
+        cache=self.cache;rows=copy.deepcopy(self.rows)
+        rows[0]['cells']['正文']='<p>合成甲公司拟认定为<span>创新型</span>中小企业</p>'
+        before=copy.deepcopy(rows);value=copy.deepcopy(self.value)
+        value['records']['r0']['events'][0]['evidence'][0]=PREFIX+'正文'
+        class Transport:
+            def __init__(self,*args,**kwargs):self.cache=cache
+            def request(self,system,payload,contract,maximum):return {'messages':[{'role':'user','content':json.dumps(payload,ensure_ascii=False)}]}
+            def call(self,requests):return [{'ok':True,'response':{'choices':[{'finish_reason':'stop','message':{'content':json.dumps(value,ensure_ascii=False)}}]}} for _ in requests]
+        with patch('bank_data.bulk_references.BatchClient',Transport):client=ReferenceClient()
+        request=client.request('unused',{'context':self.card,'records':rows},{},2048)
+        payload=json.loads(request['messages'][0]['content'])
+        self.assertNotIn('正文',payload['records'][0]['cells']);self.assertIn(PREFIX+'正文',payload['records'][0]['cells'])
+        response=client.call([request])[0];self.assertTrue(response['ok']);self.assertEqual(rows,before)
+        self.assertEqual(client.content(response)['results'][0]['events'][0]['evidence'][0]['value'],'合成甲公司拟认定为创新型中小企业')
+        self.assertEqual(client.record_provenance['original-A']['input_field_views'][0]['source_field'],'正文')
+
+    def test_missing_optional_values_can_be_null_without_fabricating_empty_references(self):
+        value=copy.deepcopy(self.value);row=value['records']['r0']
+        row['entities'][0].update(credit_code=None,address=None);row['events'][0].update(date=None,amount=None,document_no=None)
+        result=unpack(value,self.rows,self.card)[0]
+        self.assertEqual(result['status'],'EXTRACTED');self.assertIsNone(result['entities'][0]['credit_code'])
+        self.assertIsNone(result['entities'][0]['address']);self.assertIsNone(result['events'][0]['date'])
+        self.assertEqual(result['events'][0]['evidence'][0]['value'],self.rows[0]['cells']['正文'])
+
+    def test_generic_categories_and_document_titles_are_not_named_organizations(self):
+        from bank_data.bulk_references import recognizable_organization
+        for name in ['中小企业','小微企业','有限公司','中小企业声明函','政府采购文件','LLC','合成高新技术企业认定','合成行政处罚','合成监督检查结果']:
+            self.assertFalse(recognizable_organization(name))
+        self.assertTrue(recognizable_organization('合成中小企业服务有限公司'))
+
+    def test_invalid_unreferenced_authority_is_audited_without_discarding_valid_subject(self):
+        rows=copy.deepcopy(self.rows);rows[0]['cells']['结果标题']='合成行政处罚'
+        value=copy.deepcopy(self.value);row=value['records']['r0']
+        row['entities'].insert(0,{'role':'authority','kind':'institution','name':{'field':'结果标题','value':'合成行政处罚'}})
+        row['events'][0]['subject_index']=1;rejected={};retained={}
+        result=unpack(value,rows,self.card,{},rejected,retained)[0]
+        self.assertEqual(result['status'],'EXTRACTED');self.assertEqual(len(result['entities']),1)
+        self.assertEqual(result['events'][0]['subject_index'],0);self.assertEqual(retained['original-A'],[1])
+        self.assertEqual(rejected['original-A'][0]['entity_index'],0)
+
+    def test_invalid_referenced_authority_cannot_be_pruned_to_change_event_subject(self):
+        rows=copy.deepcopy(self.rows);rows[0]['cells']['结果标题']='合成行政处罚'
+        value=copy.deepcopy(self.value);value['records']['r0']['entities'][0]={'role':'authority','kind':'institution','name':{'field':'结果标题','value':'合成行政处罚'}}
+        issues={};result=unpack(value,rows,self.card,issues)[0]
+        self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['events'],[]);self.assertIn('original-A',issues)
 
 
 if __name__=='__main__':unittest.main()

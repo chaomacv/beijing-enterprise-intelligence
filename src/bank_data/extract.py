@@ -2,11 +2,12 @@
 import json
 
 from .common import ontology, text
+from .source_views import source_cell
 
 STATUSES = {'EXTRACTED', 'NO_EVENT', 'REVIEW'}
 EVENT_STATUSES = {'confirmed', 'proposed', 'removed', 'revoked', 'unknown'}
 ROLES = {'subject', 'supplier', 'buyer', 'authority', 'other'}
-CONTRACT_VERSION = 'extraction-v2-source-title'
+CONTRACT_VERSION = 'extraction-v3-reconstructible-html-views'
 
 
 def obj(properties):
@@ -51,7 +52,9 @@ def validate_ref(ref, row, filename=None):
         raise ValueError('Invalid source reference')
     value = ref['value']
     cells = {**row['cells'], **({'__filename__':filename} if filename else {})}
-    if not isinstance(value, str) or not value or ref['field'] not in cells or value not in text(cells[ref['field']]):
+    try:source=source_cell(cells,ref['field'])
+    except KeyError:raise ValueError('Evidence is absent from the cited source cell')
+    if not isinstance(value, str) or not value or value not in text(source):
         raise ValueError('Evidence is absent from the cited source cell')
 
 
