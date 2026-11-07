@@ -1,6 +1,7 @@
 """Private, source-budgeted batched inference transport for corpus jobs."""
 import json
 import time
+import threading
 import urllib.request
 import urllib.error
 from pathlib import Path
@@ -8,12 +9,17 @@ from pathlib import Path
 from .common import dump,ontology,resource,stable_id
 from .llm import NoRedirect,validate_endpoint
 
+TOKENIZER_INIT_LOCK=threading.Lock()
+
 
 class BatchClient:
     def __init__(self,endpoint,model,tokenizer_dir,cache,context=8192):
-        from transformers import AutoTokenizer
         self.endpoint=validate_endpoint(endpoint);self.model=model;self.context=context
-        self.tokenizer=AutoTokenizer.from_pretrained(tokenizer_dir,local_files_only=True,trust_remote_code=False)
+        # Transformers lazily imports AutoTokenizer; concurrent first imports can fail.
+        # Initialize separate tokenizers sequentially; inference remains parallel.
+        with TOKENIZER_INIT_LOCK:
+            from transformers import AutoTokenizer
+            self.tokenizer=AutoTokenizer.from_pretrained(tokenizer_dir,local_files_only=True,trust_remote_code=False)
         self.cache=Path(cache);self.cache.mkdir(parents=True,exist_ok=True)
         self.opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
 

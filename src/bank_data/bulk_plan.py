@@ -1,6 +1,6 @@
 """Local-model field plans: explicit mappings, predicates and deferred semantics."""
 from collections import Counter
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor,as_completed
 import json
 from pathlib import Path
 import queue
@@ -83,7 +83,7 @@ def create_plans(profiles,root,endpoints,model,tokenizer_dir):
     (stage/'prompt.md').write_text(PROMPT,encoding='utf-8')
     dump(stage/'config.json',{'signature':signature,'model':model,'temperature':0,'max_output':1024,
         'method':'local_llm_schema_plan_then_source_bound_row_application'})
-    tasks=queue.Queue();cards=[];results={};lock=threading.Lock();start=time.monotonic()
+    tasks=queue.Queue();cards=[];results={};lock=threading.Lock();start=time.monotonic();stop=threading.Event()
     for profile in profiles:
         for card in profile['cards']:
             prior=root/'03_screen/scopes'/(card['scope_id']+'.json')
@@ -106,7 +106,7 @@ def create_plans(profiles,root,endpoints,model,tokenizer_dir):
                 dump(stage/'progress.json',value);print(json.dumps(value),flush=True)
     def worker(endpoint):
         client=BatchClient(endpoint,model,tokenizer_dir,root/'model_cache')
-        while True:
+        while not stop.is_set():
             group=[]
             for _ in range(4):
                 try:group.append(tasks.get_nowait())
@@ -148,9 +148,12 @@ def create_plans(profiles,root,endpoints,model,tokenizer_dir):
                         plan={'mode':'review','reason':error,'entities':[],'events':[]}
                 save(card,plan,response,error,request)
     # Tasks are independent; each replica owns its model lock.
+    def guarded(endpoint):
+        try:return worker(endpoint)
+        except Exception:stop.set();raise
     with ThreadPoolExecutor(max_workers=len(endpoints)) as pool:
-        futures=[pool.submit(worker,endpoint) for endpoint in endpoints]
-        for future in futures:future.result()
+        futures=[pool.submit(guarded,endpoint) for endpoint in endpoints]
+        for future in as_completed(futures):future.result()
     summary={'complete':True,'planned_scopes':len(results),'modes':dict(Counter(v['plan']['mode'] for v in results.values())),
              'seconds':round(time.monotonic()-start,2)}
     dump(stage/'summary.json',summary);return results

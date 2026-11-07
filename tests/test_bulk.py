@@ -42,6 +42,22 @@ class BulkTests(unittest.TestCase):
         self.assertEqual(selected[0],0);self.assertEqual(selected[-1],12)
         self.assertIn(6,selected)
 
+    def test_clients_initialize_non_threadsafe_tokenizers_without_losing_a_worker(self):
+        from concurrent.futures import ThreadPoolExecutor
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        from bank_data.bulk_client import BatchClient
+        import threading,time
+        active=threading.Event()
+        def initialize(*args,**kwargs):
+            if active.is_set():raise ImportError('Concurrent lazy initialization')
+            active.set();time.sleep(0.01);active.clear();return object()
+        fake=SimpleNamespace(AutoTokenizer=SimpleNamespace(from_pretrained=initialize))
+        with patch.dict('sys.modules',{'transformers':fake}),ThreadPoolExecutor(max_workers=4) as pool:
+            futures=[pool.submit(BatchClient,'http://127.0.0.1:'+str(18080+i)+'/v1','synthetic',self.raw,self.work/'cache') for i in range(4)]
+            clients=[f.result() for f in futures]
+        self.assertEqual(len({id(c.tokenizer) for c in clients}),4)
+
     def test_archive_byte_names_preserve_original_encoding(self):
         original='目录/企业名单.csv'.encode('gb18030')
         name,metadata=member_name(original)

@@ -1,7 +1,7 @@
 """Resumable corpus-wide file screening, with per-scope inputs and decisions."""
 import argparse
 from collections import Counter
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor,as_completed
 import json
 from pathlib import Path
 import queue
@@ -47,7 +47,7 @@ def screen(profiles,root,endpoints,model,tokenizer_dir):
     (stage/'prompt.md').write_text(CORPUS_PROMPT,encoding='utf-8')
     dump(history/(signature+'.json'),{'protocol':'compact_fields_with_human_readable_expansion','prompt':CORPUS_PROMPT,'reason_codes':REASONS})
     dump(stage/'schema.json',SCREEN_SCHEMA)
-    tasks=queue.Queue();results={};lock=threading.Lock();started=time.monotonic()
+    tasks=queue.Queue();results={};lock=threading.Lock();started=time.monotonic();stop=threading.Event()
     cards=[card for profile in profiles for card in profile['cards']]
     cards.sort(key=lambda c:sum(min(len(str(v)),1000) for row in c['sample'] for v in row['cells'].values()))
     for card in cards:
@@ -59,7 +59,7 @@ def screen(profiles,root,endpoints,model,tokenizer_dir):
         tasks.put(card)
     def worker(index,endpoint):
         client=BatchClient(endpoint,model,tokenizer_dir,root/'model_cache')
-        while True:
+        while not stop.is_set():
             group=[]
             for _ in range(4):
                 try:group.append(tasks.get_nowait())
@@ -94,9 +94,12 @@ def screen(profiles,root,endpoints,model,tokenizer_dir):
                     'scope_statuses':dict(Counter(v['decision']['decision'] for v in results.values())),
                     'seconds':round(time.monotonic()-started,1)}
                 dump(stage/'progress.json',progress);print(json.dumps(progress),flush=True)
+    def guarded(index,endpoint):
+        try:return worker(index,endpoint)
+        except Exception:stop.set();raise
     with ThreadPoolExecutor(max_workers=len(endpoints)) as pool:
-        futures=[pool.submit(worker,i,endpoint) for i,endpoint in enumerate(endpoints)]
-        for future in futures:future.result()
+        futures=[pool.submit(guarded,i,endpoint) for i,endpoint in enumerate(endpoints)]
+        for future in as_completed(futures):future.result()
     files=[]
     for profile in profiles:
         scopes=[results[c['scope_id']] for c in profile['cards']]
