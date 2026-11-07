@@ -34,6 +34,19 @@ python3.10 -m venv .venv
 
 文件准备和规则 Demo 不需要 GPU、浏览器、平台登录或云 API。
 
+## v0.2 完整流程入口
+
+先生成文件卡片，再由本地模型筛选；只有保留文件的记录进入事实库。阶段结果与缓存支持重复运行。
+
+```bash
+bank-data workflow --input /private/raw --work-dir /private/results --through scan --workers 4
+bank-data workflow --input /private/raw --work-dir /private/results \
+  --backend local --endpoint http://127.0.0.1:8000/v1 \
+  --model YOUR_LOCAL_MODEL_ID --tokenizer-dir /private/models/Qwen3-8B
+```
+
+[完整流程与状态说明](docs/workflow.md) · [本地模型服务与部署](docs/local_inference.md)
+
 ## 先运行离线闭环
 
 ```bash

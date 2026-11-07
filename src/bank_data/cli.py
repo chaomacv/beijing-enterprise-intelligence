@@ -30,18 +30,31 @@ def demo_input(root):
 def main():
     p = argparse.ArgumentParser(description='北京公开文件后处理；真实数据与模型权重放在仓库外。')
     sub = p.add_subparsers(dest='command', required=True)
-    for name in ('prepare', 'run'):
+    for name in ('prepare', 'run', 'workflow'):
         s = sub.add_parser(name)
         s.add_argument('--input', type=Path, required=True)
         s.add_argument('--work-dir', type=Path, required=True)
-        if name == 'run':
+        if name in ('run', 'workflow'):
             s.add_argument('--backend', choices=('local', 'rules'), default='local')
             s.add_argument('--endpoint', default=os.environ.get('BANK_LLM_ENDPOINT', 'http://127.0.0.1:8000/v1'))
             s.add_argument('--model', default=os.environ.get('BANK_LLM_MODEL', 'Qwen/Qwen3-8B'))
             s.add_argument('--tokenizer-dir', type=Path)
+        if name == 'workflow':
+            s.add_argument('--through', choices=('scan','screen','prepare','run'), default='run')
+            s.add_argument('--workers', type=int, default=1, help='Parallel file profiling workers')
+            s.add_argument('--retry-review', action='store_true')
     demo = sub.add_parser('demo')
     demo.add_argument('--work-dir', type=Path, required=True)
     args = p.parse_args()
+    if args.command == 'workflow':
+        from .workflow import workflow
+        def backend_factory(store):
+            if args.backend == 'rules': return RuleBaseline()
+            from .llm import LocalQwen
+            return LocalQwen(store,args.endpoint,args.model,args.tokenizer_dir)
+        result = workflow(args.input,args.work_dir,backend_factory,args.through,args.workers,args.retry_review)
+        print(json.dumps(result,ensure_ascii=False,indent=2))
+        return 0
     from .pipeline import run
     store = Store(args.work_dir)
     try:

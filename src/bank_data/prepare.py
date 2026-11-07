@@ -4,14 +4,16 @@ from collections import Counter
 from pathlib import Path
 
 from .common import dump, file_hash, stable_id
-from .readers import detect, discover, read_records
+from .readers import READER_VERSION, detect, discover, read_records
 
 
 def source_metadata(path):
     p = path.parent / 'provenance.json'
     if not p.exists(): return {}
     data = json.loads(p.read_text(encoding='utf-8'))
-    return {k: data[k] for k in ('dataset_url', 'file_name', 'expected_name', 'sha256', 'attachment_id') if k in data}
+    return {k: data[k] for k in ('dataset_url', 'file_name', 'expected_name', 'sha256', 'attachment_id',
+                               'attachment_href', 'task_id', 'snapshot_id', 'archive_member', 'parent_sha256',
+                               'page_version_hint', 'format_mismatch') if k in data}
 
 
 def build_cards(store, file_id):
@@ -35,17 +37,20 @@ def build_cards(store, file_id):
         store.db.execute('INSERT OR REPLACE INTO scopes VALUES(?,?,?)', (scope['scope'], file_id, json.dumps(card, ensure_ascii=False)))
 
 
-def prepare(store, input_dir):
+def prepare(store, input_dir, selected_paths=None):
     input_dir = Path(input_dir).resolve()
     if store.root == input_dir or store.root.is_relative_to(input_dir):
         raise ValueError('Work directory must be outside the input data directory')
     files = list(discover(input_dir))
+    if selected_paths is not None:
+        selected_paths = {str(Path(p).resolve()) for p in selected_paths}
+        files = [p for p in files if str(p.resolve()) in selected_paths]
     inventory = []
     store.db.execute('DELETE FROM active_files')
     store.db.commit()
     for path in files:
         sha = file_hash(path)
-        fid = stable_id(str(path.relative_to(input_dir)), sha)
+        fid = stable_id(READER_VERSION, path.relative_to(input_dir).as_posix(), sha)
         store.db.execute('INSERT OR IGNORE INTO active_files VALUES(?)', (fid,))
         previous = store.db.execute('SELECT status FROM files WHERE id=?', (fid,)).fetchone()
         if previous and previous['status'] == 'prepared':

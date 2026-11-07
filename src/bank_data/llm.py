@@ -1,16 +1,18 @@
 import ipaddress
 import json
 import os
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
 
-from .common import resource, stable_id
+from .common import ontology, resource, stable_id
 from .extract import EXTRACTION_SCHEMA, SCREEN_SCHEMA, validate_results, validate_screen
 
 
 class ModelFailure(RuntimeError): pass
 class TruncatedOutput(ModelFailure): pass
+class ModelUnavailable(ModelFailure): pass
 
 
 def validate_endpoint(endpoint):
@@ -47,6 +49,15 @@ class LocalQwen:
         self.name = 'local-qwen-' + stable_id(model, str(Path(tokenizer_dir).resolve()), context, max_output,
                                              resource('screen.md'), resource('extract.md'))
         self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+        headers = {'Authorization':'Bearer ' + os.environ['BANK_LLM_API_KEY']} if os.environ.get('BANK_LLM_API_KEY') else {}
+        try:
+            with self.opener.open(urllib.request.Request(self.endpoint+'/models',headers=headers),timeout=15) as response:
+                models = json.load(response)
+            if model not in {row['id'] for row in models['data']}:
+                raise ModelUnavailable('Configured local model is not served by this endpoint')
+        except ModelUnavailable: raise
+        except Exception as error:
+            raise ModelUnavailable('Local model preflight failed; no business data was submitted') from error
 
     def messages(self, task, value):
         return [{'role': 'system', 'content': resource(task + '.md')},
@@ -64,17 +75,31 @@ class LocalQwen:
                    'response_format': {'type': 'json_schema', 'json_schema': {'name': task, 'strict': True, 'schema': schema}}}
         key = stable_id(self.name, request)
         cached = self.store.db.execute('SELECT result FROM llm_cache WHERE id=?', (key,)).fetchone()
-        if cached: return json.loads(cached['result'])
+        def validate(data):
+            if task == 'screen': validate_screen(data,payload)
+            else: validate_results(data,payload['records'])
+            return data
+        if cached:
+            try: return validate(json.loads(cached['result']))
+            except (ValueError,TypeError,KeyError):
+                self.store.db.execute('DELETE FROM llm_cache WHERE id=?',(key,));self.store.db.commit()
         headers = {'Content-Type': 'application/json'}
         if os.environ.get('BANK_LLM_API_KEY'): headers['Authorization'] = 'Bearer ' + os.environ['BANK_LLM_API_KEY']
         req = urllib.request.Request(self.endpoint + '/chat/completions', json.dumps(request).encode(), headers)
-        try:
-            with self.opener.open(req, timeout=180) as r: response = json.load(r)
-        except Exception as e:
-            raise ModelFailure('Local inference request failed; no external fallback') from e
+        for attempt in range(3):
+            try:
+                with self.opener.open(req, timeout=180) as r: response = json.load(r)
+                break
+            except urllib.error.HTTPError as error:
+                if error.code not in (429,500,502,503,504):
+                    raise ModelFailure('Local inference rejected request: HTTP '+str(error.code)) from error
+                if attempt == 2: raise ModelUnavailable('Local inference service is unavailable') from error
+            except (urllib.error.URLError,TimeoutError,OSError) as error:
+                if attempt == 2: raise ModelUnavailable('Local inference service is unreachable') from error
+            time.sleep(attempt+1)
         choice = response['choices'][0]
         if choice.get('finish_reason') != 'stop': raise TruncatedOutput('Nonterminal or truncated model output')
-        data = json.loads(choice['message']['content'])
+        data = validate(json.loads(choice['message']['content']))
         self.store.db.execute('INSERT OR REPLACE INTO llm_cache VALUES(?,?)', (key, json.dumps(data, ensure_ascii=False)))
         self.store.db.commit()
         return data
@@ -82,6 +107,7 @@ class LocalQwen:
     def screen(self, card):
         # Shrink sample only. Never truncate column names or silently alter cell values.
         payload = dict(card)
+        payload['label_definitions'] = ontology()['events']
         while payload['sample'] and not self.fits(self.messages('screen', payload)):
             payload['sample'] = payload['sample'][::2] if len(payload['sample']) > 1 else []
         data = self.call('screen', payload, SCREEN_SCHEMA)
@@ -89,6 +115,6 @@ class LocalQwen:
 
     def extract(self, records, card):
         context = {k: card[k] for k in ('filename', 'sheet', 'columns', 'source')}
-        payload = {'context': context, 'event_types': list(EXTRACTION_SCHEMA['properties']['results']['items']['properties']['events']['items']['properties']['event_type']['enum']), 'records': records}
+        payload = {'context': context, 'event_types': ontology()['events'], 'records': records}
         data = self.call('extract', payload, EXTRACTION_SCHEMA)
         return validate_results(data, records)

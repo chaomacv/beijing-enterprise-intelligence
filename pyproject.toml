@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "beijing-enterprise-intelligence"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local-model processing of Beijing public-data files into evidenced enterprise events."
 requires-python = ">=3.10"
 dependencies = ["openpyxl>=3.1,<4", "xlrd>=2.0,<3", "defusedxml>=0.7,<1"]
 
 [project.optional-dependencies]
 llm = ["transformers>=4.51,<5"]
+serve = ["transformers==4.51.3", "accelerate==1.6.0", "lm-format-enforcer==0.11.3", "jsonschema==4.23.0"]
 
 [project.scripts]
 bank-data = "bank_data.cli:main"

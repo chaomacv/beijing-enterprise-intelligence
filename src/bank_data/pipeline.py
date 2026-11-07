@@ -4,6 +4,7 @@ from collections import defaultdict
 from .common import dump, ontology, stable_id
 from .extract import review_result, validate_results, validate_screen
 from .resolve import resolve_results
+from .llm import ModelUnavailable
 
 
 def extract_batch(backend, records, card):
@@ -11,6 +12,7 @@ def extract_batch(backend, records, card):
     try:
         results = backend.extract(records, card)
         return validate_results({'results': results}, records), []
+    except ModelUnavailable: raise
     except Exception as error:
         if len(records) > 1:
             split = len(records) // 2
@@ -35,6 +37,7 @@ def run(store, backend):
             decision = json.loads(saved['result'])
         else:
             try: decision = validate_screen(backend.screen(card), card)
+            except ModelUnavailable: raise
             except Exception as error:
                 decision = {'decision': 'REVIEW', 'event_types': [], 'reason': type(error).__name__, 'evidence_fields': []}
                 issues.append({'scope_id': scope_id, 'stage': 'screen', 'reason': type(error).__name__})
