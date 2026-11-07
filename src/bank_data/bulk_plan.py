@@ -74,6 +74,9 @@ def validate_plan(plan,card):
                                        (('拟处罚','拟认定','拟支持','拟推荐'),'proposed')]:
                     if any(word in rule['contains'] for word in words) and rule['status']!=expected:
                         raise ValueError('Explicit stage phrase contradicts mapped status: '+rule['contains'])
+    # Preserve the raw reply separately; the effective plan lists only executed mappings.
+    if plan['mode'] not in ('map','entity_only'):return {**plan,'entities':[],'events':[]}
+    if plan['mode']=='entity_only':return {**plan,'events':[]}
     return plan
 
 
@@ -83,7 +86,7 @@ def create_plans(profiles,root,endpoints,model,tokenizer_dir):
     (stage/'prompt.md').write_text(PROMPT,encoding='utf-8')
     dump(stage/'config.json',{'signature':signature,'model':model,'temperature':0,'max_output':1024,
         'method':'local_llm_schema_plan_then_source_bound_row_application'})
-    tasks=queue.Queue();cards=[];results={};lock=threading.Lock();start=time.monotonic();stop=threading.Event()
+    tasks=queue.Queue();pending=[];cards=[];results={};lock=threading.Lock();start=time.monotonic();stop=threading.Event()
     for profile in profiles:
         for card in profile['cards']:
             prior=root/'03_screen/scopes'/(card['scope_id']+'.json')
@@ -93,7 +96,11 @@ def create_plans(profiles,root,endpoints,model,tokenizer_dir):
             if saved.exists():
                 result=json.loads(saved.read_text(encoding='utf-8'))
                 if result.get('signature')==signature and result.get('card_hash')==stable_id(card):results[card['scope_id']]=result;continue
-            tasks.put(card)
+            pending.append((card,len(decision['event_types'])))
+    # Bucket similar schemas and expected output complexity before GPU padding.
+    pending.sort(key=lambda item:(item[1],tuple(item[0]['columns']),
+        sum(len(str(value)) for row in item[0]['sample'] for value in row['cells'].values())))
+    for card,_ in pending:tasks.put(card)
     def save(card,plan,response,error=None,request=None):
         data={'scope_id':card['scope_id'],'file_id':card['file_id'],'signature':signature,'card_hash':stable_id(card),
               'plan':plan,'response':response,'error':error,'request':request}

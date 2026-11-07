@@ -58,6 +58,26 @@ class BulkTests(unittest.TestCase):
             clients=[f.result() for f in futures]
         self.assertEqual(len({id(c.tokenizer) for c in clients}),4)
 
+    def test_padded_token_budget_splits_before_sending_without_changing_requests(self):
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        from bank_data.bulk_client import BatchClient
+        import io
+        tokenizer=SimpleNamespace(apply_chat_template=lambda *args,**kwargs:[0]*6000)
+        fake=SimpleNamespace(AutoTokenizer=SimpleNamespace(from_pretrained=lambda *args,**kwargs:tokenizer))
+        batches=[]
+        def send(request,**kwargs):
+            values=json.loads(request.data)['requests'];batches.append(values)
+            return io.BytesIO(json.dumps({'items':[{'ok':False,'error':'synthetic'} for _ in values]}).encode())
+        with patch.dict('sys.modules',{'transformers':fake}):
+            client=BatchClient('http://127.0.0.1:18080/v1','synthetic',self.raw,self.work/'cache')
+        client.opener=SimpleNamespace(open=send)
+        requests=[client.request('synthetic',{'case':i},{'type':'object'},512) for i in range(4)]
+        output=client.call(requests)
+        self.assertEqual(len(output),4)
+        self.assertEqual([len(b) for b in batches],[2,2])
+        self.assertEqual([r for batch in batches for r in batch],requests)
+
     def test_archive_byte_names_preserve_original_encoding(self):
         original='目录/企业名单.csv'.encode('gb18030')
         name,metadata=member_name(original)
@@ -116,6 +136,13 @@ class BulkTests(unittest.TestCase):
         card={'filename':'合成行政处罚.csv','columns':['企业名称','地址','事件内容','日期','状态']}
         plan=mapping();plan['events'][0]['status_rules']=[{'field':'状态','contains':'已处罚','status':'proposed'}]
         with self.assertRaises(ValueError):validate_plan(plan,card)
+
+    def test_effective_plan_omits_unused_mappings_without_changing_raw_reply(self):
+        card={'filename':'合成统计.csv','columns':['企业名称','地址','事件内容','日期']}
+        raw=mapping();raw['mode']='exclude'
+        effective=validate_plan(raw,card)
+        self.assertEqual(effective['entities'],[]);self.assertEqual(effective['events'],[])
+        self.assertEqual(len(raw['events']),1)
 
     def test_native_xml_keeps_repeated_fields_and_attributes(self):
         from bank_data.bulk_native import native_one

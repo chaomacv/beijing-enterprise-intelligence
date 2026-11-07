@@ -15,6 +15,8 @@ CUDA_VISIBLE_DEVICES=0 python -m bank_data.serve_batch \
 
 服务仅绑定本机，支持每批最多 4 个独立 schema 请求。多 GPU 各启动一个副本并使用不同端口；单 GPU 也可完成全流程。
 
+客户端按实际 tokenizer 统计每个请求，默认将填充后的整批输入加输出预算限制为 24,576 token，长请求提前拆批；GPU 仍不足时保留递归缩批。字段规划将相近表头和事件类别数量放在相邻批次，减少长短请求混排的填充开销。它们改变调度，不删除请求内容。
+
 ```bash
 python -m bank_data.bulk_run \
   --input /private/raw --work-dir /private/full_run \
@@ -61,6 +63,8 @@ OCR 保留模型版本、原图哈希、页号、文字框、识别置信度及�
 OCR 记录及其主体、事件会带 `source_quality=OCR_UNVERIFIED`、`source_kind` 和该页最低识别置信度；画像汇总 `observed_source_quality`。`confirmed` 描述来源中的事件阶段，不能理解为识别文字或银行事实已经人工核验。
 
 字段方案是有限的声明式映射，不执行模型生成的 Python 或正则。程序阻止机关代码充当企业代码、明确阶段与映射矛盾，以及检查合格生成处罚。来源引用、事件主体下标、记录 ID 集合分别验证；模型返回顺序不会改变记录归属。这些约束可以减少特定错误，无法替代独立语义评测。
+
+`plan` 记录真正执行的方案：exclude / review / row_llm 的字段映射为空，entity_only 不包含事件映射。模型未被采用的定义仍可在 `response` 原回复中检查，避免把无效定义误当作已执行步骤。
 
 ## 身份关联与使用结果
 

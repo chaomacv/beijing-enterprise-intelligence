@@ -13,8 +13,9 @@ TOKENIZER_INIT_LOCK=threading.Lock()
 
 
 class BatchClient:
-    def __init__(self,endpoint,model,tokenizer_dir,cache,context=8192):
+    def __init__(self,endpoint,model,tokenizer_dir,cache,context=8192,padded_batch_tokens=24576):
         self.endpoint=validate_endpoint(endpoint);self.model=model;self.context=context
+        self.padded_batch_tokens=padded_batch_tokens;self.token_counts={}
         # Transformers lazily imports AutoTokenizer; concurrent first imports can fail.
         # Initialize separate tokenizers sequentially; inference remains parallel.
         with TOKENIZER_INIT_LOCK:
@@ -27,8 +28,10 @@ class BatchClient:
         messages=[{'role':'system','content':system},{'role':'user','content':json.dumps(payload,ensure_ascii=False)}]
         tokens=self.tokenizer.apply_chat_template(messages,tokenize=True,add_generation_prompt=True,enable_thinking=False)
         if len(tokens)+maximum+256>self.context:raise ValueError('context_budget_exceeded')
-        return {'model':self.model,'messages':messages,'max_tokens':maximum,
+        request={'model':self.model,'messages':messages,'max_tokens':maximum,
                 'temperature':0,'response_format':{'type':'json_schema','json_schema':{'name':'corpus','strict':True,'schema':schema}}}
+        self.token_counts[stable_id('batch-greedy-v1',request)]=len(tokens)
+        return request
 
     def screen_request(self,card,schema,prompt=None):
         if len(card['columns'])>512:raise ValueError('very_wide_schema_requires_header_review')
@@ -56,6 +59,18 @@ class BatchClient:
             else:pending.append((i,request,path))
         if pending:
             batch=[r for _,r,_ in pending]
+            lengths=[]
+            for request in batch:
+                key=stable_id('batch-greedy-v1',request)
+                if key not in self.token_counts:
+                    self.token_counts[key]=len(self.tokenizer.apply_chat_template(request['messages'],tokenize=True,
+                        add_generation_prompt=True,enable_thinking=False))
+                lengths.append(self.token_counts[key])
+            padded=len(batch)*(max(lengths)+max(r['max_tokens'] for r in batch))
+            if len(batch)>1 and padded>self.padded_batch_tokens:
+                smaller=self.call(batch[:len(batch)//2])+self.call(batch[len(batch)//2:])
+                for (i,_,_),item in zip(pending,smaller):output[i]=item
+                return output
             req=urllib.request.Request(self.endpoint+'/batch/chat/completions',
                 json.dumps({'requests':batch},ensure_ascii=False).encode('utf-8'),{'Content-Type':'application/json'})
             result=None
