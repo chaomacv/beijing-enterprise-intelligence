@@ -28,8 +28,8 @@ def report(root,state):
         '本地 Qwen 负责文件理解、字段方案和复杂记录抽取；程序逐行复制原值、执行条件、校验与匹配。',
         '原始文件保持只读。抽样用于文件判断，不代表模型已理解所有内容；语义准确率尚未独立评测。','',
         '当前状态：**'+state['status']+'**；当前步骤：**'+state['current_stage']+'**。','',
-        '| 目录 | 步骤 | 主要中间结果 |','| --- | --- | --- |']
-    lines.extend('| '+name+' | '+title+' | '+outputs+' |' for name,title,outputs in STEPS)
+        '| 目录 | 状态 | 步骤 | 主要中间结果 |','| --- | --- | --- | --- |']
+    lines.extend('| '+name+' | '+state.get('steps',{}).get(name,{}).get('status','PENDING')+' | '+title+' | '+outputs+' |' for name,title,outputs in STEPS)
     lines+=['','## 每一步的数量与状态','']
     for name in ['02_profiles/native_summary.json','02_profiles/summary.json','03_screen/summary.json',
                  '04_plans/summary.json','06_validation/mapping_summary.json','06_validation/llm_summary.json',
@@ -38,6 +38,7 @@ def report(root,state):
         if path.exists():
             lines+=['### '+name,'','```json',json.dumps(json.loads(path.read_text(encoding='utf-8')),ensure_ascii=False,indent=2),'```','']
     lines+=['## 如何追溯','',
+        '先打开 02_profiles/文件总表.csv、03_screen/筛选总表.csv、04_plans/字段方案总表.csv、05_records/分块与处理总表.csv 和 06_validation/校验总表.csv。它们是适合人工查看的小型索引；全部记录在 JSONL 和 Parquet 中。','',
         '1. 从 08_results/profiles 或 events 的 entity_id / event_id 查找对应 event_sources。',
         '2. event_sources 保存 file_id、scope_id、sheet、row、record_id 与原文引用。',
         '3. 08_results/file_index.json 给出原文件、内容哈希、下载来源及压缩成员关系。',
@@ -131,13 +132,17 @@ def run(args):
         elif not args.skip_native:
             from .bulk_native import enrich
             profiles=enrich(profiles,root,args.workers)
+        from .bulk_report import overviews
+        overviews(root,profiles)
         stage('03_screen')
         wait_job(root,'screen.pid','bank_data.bulk_screen')
         from .bulk_screen import screen
         screen(profiles,root,args.endpoints,args.model,args.tokenizer_dir)
+        overviews(root,profiles)
         stage('04_plans')
         from .bulk_plan import create_plans
         create_plans(profiles,root,args.endpoints,args.model,args.tokenizer_dir)
+        overviews(root,profiles)
         stage('05_records')
         from .bulk_rows import materialize
         materialize(profiles,root,args.workers)
@@ -145,6 +150,7 @@ def run(args):
         from .bulk_semantics import resolve_pending,finalize_validation
         resolve_pending(profiles,root,args.endpoints,args.model,args.tokenizer_dir)
         finalize_validation(profiles,root)
+        overviews(root,profiles)
         stage('07_entities')
         from .bulk_aggregate import aggregate
         result=aggregate(root,profiles)

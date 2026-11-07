@@ -40,6 +40,8 @@ python -m bank_data.bulk_run \
 
 根目录 `run_status.json` 给出阶段状态；`流程与结果.md` 汇总各步数量和追溯方法；`audit.json` 核对原始文件 ID 集合以及已知记录是否都有结果、显式排除或文件失败去向。
 
+人工查看可先打开各阶段的 `文件总表.csv`、`筛选总表.csv`、`字段方案总表.csv`、`分块与处理总表.csv` 和 `校验总表.csv`。这些是文件／表级索引；JSONL 和 Parquet 保存完整记录，避免大型结果受电子表格行数限制。
+
 ## 状态的含义
 
 - 文件：PROFILED 已解析；EMPTY 无记录；CONTAINER 压缩容器；CONVERTED 有独立转换结果；COMPONENT 由数据库逻辑表消费的组件；METADATA 配套元数据；REVIEW 无法可靠读取。
