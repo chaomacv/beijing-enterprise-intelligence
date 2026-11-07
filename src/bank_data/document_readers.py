@@ -6,6 +6,11 @@ import subprocess
 import zipfile
 
 
+def blank_raster(pixmap):
+    pixels=pixmap.samples
+    return bool(pixels) and pixels.count(255)==len(pixels)
+
+
 def text_fragments(value,maximum=2000,overlap=160):
     start=0
     while start<len(value):
@@ -34,7 +39,9 @@ def document_records(path,kind):
             for page_number,page in enumerate(document,1):
                 blocks=page.get_text('blocks',sort=True)
                 text_blocks=[b for b in blocks if len(b)>6 and b[6]==0 and b[4].strip()]
-                if not text_blocks:raise ValueError('OCR_REQUIRED: native text absent on page '+str(page_number))
+                if not text_blocks:
+                    if blank_raster(page.get_pixmap(matrix=pymupdf.Matrix(1.5,1.5),alpha=False)):continue
+                    raise ValueError('OCR_REQUIRED: native text absent on page '+str(page_number))
                 boxes=[]
                 try:tables=page.find_tables().tables
                 except Exception:tables=[]

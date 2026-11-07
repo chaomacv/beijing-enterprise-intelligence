@@ -11,7 +11,7 @@ from pathlib import Path,PurePosixPath
 import time
 
 from .common import dump,file_hash,stable_id
-from .document_readers import text_fragments
+from .document_readers import text_fragments,blank_raster
 from .scan import profile_file
 
 
@@ -30,12 +30,11 @@ def ocr_engine():
 
 
 def ocr_file(profile,root):
-    import numpy as np
     root=Path(root);cache=root/'01_inputs/ocr_cache';cache.mkdir(parents=True,exist_ok=True)
     key=stable_id('rapidocr-onnx-1.4.4-side1400-v1',profile['sha256'])
     saved=cache/(key+'.json')
     if saved.exists():return json.loads(saved.read_text(encoding='utf-8'))
-    pages=[];engine=ocr_engine()
+    pages=[]
     if profile['kind']=='pdf':
         import pymupdf
         with pymupdf.open(profile['path']) as document:
@@ -43,12 +42,17 @@ def ocr_file(profile,root):
                 native=page.get_text(sort=True)
                 if native.strip():pages.append({'page':index,'source':'pdf_native_text','text':native,'lines':[]});continue
                 pix=page.get_pixmap(matrix=pymupdf.Matrix(1.5,1.5),alpha=False)
+                if blank_raster(pix):
+                    pages.append({'page':index,'source':'blank_page','text':'','lines':[]});continue
+                engine=ocr_engine()
+                import numpy as np
                 image=np.frombuffer(pix.samples,dtype=np.uint8).reshape(pix.height,pix.width,pix.n)
                 if pix.n>=3:image=image[:,:,:3][:,:,::-1].copy()
                 lines,_=engine(image)
                 if not lines:raise ValueError('OCR_NO_TEXT_ON_PAGE_'+str(index))
                 pages.append({'page':index,'source':'rapidocr_cpu','text':'\n'.join(v[1] for v in lines),'lines':lines})
     else:
+        engine=ocr_engine()
         lines,_=engine(profile['path'])
         if not lines:raise ValueError('OCR_NO_RECOGNIZED_TEXT')
         pages.append({'page':1,'source':'rapidocr_cpu','text':'\n'.join(v[1] for v in lines),'lines':lines})

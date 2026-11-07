@@ -156,6 +156,21 @@ class BulkTests(unittest.TestCase):
         self.assertEqual(data['station/reading[1]/text()'],'1')
         self.assertEqual(data['station/reading[2]/text()'],'2')
 
+    @unittest.skipUnless(importlib.util.find_spec('pymupdf'),'native PDF runtime not installed')
+    def test_blank_pdf_page_does_not_quarantine_native_text_or_start_ocr(self):
+        from bank_data.bulk_native import ocr_file
+        from unittest.mock import patch
+        import pymupdf
+        path=self.raw/'synthetic.pdf'
+        with pymupdf.open() as doc:
+            doc.new_page();page=doc.new_page();page.insert_text((72,72),'SYNTHETIC BUSINESS RECORD');doc.save(path)
+        with patch('bank_data.bulk_native.ocr_engine',side_effect=AssertionError('OCR not needed')):
+            result=ocr_file({'kind':'pdf','path':str(path),'sha256':file_hash(path)},self.work)
+        self.assertEqual([p['source'] for p in result['pages']],['blank_page','pdf_native_text'])
+        self.assertIn('SYNTHETIC BUSINESS RECORD',result['pages'][1]['text'])
+        rows=list(document_records(path,'pdf'))
+        self.assertTrue(rows);self.assertEqual({row[3]['page'] for row in rows},{2})
+
     def test_model_results_are_assigned_by_id_even_when_reordered(self):
         from bank_data.bulk_semantics import infer
         from unittest.mock import Mock,patch
