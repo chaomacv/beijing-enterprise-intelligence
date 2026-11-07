@@ -195,5 +195,32 @@ class BulkTests(unittest.TestCase):
             self.assertIn('OCR_UNVERIFIED',db.execute('SELECT observed_source_quality FROM profiles').fetchone()[0])
         finally:db.close()
 
+    @unittest.skipUnless(importlib.util.find_spec('duckdb'),'bulk SQL runtime not installed')
+    def test_header_uncertainty_survives_fact_and_profile_exports(self):
+        from bank_data.common import stable_id
+        for folder in ['one','two']:
+            path=self.raw/folder/'合成许可名单.csv';path.parent.mkdir()
+            path.write_text('客户名称,经营地址,事项结果,发生日,文书编号\n合成甲公司,示例路1号,已批准,2026-01-01,SYNTHETIC-L-001\n',encoding='utf-8')
+        profiles,_=scan(self.raw,self.work/'02_profiles')
+        profiles.sort(key=lambda p:stable_id(p['cards'][0]['sample'][0]['record_id'],0))
+        profiles[-1]['cards'][0]['quality_flags'].append('width_mismatch')
+        plan=mapping();plan['entities'][0].update(name_field='客户名称',address_field='经营地址')
+        plan['events'][0].update(event_type='qualification',date_field='发生日',document_field='文书编号',evidence_fields=['事项结果','__filename__'])
+        for profile in profiles:
+            card=profile['cards'][0];self.assertIn('header_uncertain',card['quality_flags'])
+            dump(self.work/'04_plans/scopes'/(card['scope_id']+'.json'),{'signature':'synthetic','plan':plan})
+        materialize(profiles,self.work,workers=1);finalize_validation(profiles,self.work)
+        result=aggregate(self.work,profiles)
+        import duckdb
+        db=duckdb.connect(str(self.work/'07_entities/results.duckdb'),read_only=True)
+        try:
+            self.assertIn('header_uncertain',db.execute('SELECT quality_flags FROM event_sources').fetchone()[0])
+            self.assertIn('header_uncertain',db.execute('SELECT observed_quality_flags FROM profiles').fetchone()[0])
+            self.assertEqual(db.execute('SELECT quality_flags FROM events').fetchone()[0],['header_uncertain','width_mismatch'])
+            self.assertEqual(result['counts']['events'],1);self.assertEqual(result['counts']['event_sources'],2)
+            self.assertEqual(result['record_statuses'],{'EXTRACTED':2})
+            self.assertEqual(result['processed_scopes_requiring_structural_review'],2)
+        finally:db.close()
+
 
 if __name__=='__main__':unittest.main()

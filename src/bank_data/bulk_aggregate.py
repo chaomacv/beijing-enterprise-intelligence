@@ -1,5 +1,6 @@
 """Disk-backed identity resolution and fact exports; no all-pairs comparison."""
 from collections import Counter
+import csv
 import json
 from pathlib import Path
 import time
@@ -47,11 +48,17 @@ def aggregate(root,profiles):
         dump(stage/'progress.json',value);print(json.dumps(value),flush=True)
     try:
         checkpoint('import_validated_partitions')
+        scope_rows=[(c['scope_id'],p['file_id'],p['filename'],c['sheet'],c['quality_flags'],c['row_count']) for p in profiles for c in p['cards']]
+        db.execute('CREATE OR REPLACE TABLE source_scopes(scope_id VARCHAR PRIMARY KEY,file_id VARCHAR,filename VARCHAR,sheet VARCHAR,quality_flags VARCHAR[],known_rows BIGINT)')
+        if scope_rows:db.executemany('INSERT INTO source_scopes VALUES (?,?,?,?,?,?)',scope_rows)
         completed=json.loads((root/'06_validation/files.json').read_text(encoding='utf-8'))
         dirs=[root/'06_validation'/p['file_id'] for p in completed if p['status']=='COMPLETE']
         import_lines(db,'mentions',[str(p/'mentions.jsonl') for p in dirs],MENTION_COLUMNS)
         import_lines(db,'facts',[str(p/'events.jsonl') for p in dirs],FACT_COLUMNS)
-        import_lines(db,'record_ledger',[str(p/'record_results.jsonl') for p in dirs],RESULT_COLUMNS)
+        import_lines(db,'raw_record_ledger',[str(p/'record_results.jsonl') for p in dirs],RESULT_COLUMNS)
+        if db.execute('SELECT count(*) FROM raw_record_ledger r LEFT JOIN source_scopes q USING(scope_id) WHERE q.scope_id IS NULL').fetchone()[0]:
+            raise ValueError('A record references an unknown source scope')
+        db.execute('CREATE OR REPLACE TABLE record_ledger AS SELECT r.*,q.quality_flags FROM raw_record_ledger r JOIN source_scopes q USING(scope_id)')
         nrecords,unique=db.execute('SELECT count(*),count(DISTINCT record_id) FROM record_ledger').fetchone()
         if nrecords!=unique:raise ValueError('Duplicate global record IDs')
         nmentions,unique=db.execute('SELECT count(*),count(DISTINCT mention_id) FROM mentions').fetchone()
@@ -61,7 +68,7 @@ def aggregate(root,profiles):
             SELECT normalized_name,normalized_address,count(DISTINCT valid_code) AS n_codes,min(valid_code) AS only_code
             FROM mentions WHERE valid_code IS NOT NULL GROUP BY 1,2''')
         db.execute('''CREATE OR REPLACE TABLE entity_mentions AS
-            SELECT m.*,
+            SELECT m.*,q.quality_flags,
             'E_' || substr(sha256(CASE
               WHEN m.valid_code IS NOT NULL THEN 'code:' || m.valid_code
               WHEN m.normalized_address<>'' AND coalesce(k.n_codes,0)=1 THEN 'code:' || k.only_code
@@ -73,7 +80,8 @@ def aggregate(root,profiles):
               WHEN m.normalized_address<>'' AND coalesce(k.n_codes,0)=0 THEN 'exact_name_and_address'
               WHEN coalesce(k.n_codes,0)>1 THEN 'conflicting_codes_require_review'
               ELSE 'insufficient_identity_fields' END AS match_reason
-            FROM mentions m LEFT JOIN name_address_codes k USING(normalized_name,normalized_address)''')
+            FROM mentions m LEFT JOIN name_address_codes k USING(normalized_name,normalized_address)
+              LEFT JOIN source_scopes q ON m.scope_id=q.scope_id''')
         db.execute('''CREATE OR REPLACE TABLE entities AS
             WITH base AS (SELECT entity_id,min(valid_code) AS valid_code,count(*) AS source_mentions
               FROM entity_mentions GROUP BY entity_id),
@@ -86,14 +94,18 @@ def aggregate(root,profiles):
             kinds AS (SELECT entity_id,list(kind ORDER BY kind) AS kinds FROM
               (SELECT DISTINCT entity_id,kind FROM entity_mentions) GROUP BY entity_id),
             quality AS (SELECT entity_id,list(source_quality ORDER BY source_quality) AS observed_source_quality FROM
-              (SELECT DISTINCT entity_id,source_quality FROM entity_mentions) GROUP BY entity_id)
+              (SELECT DISTINCT entity_id,source_quality FROM entity_mentions) GROUP BY entity_id),
+            structure AS (SELECT entity_id,list(flag ORDER BY flag) AS observed_quality_flags FROM
+              (SELECT DISTINCT m.entity_id,u.flag FROM entity_mentions m CROSS JOIN unnest(m.quality_flags) AS u(flag)) GROUP BY entity_id)
             SELECT base.*,names.names,addresses.addresses,roles.roles,kinds.kinds,quality.observed_source_quality,
+              coalesce(structure.observed_quality_flags,[]::VARCHAR[]) AS observed_quality_flags,
               CASE WHEN valid_code IS NOT NULL THEN 'code_checksum_only_not_registry_verified' ELSE 'provisional' END AS identity_status
             FROM base LEFT JOIN names USING(entity_id) LEFT JOIN addresses USING(entity_id)
-              LEFT JOIN roles USING(entity_id) LEFT JOIN kinds USING(entity_id) LEFT JOIN quality USING(entity_id)''')
+              LEFT JOIN roles USING(entity_id) LEFT JOIN kinds USING(entity_id) LEFT JOIN quality USING(entity_id)
+              LEFT JOIN structure USING(entity_id)''')
         checkpoint('resolve_event_sources')
         db.execute('''CREATE OR REPLACE TABLE event_sources AS
-            SELECT f.*,m.entity_id,
+            SELECT f.*,m.entity_id,m.quality_flags,
               'F_' || substr(sha256(CASE WHEN json_extract_string(f.document_no,'$.value') IS NOT NULL
                 THEN m.entity_id || chr(31) || f.event_type || chr(31) || f.status || chr(31) ||
                   json_extract_string(f.document_no,'$.value') || chr(31) || coalesce(cast(f.date AS VARCHAR),'') || chr(31) ||
@@ -102,8 +114,13 @@ def aggregate(root,profiles):
             FROM facts f JOIN entity_mentions m ON f.subject_mention_id=m.mention_id''')
         nfacts=db.execute('SELECT count(*) FROM facts').fetchone()[0]
         if db.execute('SELECT count(*) FROM event_sources').fetchone()[0]!=nfacts:raise ValueError('A fact lost its source subject')
-        db.execute('''CREATE OR REPLACE TABLE events AS SELECT * EXCLUDE(rank) FROM
-            (SELECT *,row_number() OVER(PARTITION BY event_id ORDER BY fact_id) AS rank FROM event_sources) WHERE rank=1''')
+        db.execute('''CREATE OR REPLACE TABLE events AS
+            WITH representative AS (SELECT * EXCLUDE(rank) FROM
+              (SELECT *,row_number() OVER(PARTITION BY event_id ORDER BY fact_id) AS rank FROM event_sources) WHERE rank=1),
+            flags AS (SELECT event_id,list(flag ORDER BY flag) AS quality_flags FROM
+              (SELECT DISTINCT e.event_id,u.flag FROM event_sources e CROSS JOIN unnest(e.quality_flags) AS u(flag)) GROUP BY event_id)
+            SELECT r.* EXCLUDE(quality_flags),coalesce(f.quality_flags,[]::VARCHAR[]) AS quality_flags
+            FROM representative r LEFT JOIN flags f USING(event_id)''')
         tags=[{'event_type':k,'label':v['tag']} for k,v in ontology()['events'].items()]
         db.execute('CREATE OR REPLACE TABLE tag_labels(event_type VARCHAR,label VARCHAR)')
         db.executemany('INSERT INTO tag_labels VALUES (?,?)',[(v['event_type'],v['label']) for v in tags])
@@ -138,6 +155,16 @@ def aggregate(root,profiles):
             if name!='record_ledger':export(db,'SELECT * FROM '+name,result/(name+'.jsonl'),'json')
         export(db,"SELECT * FROM record_ledger WHERE status='REVIEW'",review/'record_review.parquet','parquet')
         export(db,"SELECT * FROM record_ledger WHERE status='REVIEW'",review/'record_review.jsonl','json')
+        db.execute('''CREATE OR REPLACE TABLE structural_review_scopes AS SELECT q.*,c.processed_records
+            FROM source_scopes q JOIN (SELECT scope_id,count(*) AS processed_records FROM record_ledger GROUP BY scope_id) c USING(scope_id)
+            WHERE array_length(q.quality_flags)>0''')
+        export(db,'SELECT * FROM source_scopes',stage/'source_scopes.parquet','parquet')
+        export(db,'SELECT * FROM structural_review_scopes',review/'structural_review_scopes.parquet','parquet')
+        export(db,'SELECT * FROM structural_review_scopes',review/'structural_review_scopes.jsonl','json')
+        with (review/'表头及结构复核清单.csv').open('w',encoding='utf-8-sig',newline='') as stream:
+            writer=csv.writer(stream);writer.writerow(['scope_id','file_id','文件名','工作表','结构标记','已知记录数','已处理记录数'])
+            for row in db.execute('SELECT * FROM structural_review_scopes ORDER BY file_id,sheet').fetchall():
+                writer.writerow([*row[:4],json.dumps(row[4],ensure_ascii=False),*row[5:]])
         dump(review/'file_review.json',[{k:p.get(k) for k in ['file_id','root_file_id','relative_path','filename','kind','error','native_error','source']}
             for p in profiles if p['status']=='REVIEW'])
         dump(result/'file_index.json',[{k:p.get(k) for k in ['file_id','root_file_id','relative_path','path','filename','kind','sha256','status','records','source']}
@@ -147,6 +174,10 @@ def aggregate(root,profiles):
         summary={'complete':True,'counts':counts,'record_statuses':statuses,
             'event_categories':dict(db.execute('SELECT event_type,count(*) FROM events GROUP BY event_type').fetchall()),
             'file_statuses':dict(Counter(p['status'] for p in profiles)),'semantic_accuracy_evaluated':False,
-            'fuzzy_candidates_do_not_merge':True,'seconds':round(time.monotonic()-start,2)}
+            'fuzzy_candidates_do_not_merge':True,
+            'input_scope_quality_flags':dict(Counter(flag for p in profiles for c in p['cards'] for flag in c['quality_flags'])),
+            'processed_scopes_requiring_structural_review':db.execute('SELECT count(*) FROM structural_review_scopes').fetchone()[0],
+            'record_coverage_basis':'按解析器识别的逻辑记录对账；表头候选保存在上下文，不等于全部物理行已经人工核验。',
+            'seconds':round(time.monotonic()-start,2)}
         dump(result/'summary.json',summary);db.execute('CHECKPOINT');return summary
     finally:db.close()
