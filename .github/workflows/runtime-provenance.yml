@@ -1,0 +1,30 @@
+name: Optional GPU runtime provenance
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/runtime-provenance.yml
+
+permissions:
+  contents: read
+
+jobs:
+  official-wheel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Hash the official CUDA 11.8 artifact without executing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://github.com/vllm-project/vllm/releases/download/v0.8.5/vllm-0.8.5%2Bcu118-cp38-abi3-manylinux1_x86_64.whl'
+          curl --fail --location --retry 2 --max-time 480 "$url" --output runtime.whl
+          test "$(stat -c %s runtime.whl)" = 213618745
+          sha256sum runtime.whl | tee runtime.sha256
+          {
+            echo 'Official vLLM 0.8.5 CUDA 11.8 wheel; downloaded over HTTPS and hashed without executing package code.'
+            echo '```text'
+            cat runtime.sha256
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
