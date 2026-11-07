@@ -47,7 +47,8 @@ class LocalQwen:
         self.store, self.model = store, model
         self.context, self.max_output = context, max_output
         self.name = 'local-qwen-' + stable_id(model, str(Path(tokenizer_dir).resolve()), context, max_output,
-                                             resource('screen.md'), resource('extract.md'))
+                                             resource('screen.md'), resource('extract.md'), ontology(),
+                                             SCREEN_SCHEMA, EXTRACTION_SCHEMA)
         self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
         headers = {'Authorization':'Bearer ' + os.environ['BANK_LLM_API_KEY']} if os.environ.get('BANK_LLM_API_KEY') else {}
         try:
@@ -77,7 +78,7 @@ class LocalQwen:
         cached = self.store.db.execute('SELECT result FROM llm_cache WHERE id=?', (key,)).fetchone()
         def validate(data):
             if task == 'screen': validate_screen(data,payload)
-            else: validate_results(data,payload['records'])
+            else: validate_results(data,payload['records'],payload.get('context'))
             return data
         if cached:
             try: return validate(json.loads(cached['result']))
@@ -117,4 +118,4 @@ class LocalQwen:
         context = {k: card[k] for k in ('filename', 'sheet', 'columns', 'source')}
         payload = {'context': context, 'event_types': ontology()['events'], 'records': records}
         data = self.call('extract', payload, EXTRACTION_SCHEMA)
-        return validate_results(data, records)
+        return validate_results(data, records, card)

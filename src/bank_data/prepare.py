@@ -52,11 +52,8 @@ def prepare(store, input_dir, selected_paths=None):
         sha = file_hash(path)
         fid = stable_id(READER_VERSION, path.relative_to(input_dir).as_posix(), sha)
         store.db.execute('INSERT OR IGNORE INTO active_files VALUES(?)', (fid,))
-        previous = store.db.execute('SELECT status FROM files WHERE id=?', (fid,)).fetchone()
-        if previous and previous['status'] == 'prepared':
-            store.db.commit()
-            inventory.append({'file_id': fid, 'path': str(path), 'sha256': sha, 'status': 'cached_prepared'})
-            continue
+        store.db.commit()
+        previous = store.db.execute('SELECT status,source,path FROM files WHERE id=?', (fid,)).fetchone()
         metadata = {}
         name = path.name
         kind = 'unknown'
@@ -66,6 +63,11 @@ def prepare(store, input_dir, selected_paths=None):
             kind = detect(path)
             if metadata.get('sha256') and metadata['sha256'] != sha:
                 raise ValueError('Source checksum differs from provenance manifest')
+            if (previous and previous['status'] == 'prepared' and previous['path'] == str(path)
+                    and json.loads(previous['source']) == metadata):
+                store.db.commit()
+                inventory.append({'file_id': fid, 'path': str(path), 'sha256': sha, 'kind': kind, 'status': 'cached_prepared'})
+                continue
             store.db.commit()
             store.db.execute('BEGIN')
             store.db.execute('DELETE FROM records WHERE file_id=?', (fid,))
@@ -83,6 +85,8 @@ def prepare(store, input_dir, selected_paths=None):
         except Exception as error:
             store.db.rollback()
             # Entire file is quarantined; a parse failure never becomes silent row loss.
+            store.db.execute('DELETE FROM records WHERE file_id=?', (fid,))
+            store.db.execute('DELETE FROM scopes WHERE file_id=?', (fid,))
             store.db.execute('INSERT OR REPLACE INTO files VALUES(?,?,?,?,?,?,?,?)',
                 (fid, str(path), sha, name, kind, 'review', type(error).__name__ + ': ' + str(error)[:180], json.dumps(metadata, ensure_ascii=False)))
             store.db.commit()

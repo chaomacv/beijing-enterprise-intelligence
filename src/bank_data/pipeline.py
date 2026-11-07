@@ -11,7 +11,7 @@ def extract_batch(backend, records, card):
     """Bounded retries by recursive splitting. Oversize single records remain visible."""
     try:
         results = backend.extract(records, card)
-        return validate_results({'results': results}, records), []
+        return validate_results({'results': results}, records, card), []
     except ModelUnavailable: raise
     except Exception as error:
         if len(records) > 1:
@@ -67,6 +67,13 @@ def run(store, backend):
     observed = [r['record_id'] for r in all_results]
     if set(observed) != expected or len(observed) != len(set(observed)):
         raise RuntimeError('Coverage invariant failed; refusing to publish a partial profile')
+    queued = {issue.get('record_id') for issue in issues}
+    for result in all_results:
+        if (result['status'] == 'REVIEW' and result.get('processing_status') != 'FILE_EXCLUDED'
+                and result['record_id'] not in queued):
+            issues.append({'record_id': result['record_id'], 'stage': 'extract',
+                           'reason': 'Uncertain source or model decision',
+                           'source': record_sources[result['record_id']]})
     resolver, mentions = resolve_results(all_results)
     lookup = {(m['record_id'], m['index']): m['entity_id'] for m in mentions}
     events, relationships = {}, []

@@ -27,15 +27,16 @@ SCREEN_SCHEMA = obj({'decision': {'type': 'string', 'enum': ['KEEP', 'REVIEW', '
                      'reason': {'type': 'string'}, 'evidence_fields': {'type': 'array', 'items': {'type': 'string'}}})
 
 
-def validate_ref(ref, row):
+def validate_ref(ref, row, filename=None):
     if not isinstance(ref, dict) or set(ref) != {'field', 'value'}:
         raise ValueError('Invalid source reference')
     value = ref['value']
-    if not isinstance(value, str) or not value or ref['field'] not in row['cells'] or value not in text(row['cells'][ref['field']]):
+    cells = {**row['cells'], **({'__filename__':filename} if filename else {})}
+    if not isinstance(value, str) or not value or ref['field'] not in cells or value not in text(cells[ref['field']]):
         raise ValueError('Evidence is absent from the cited source cell')
 
 
-def validate_results(data, records):
+def validate_results(data, records, card=None):
     if not isinstance(data, dict) or set(data) != {'results'} or not isinstance(data['results'], list):
         raise ValueError('Invalid extraction result')
     expected = {r['record_id']: r for r in records}
@@ -52,6 +53,8 @@ def validate_results(data, records):
             raise ValueError('Uncertain facts must not enter the confirmed fact store')
         if result['status'] == 'NO_EVENT' and result['events']:
             raise ValueError('NO_EVENT cannot contain events')
+        if result['status'] == 'EXTRACTED' and not result['events']:
+            raise ValueError('EXTRACTED requires at least one event')
         for entity in result['entities']:
             if set(entity) != {'role', 'name', 'credit_code', 'address'} or entity['role'] not in ROLES:
                 raise ValueError('Invalid entity contract')
@@ -66,7 +69,7 @@ def validate_results(data, records):
             if event['event_type'] not in ontology()['events'] or event['status'] not in EVENT_STATUSES:
                 raise ValueError('Unknown event type/status')
             if not event['evidence']: raise ValueError('Missing event evidence')
-            for ref in event['evidence']: validate_ref(ref, row)
+            for ref in event['evidence']: validate_ref(ref, row, (card or {}).get('filename'))
             for field in ('date', 'amount', 'document_no'):
                 if event[field] is not None: validate_ref(event[field], row)
     return data['results']
@@ -134,4 +137,4 @@ class RuleBaseline:
                                    'amount': first_ref(cells, ['金额', '罚款金额', '罚款金额（万元）']),
                                    'document_no': first_ref(cells, ont['document_fields']), 'evidence': [fact]})
             result.append({'record_id': row['record_id'], 'status': 'EXTRACTED' if events else 'NO_EVENT', 'entities': [entity], 'events': events})
-        return validate_results({'results': result}, records)
+        return validate_results({'results': result}, records, card)

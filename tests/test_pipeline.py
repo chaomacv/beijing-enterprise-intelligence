@@ -80,6 +80,46 @@ class PipelineTests(unittest.TestCase):
         with self.assertRaises(ValueError): validate_results({'results': []}, [row])
         good = {'record_id': 'r1', 'status': 'NO_EVENT', 'entities': [], 'events': []}
         with self.assertRaises(ValueError): validate_results({'results': [good, good]}, [row])
+        with self.assertRaises(ValueError): validate_results({'results': [{**good, 'status':'EXTRACTED'}]}, [row])
+
+    def test_changed_provenance_invalidates_preparation_and_bad_checksum_quarantines_old_rows(self):
+        demo_input(self.input)
+        prepare(self.store,self.input)
+        sidecar=self.input/'provenance.json'
+        sidecar.write_text(json.dumps({'dataset_url':'https://example.test/revised'}),encoding='utf-8')
+        prepare(self.store,self.input)
+        cards=[json.loads(r['card']) for r in self.store.active_scopes()]
+        self.assertTrue(all(c['source']['dataset_url'].endswith('/revised') for c in cards))
+        sidecar.write_text(json.dumps({'sha256':'incorrect'}),encoding='utf-8')
+        report=prepare(self.store,self.input)
+        self.assertEqual(report['records'],0)
+        self.assertEqual(report['status_counts'],{'review':3})
+        self.assertEqual(list(self.store.active_scopes()),[])
+
+    def test_semantic_review_is_exported_to_review_queue(self):
+        demo_input(self.input)
+        prepare(self.store,self.input)
+        class Uncertain(RuleBaseline):
+            name='uncertain-test'
+            def extract(self,records,card):
+                return [{'record_id':r['record_id'],'status':'REVIEW','entities':[],'events':[]} for r in records]
+        report=run(self.store,Uncertain())
+        queue=json.loads((self.work/'review_queue.json').read_text(encoding='utf-8'))
+        self.assertEqual(report['review_records'],4)
+        self.assertEqual(len(queue),4)
+
+    def test_filename_evidence_is_source_bound_and_only_allowed_for_events(self):
+        row={'record_id':'r','cells':{'企业名称':'合成甲公司'}}
+        name={'field':'企业名称','value':'合成甲公司'}
+        entity={'role':'subject','name':name,'credit_code':None,'address':None}
+        event={'subject_index':0,'event_type':'innovation','status':'proposed','date':None,
+               'amount':None,'document_no':None,'evidence':[name,{'field':'__filename__','value':'拟认定名单'}]}
+        result={'record_id':'r','status':'EXTRACTED','entities':[entity],'events':[event]}
+        card={'filename':'合成_创新型企业拟认定名单.csv'}
+        validate_results({'results':[result]},[row],card)
+        with self.assertRaises(ValueError):validate_results({'results':[result]},[row],{'filename':'其他.csv'})
+        entity['name']={'field':'__filename__','value':'拟认定名单'}
+        with self.assertRaises(ValueError):validate_results({'results':[result]},[row],card)
 
     def test_truncated_batches_split_then_keep_review_for_single_failure(self):
         class Backend:
