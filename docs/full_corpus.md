@@ -104,6 +104,8 @@ OCR 记录及其主体、事件会带 `source_quality=OCR_UNVERIFIED`、`source_
 
 主体必须同时给出类型和明确名称的原文子串，不能仅选择一个字段作为名称。证据、日期等可直接引用字段，由程序完整复制该单元格；只需部分原文时仍给字段及原文子串。个人、类型不明或无法识别为机构的名称进入复核，不能把地点、项目或编号自动当成企业。名称识别校验较保守，短简称、没有机构特征的名称可能需要人工复核。
 
+主体歧义按条记录 REVIEW 及具体原因，同批其他已通过校验的记录继续使用，不让一条主体歧义触发整批拆分重试。缺少槽位、引用错行、原文不存在等失败仍走原有重试和来源校验。该取舍减少对不明确名称的反复推理，但不会把保守复核当作真实语义已经确认。
+
 `record_results.jsonl` 区分 `llm_field_plan`、`local_llm_sparse_source_references` 和 `local_llm_exact_content_reuse`。`model_provenance` 保存 request_path、raw_response_path 和 model_cache_key：根目录 `model_requests/<key>.json`、`model_responses/<key>.json` 是完整请求与原回复，`model_cache/<key>.json` 保存可重放的生成结果；重复内容还保存 representative_record_id 和 content_key。主体类型保留在该模型来源元数据中。原始回复留痕与已通过来源校验的结果分开，失败会重试或明确复核。
 
 原文引用校验只能证明引用存在。模型仍可能把有来源的描述理解错，真实数据语义准确率需要独立标注评测，不能由 Schema 测试或同模型自检代替。

@@ -95,7 +95,9 @@ class SourceReferenceTests(unittest.TestCase):
         rows=copy.deepcopy(self.rows);rows[0]['cells']['企业名称']='合成个人'
         for kind in ['person','unknown','business']:
             value=copy.deepcopy(self.value);entity=value['records']['r0']['entities'][0];entity['kind']=kind;entity['name']['value']='合成个人'
-            with self.assertRaises(ValueError):unpack(value,rows,self.card)
+            issues={};result=unpack(value,rows,self.card,issues)[0]
+            self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[]);self.assertEqual(result['events'],[])
+            self.assertIn(rows[0]['record_id'],issues)
 
     def test_school_and_english_legal_names_are_retained_without_matching_person_substrings(self):
         from bank_data.bulk_references import recognizable_organization
@@ -104,6 +106,14 @@ class SourceReferenceTests(unittest.TestCase):
             value=copy.deepcopy(self.value);row=value['records']['r0'];row['status']='NO_EVENT';row.pop('events');row['entities'][0]['name']['value']=name
             self.assertEqual(unpack(value,rows,self.card)[0]['entities'][0]['name']['value'],name)
         self.assertFalse(recognizable_organization('Vincent'))
+
+    def test_one_ambiguous_subject_preserves_the_other_valid_record(self):
+        rows=copy.deepcopy(self.rows);rows[1]['cells']['姓名']='合成个人'
+        value=copy.deepcopy(self.value);value['records']['r1']={'status':'NO_EVENT','entities':[{'role':'subject','kind':'person','name':{'field':'姓名','value':'合成个人'}}]}
+        issues={};result=unpack(value,rows,self.card,issues)
+        self.assertEqual([v['status'] for v in result],['EXTRACTED','REVIEW'])
+        self.assertEqual(result[0]['entities'][0]['name']['value'],'合成甲公司')
+        self.assertEqual(set(issues),{'original-B'})
 
 
 if __name__=='__main__':unittest.main()

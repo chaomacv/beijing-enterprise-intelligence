@@ -2,7 +2,7 @@
 import copy,json,re
 from .bulk_client import BatchClient
 from .common import ontology,stable_id,text,file_hash,dump
-from .extract import obj,validate_results
+from .extract import obj,validate_results,review_result,validate_ref
 from .bulk_rows import ORG_MARKERS
 
 
@@ -32,7 +32,7 @@ def schema(records):
     row={'type':'object','properties':{'status':{'type':'string','enum':['EXTRACTED','NO_EVENT','REVIEW']},'entities':{'type':'array','items':entity},'events':{'type':'array','items':event}},'required':['status'],'additionalProperties':False}
     return obj({'records':obj({'r'+str(i):copy.deepcopy(row) for i in range(len(records))})})
 
-def unpack(data,records,card):
+def unpack(data,records,card,guard_failures=None):
     from jsonschema import Draft202012Validator
     try:Draft202012Validator(schema(records)).validate(data)
     except Exception as error:raise ValueError('Invalid sparse source schema') from error
@@ -43,19 +43,27 @@ def unpack(data,records,card):
         else:raise ValueError('Invalid source reference')
         cells={**row['cells'],**({'__filename__':card['filename']} if filename else {})}
         if field not in cells:raise ValueError('Field absent from its source record')
-        return {'field':field,'value':text(cells[field]) if value is None else value}
+        result={'field':field,'value':text(cells[field]) if value is None else value}
+        validate_ref(result,row,card['filename'] if filename else None)
+        return result
     values=[]
     for i,row in enumerate(records):
         v=data['records']['r'+str(i)]
         if not isinstance(v,dict) or not {'status'}<=set(v)<= {'status','entities','events'}:raise ValueError('Unexpected record fields')
         result={'record_id':row['record_id'],'status':v['status'],'entities':[],'events':[]}
+        guard_reason=None
         for e in v.get('entities',[]):
             if not {'role','kind','name'}<=set(e)<={'role','kind','name','credit_code','address'}:raise ValueError('Unexpected entity fields')
             name=ref(e['name'],row)
-            if e['kind'] not in ['business','institution']:raise ValueError('Personal or uncertain subjects require REVIEW')
+            if e['kind'] not in ['business','institution']:
+                guard_reason='subject_kind_'+e['kind']+'_requires_review';break
             if not recognizable_organization(name['value']):
-                raise ValueError('Subject is not recognizable as an organization; use REVIEW')
+                guard_reason='subject_name_not_recognizable_requires_review';break
             result['entities'].append({'role':e['role'],'name':name,**{key:ref(e[key],row) if key in e else None for key in ['credit_code','address']}})
+        if guard_reason:
+            values.append(review_result(row['record_id']))
+            if guard_failures is not None:guard_failures[row['record_id']]=guard_reason
+            continue
         for e in v.get('events',[]):
             if not {'subject_index','event_type','status','evidence'}<=set(e)<={'subject_index','event_type','status','evidence','date','amount','document_no'}:raise ValueError('Unexpected event fields')
             result['events'].append({key:e[key] for key in ['subject_index','event_type','status']}|{'evidence':[ref(f,row,True) for f in e['evidence']]}|{key:ref(e[key],row) if key in e else None for key in ['date','amount','document_no']})
@@ -65,7 +73,7 @@ def unpack(data,records,card):
 class ReferenceClient:
     method = "local_llm_sparse_source_references"
     @staticmethod
-    def cache_signature():return stable_id("sparse-source-refs-v1",file_hash(__file__),PROMPT)
+    def cache_signature():return stable_id("sparse-source-refs-v2-per-record-review",file_hash(__file__),PROMPT)
     def __init__(self,*args,**kwargs):
         self.transport=BatchClient(*args,**kwargs);self.bindings={};self.record_provenance={};self.strategy_signature=self.cache_signature()
         self.audit_root=self.transport.cache.resolve().parent
@@ -91,9 +99,11 @@ class ReferenceClient:
                     return dict(items)
                 choice=item['response']['choices'][0]
                 if choice['finish_reason']!='stop':raise ValueError('truncated_output')
-                data=json.loads(choice['message']['content'],object_pairs_hook=pairs);canonical=unpack(data,records,card)
-                for i,row in enumerate(records):self.record_provenance[row['record_id']].update(canonical_validation_passed=True,
-                    entity_kinds=[e['kind'] for e in data['records']['r'+str(i)].get('entities',[])])
+                data=json.loads(choice['message']['content'],object_pairs_hook=pairs);guard_failures={};canonical=unpack(data,records,card,guard_failures)
+                for i,row in enumerate(records):
+                    provenance=self.record_provenance[row['record_id']]
+                    if row['record_id'] in guard_failures:provenance['guard_review_reason']=guard_failures[row['record_id']]
+                    else:provenance.update(canonical_validation_passed=True,entity_kinds=[e['kind'] for e in data['records']['r'+str(i)].get('entities',[])])
                 converted=copy.deepcopy(item);converted['source_reference_response']=copy.deepcopy(item['response']);converted['response']['choices'][0]['message']['content']=json.dumps({'results':canonical},ensure_ascii=False);out.append(converted)
             except (ValueError,TypeError,KeyError) as error:out.append({'ok':False,'error':str(error)[:150],'source_reference_response':item})
         for request in requests:self.bindings.pop(stable_id(request),None)
