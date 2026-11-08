@@ -76,6 +76,17 @@ def infer(client,records,card,depth=0,feedback=None):
         return [review_result(row['record_id'])],[{'record_id':row['record_id'],'reason':message}]
 
 
+def budgeted_requests(client,tasks,records,card,depth=0):
+    """Split over-budget groups before inference so independent parts can batch."""
+    try:return [(tasks,records,card,extract_request(client,records,card),depth)],[]
+    except ValueError:
+        if len(records)==1:return [],[(tasks,records,card,depth)]
+        middle=len(records)//2
+        left,a=budgeted_requests(client,tasks[:middle],records[:middle],card,depth+1)
+        right,b=budgeted_requests(client,tasks[middle:],records[middle:],card,depth+1)
+        return left+right,a+b
+
+
 def resolve_pending(profiles,root,endpoints,model,tokenizer_dir,client_class=BatchClient):
     root=Path(root);directory=root/'06_validation';mapping=json.loads((directory/'mapping_files.json').read_text(encoding='utf-8'))
     scope_cards={c['scope_id']:c for p in profiles for c in p['cards']}
@@ -147,22 +158,20 @@ def resolve_pending(profiles,root,endpoints,model,tokenizer_dir,client_class=Bat
                     except queue.Empty:break
                     if extra is None:tasks.put(None);break
                     groups.append(extra)
-                pending=[];requests=[]
+                pending=[];oversized=[]
                 for group in groups:
                     records=[load_row(root,task) for task in group];card=scope_cards[group[0]['scope_id']]
-                    try:request=extract_request(client,records,card)
-                    except ValueError:
-                        results,errors=infer(client,records,card)
+                    packed,too_long=budgeted_requests(client,group,records,card);pending.extend(packed);oversized.extend(too_long)
+                for start in range(0,len(pending),4):
+                    batch=pending[start:start+4];responses=client.call([entry[3] for entry in batch])
+                    for (group,records,card,_,depth),response in zip(batch,responses):
+                        try:
+                            checked=validate_results(client.content(response),records,card);by_id={r['record_id']:r for r in checked}
+                            results=[by_id[r['record_id']] for r in records];errors=[]
+                        except (ValueError,TypeError,KeyError):results,errors=infer(client,records,card,depth=depth)
                         for task,result in zip(group,results):save(task,result,errors,client)
-                        continue
-                    requests.append(request);pending.append((group,records,card))
-                if not requests:continue
-                responses=client.call(requests)
-                for (group,records,card),response in zip(pending,responses):
-                    try:
-                        checked=validate_results(client.content(response),records,card);by_id={r['record_id']:r for r in checked}
-                        results=[by_id[r['record_id']] for r in records];errors=[]
-                    except (ValueError,TypeError,KeyError):results,errors=infer(client,records,card)
+                for group,records,card,depth in oversized:
+                    results,errors=infer(client,records,card,depth=depth)
                     for task,result in zip(group,results):save(task,result,errors,client)
         except Exception:error_flag.set();raise
     with ThreadPoolExecutor(max_workers=len(endpoints)+1) as pool:

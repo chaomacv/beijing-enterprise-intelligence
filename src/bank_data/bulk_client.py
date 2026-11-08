@@ -1,5 +1,6 @@
 """Private, source-budgeted batched inference transport for corpus jobs."""
 import json
+import os
 import time
 import threading
 import urllib.request
@@ -13,8 +14,10 @@ TOKENIZER_INIT_LOCK=threading.Lock()
 
 
 class BatchClient:
-    def __init__(self,endpoint,model,tokenizer_dir,cache,context=8192,padded_batch_tokens=24576):
+    def __init__(self,endpoint,model,tokenizer_dir,cache,context=8192,padded_batch_tokens=None):
         self.endpoint=validate_endpoint(endpoint);self.model=model;self.context=context
+        if padded_batch_tokens is None:padded_batch_tokens=int(os.environ.get('BANK_PADDED_BATCH_TOKENS','24576'))
+        if type(padded_batch_tokens) is not int or padded_batch_tokens<1:raise ValueError('Batch token budget must be a positive integer')
         self.padded_batch_tokens=padded_batch_tokens;self.token_counts={}
         # Transformers lazily imports AutoTokenizer; concurrent first imports can fail.
         # Initialize separate tokenizers sequentially; inference remains parallel.

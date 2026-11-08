@@ -85,6 +85,23 @@ class BulkTests(unittest.TestCase):
         self.assertEqual(name,'目录/企业名单.csv')
         self.assertEqual(base64.b64decode(metadata['pathname_bytes_base64']),original)
 
+    def test_configurable_transport_budget_keeps_individual_requests_identical(self):
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        from bank_data.bulk_client import BatchClient
+        import io
+        fake=SimpleNamespace(AutoTokenizer=SimpleNamespace(from_pretrained=lambda *a,**k:SimpleNamespace(apply_chat_template=lambda *a,**k:[0]*6000)))
+        batches=[]
+        def send(request,**kwargs):
+            values=json.loads(request.data)['requests'];batches.append(values)
+            return io.BytesIO(json.dumps({'items':[{'ok':False,'error':'synthetic'} for _ in values]}).encode())
+        with patch.dict('sys.modules',{'transformers':fake}),patch.dict('os.environ',{'BANK_PADDED_BATCH_TOKENS':'32768'}):
+            client=BatchClient('http://127.0.0.1:18080/v1','synthetic',self.raw,self.work/'cache')
+            explicit=BatchClient('http://127.0.0.1:18080/v1','synthetic',self.raw,self.work/'explicit',padded_batch_tokens=24576)
+        self.assertEqual((client.padded_batch_tokens,explicit.padded_batch_tokens),(32768,24576))
+        client.opener=SimpleNamespace(open=send);requests=[client.request('synthetic',{'case':i},{'type':'object'},512) for i in range(4)]
+        client.call(requests);self.assertEqual(batches,[requests])
+
     def test_multiline_model_json_keeps_column_values_and_rejects_broken_syntax(self):
         from bank_data.common import decode_model_json
         raw='{"field":"多行'+chr(10)+'表头","value":"制表'+chr(9)+'原值"}'

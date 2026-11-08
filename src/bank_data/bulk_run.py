@@ -99,6 +99,7 @@ def run(args):
             shutil.copyfile(path,dest);hashes[str(relative)]=hashlib.sha256(path.read_bytes()).hexdigest()
     dump(root/'01_inputs/run_attempts'/(attempt+'.json'),{'attempt':attempt,'code_sha256':hashes,'model':args.model,
         'endpoints':args.endpoints,'tokenizer_dir':str(args.tokenizer_dir),'workers':args.workers,
+        'batch_token_budget':int(os.environ.get('BANK_PADDED_BATCH_TOKENS','24576')),
         'input':str(args.input),'profiles':str(args.profiles),'semantic_accuracy_evaluated':False})
     if state_file.exists():
         prior=json.loads(state_file.read_text(encoding='utf-8'));state['started_utc']=prior.get('started_utc',state['started_utc'])
