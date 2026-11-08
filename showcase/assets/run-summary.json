@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "aggregate_run_snapshot",
+  "snapshot_date": "2026-11-07",
+  "updated_at": "2026-11-08",
+  "source_commit": "57748c4c4086432c4b129a0fee059018a1d6a4c1",
+  "pipeline_status": "running",
+  "semantic_accuracy_evaluated": false,
+  "input": {
+    "catalog_datasets": 4710,
+    "attachments": 5200,
+    "attachment_bytes": 8447438913,
+    "distinct_file_contents": 5077,
+    "logical_files": 11701,
+    "scopes": 13281,
+    "known_logical_records": 43653625,
+    "upstream_failed_downloads": 22,
+    "pages_without_recognized_attachments": 4,
+    "unreadable_logical_files": 65
+  },
+  "plans": {"total": 9551, "map": 1347, "entity_only": 408, "row_llm": 382, "exclude": 6939, "review": 475},
+  "preparation": {"retained_records": 15861277, "field_mapped_records": 14420658, "pending_semantic_source_records": 1440619, "excluded_records": 27792348},
+  "semantic_work": {"representative_records": 388349, "exact_duplicate_source_records": 1052270},
+  "model": {"name": "Qwen3-8B", "weights": "BF16", "deployment": "local", "context_tokens": 8192},
+  "validation": {"python_tests": 105, "synthetic_model_checks": 20, "final_audit_passed": false},
+  "benchmarks": {
+    "batching": {"records": 8, "serial_seconds": 89.917, "packed_seconds": 43.140, "same_request_keys": true, "same_canonical_results": true, "review_records": 8, "shared_prefix_warmup": true, "initial_client_cache_empty": true},
+    "html_view": {"records": 12, "original_body_characters": 118616, "view_body_characters": 28338, "original_values_unchanged": true}
+  },
+  "final_counts": null
+}

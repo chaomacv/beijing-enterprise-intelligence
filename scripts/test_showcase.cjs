@@ -82,3 +82,34 @@ test('all HTML anchors and local assets resolve, and public UI has no remote scr
   assert.ok(!/<script[^>]+src="https?:/.test(html));
   for (const id of ['panel-sample', 'panel-chunk', 'panel-match']) assert.ok(ids.includes(id));
 });
+
+test('public corpus snapshot contains only aggregate metadata and keeps pending results unclaimed', () => {
+  const snapshot = JSON.parse(fs.readFileSync(path.join(root, 'showcase/assets/run-summary.json'), 'utf8'));
+  assert.equal(snapshot.kind, 'aggregate_run_snapshot');
+  assert.equal(snapshot.semantic_accuracy_evaluated, false);
+  assert.match(snapshot.source_commit, /^[a-f0-9]{40}$/);
+  assert.deepEqual(Object.keys(snapshot).sort(), ['schema_version','kind','snapshot_date','updated_at','source_commit','pipeline_status','semantic_accuracy_evaluated','input','plans','preparation','semantic_work','model','validation','benchmarks','final_counts'].sort());
+  const {input, preparation, semantic_work, plans} = snapshot;
+  for (const section of [input,preparation,semantic_work,plans]) {
+    for (const value of Object.values(section)) assert.ok(Number.isSafeInteger(value) && value >= 0);
+  }
+  assert.equal(input.known_logical_records, preparation.retained_records + preparation.excluded_records);
+  assert.equal(preparation.retained_records, preparation.field_mapped_records + preparation.pending_semantic_source_records);
+  assert.equal(preparation.pending_semantic_source_records, semantic_work.representative_records + semantic_work.exact_duplicate_source_records);
+  assert.equal(plans.total, plans.map + plans.entity_only + plans.row_llm + plans.exclude + plans.review);
+  assert.ok(input.distinct_file_contents <= input.attachments);
+  assert.ok(['running','completed','completed_with_review'].includes(snapshot.pipeline_status));
+  if (snapshot.pipeline_status === 'running') {
+    assert.equal(snapshot.final_counts, null);
+    assert.equal(snapshot.validation.final_audit_passed, false);
+  } else {
+    assert.equal(snapshot.validation.final_audit_passed, true);
+    assert.equal(snapshot.final_counts.record_ledger, preparation.retained_records);
+    for (const value of Object.values(snapshot.final_counts)) assert.ok(Number.isSafeInteger(value) && value >= 0);
+  }
+  assert.ok(!/\/opt\/|password|api_key|raw_response_path|request_path|"cells"|"record_id"|10\.126\./i.test(JSON.stringify(snapshot)));
+  const benchmark = snapshot.benchmarks.batching;
+  assert.equal(benchmark.same_request_keys, true);assert.equal(benchmark.same_canonical_results, true);
+  assert.equal(benchmark.review_records, benchmark.records);
+  assert.ok(benchmark.packed_seconds < benchmark.serial_seconds);
+});

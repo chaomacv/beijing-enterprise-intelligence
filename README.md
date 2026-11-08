@@ -5,7 +5,7 @@
 
 [![Beijing Enterprise Intelligence：从分散的数据到有据可查的企业情报](showcase/assets/project-preview.svg)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
 
-**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/)** · 文件抽样、结构分块、企业匹配与证据追溯。页面案例为现有规则 Demo 生成的合成示例，不代表真实模型或全量处理效果。
+**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/)** · 九步流程、方法选择、企业匹配与证据追溯。交互案例使用合成数据；真实运行汇总与工程对照单独标明，全量抽取仍在进行中。
 
 把北京公共数据平台下载的异构文件，转换为有来源证据的企业记录、业务事件与标签画像。语义理解使用私有环境中的 Qwen；读取、分块、校验和聚合使用 Python。
 
@@ -22,6 +22,8 @@
 7. 导出事实事件、标签、画像、匹配依据、复核队列和来源索引。保留 proposed/confirmed/removed/revoked/unknown 状态，不生成授信评分。
 
 当前版本 **v0.2**。已校验接收 5,200 个附件，完成全量文件卡片扫描；Qwen3-8B 已在私有 RTX 4090 上运行并完成小样本端到端验证。**全量 LLM 抽取和独立准确率评测尚未完成。** [实测范围与结果](docs/validation.md) · [GitHub 交付记录](https://github.com/chaomacv/beijing-enterprise-intelligence/pull/2)
+
+全量扩展开发见 [PR #5](https://github.com/chaomacv/beijing-enterprise-intelligence/pull/5) 与 [全量流程及中间产物](docs/full_corpus.md)。本批已固定 5,200 份附件、展开 11,701 个逻辑文件，完成筛选、字段规划和完整记录准备；复杂内容推理、来源回填及最终对账仍在运行。公开页面的更新在合并后部署。
 
 ## 安装
 
