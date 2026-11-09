@@ -12,7 +12,6 @@
   const colors = ['#4269d0', '#efb118', '#ff725c', '#6cc5b0', '#a463f2', '#ff8ab7', '#97bbf5', '#b59a6b', '#60a8a4', '#b5c456', '#9194a5'];
   const statusLabels = {PROFILED: '已解析', CONVERTED: '已转换', REVIEW: '待复核', CONTAINER: '容器', EMPTY: '空文件', COMPONENT: '配套组件'};
   const eventStates = {confirmed: '来源标为 confirmed', proposed: '拟议', unknown: '阶段未明', removed: '已移出', revoked: '已撤销'};
-  const recordColors = {EXTRACTED: '#39a98b', NO_EVENT: '#4269d0', REVIEW: '#ed9950'};
   const number = n => n.toLocaleString('en-US');
   const percent = (part, total) => (part / total * 100).toFixed(1) + '%';
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
@@ -37,23 +36,10 @@
     }
     return groups.sort((a,b)=>b.count-a.count||a.type.localeCompare(b.type));
   }
-  function allocateSlots(rows, slots) {
-    const total = rows.reduce((s,r) => s+r.count,0);
-    if (!(total > 0) || !Number.isInteger(slots) || slots < 1) throw new RangeError('Invalid allocation');
-    const exact = rows.map(r => r.count / total * slots), counts = exact.map(Math.floor);
-    const order = exact.map((v,i) => ({i,remainder:v-counts[i]})).sort((a,b) => b.remainder-a.remainder || a.i-b.i);
-    for (let i=0, remaining=slots-counts.reduce((a,b)=>a+b,0); i<remaining; i++) counts[order[i].i]++;
-    return counts;
-  }
   function autoplayStep(elapsed, delta, duration, paused) {
     if (duration <= 0 || delta < 0 || elapsed < 0) throw new RangeError('Invalid timer');
     const next = elapsed + (paused ? 0 : delta);
     return {advance:next>=duration, elapsed:next>=duration ? next%duration : next};
-  }
-  function project(x,y,z,yaw,pitch) {
-    const a = x*Math.cos(yaw)-z*Math.sin(yaw), b = x*Math.sin(yaw)+z*Math.cos(yaw);
-    const up = y*Math.cos(pitch)-b*Math.sin(pitch), depth = y*Math.sin(pitch)+b*Math.cos(pitch);
-    return {x:360+a*150, y:186-up*116, depth};
   }
   function loopOrder(order, target) {
     const position=order.indexOf(target);
@@ -137,47 +123,6 @@
       text(350,47,number(dedup.representative_records),'class="svg-stat"')+text(350,127,'不同内容代表 · '+percent(ratio,1),'class="svg-muted"')+
       text(350,284,number(dedup.exact_duplicate_source_records),'class="svg-stat"')+text(350,329,'重复来源 · 保留全部原始位置','class="svg-muted"'),
       '来源记录精确分组：不同内容代表与重复来源，端点高度按记录比例绘制');
-
-    const spaceFormats=[...new Set(data.file_space.bins.map(r=>r.format))], spaceStates=[...new Set(data.file_space.bins.map(r=>r.status))];
-    let yaw=-Math.PI/6, pitch=.4;
-    function renderSpace() {
-      let body='';const p=(x,y,z)=>project(x,y,z,yaw,pitch);
-      for(const z of [-1,1])for(const x of [-1,1]) {
-        const a=p(x,-1,z),b=p(x,1,z);body+=`<path d="M${a.x} ${a.y}L${b.x} ${b.y}" stroke="#dce1e9"/>`;
-      }
-      for(const y of [-1,1])for(const fixed of [-1,1]) {
-        let a=p(-1,y,fixed),b=p(1,y,fixed);body+=`<path d="M${a.x} ${a.y}L${b.x} ${b.y}" stroke="#dce1e9"/>`;
-        a=p(fixed,y,-1);b=p(fixed,y,1);body+=`<path d="M${a.x} ${a.y}L${b.x} ${b.y}" stroke="#dce1e9"/>`;
-      }
-      const dots=data.file_space.bins.map(row=>({...row,...p(spaceFormats.indexOf(row.format)/(spaceFormats.length-1)*2-1,row.bucket/(data.file_space.buckets.length-1)*2-1,spaceStates.indexOf(row.status)/(spaceStates.length-1)*2-1)})).sort((a,b)=>a.depth-b.depth);
-      dots.forEach(row=>{
-        const label=`${row.format} / ${data.file_space.buckets[row.bucket]} 条 / ${statusLabels[row.status]}：${number(row.files)} 个文件`;
-        body+=`<circle cx="${row.x}" cy="${row.y}" r="${Math.min(19,3+Math.sqrt(row.files)*.45)}" fill="${colors[spaceFormats.indexOf(row.format)%colors.length]}" fill-opacity=".85" stroke="white" stroke-width="1.2"><title>${esc(label)}</title></circle>`;
-      });
-      body+=text(20,362,'X 格式分组   /   Y 已知记录规模   /   Z 解析状态','class="svg-muted"');
-      $('gallery-file-space').innerHTML=svg(body,'三维文件分箱，点大小表示文件数；可用下方滑块旋转',720,380);
-      $('gallery-space-angle-value').value=Math.round(yaw*180/Math.PI)+'°';
-    }
-    $('gallery-space-angle').addEventListener('input',e=>{yaw=Number(e.target.value)*Math.PI/180;renderSpace();});
-    let drag=null;const space=$('gallery-file-space');
-    space.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw,pitch};space.setPointerCapture(e.pointerId);});
-    space.addEventListener('pointermove',e=>{if(!drag)return;yaw=drag.yaw+(e.clientX-drag.x)*.008;pitch=Math.max(-1,Math.min(1,drag.pitch+(e.clientY-drag.y)*.006));$('gallery-space-angle').value=Math.max(-180,Math.min(180,yaw*180/Math.PI));renderSpace();});
-    for(const event of ['pointerup','pointercancel','lostpointercapture'])space.addEventListener(event,()=>{drag=null;});
-    renderSpace();
-
-    const states=data.record_statuses, slots=allocateSlots(states,200), qualityTotal=states.reduce((n,r)=>n+r.count,0);
-    $('gallery-review-share').textContent=percent(states.find(r=>r.status==='REVIEW').count,qualityTotal);
-    $('gallery-quality-waffle').innerHTML=states.map((r,i)=>Array.from({length:slots[i]},()=>`<span style="background:${recordColors[r.status]}" title="${r.status}"></span>`).join('')).join('');
-    $('gallery-quality-waffle').setAttribute('aria-label',states.map(r=>`${r.status} ${number(r.count)} 条，占 ${percent(r.count,qualityTotal)}`).join('；'));
-    $('gallery-quality-legend').innerHTML=states.map(r=>`<div><i style="background:${recordColors[r.status]}"></i><span>${r.status}</span><strong>${number(r.count)}</strong><small>${percent(r.count,qualityTotal)}</small></div>`).join('');
-
-    const ids=data.identities, identityTotal=ids.reduce((n,r)=>n+r.count,0), provisional=ids.find(r=>r.status==='provisional').count;
-    let a=-Math.PI/2, donut='';
-    ids.forEach((r,i)=>{const b=a+r.count/identityTotal*Math.PI*2;donut+=`<path d="${sector(130,120,67,108,a,b)}" fill="${i?'#ffb86a':'#4269d0'}" stroke="white" stroke-width="3"><title>${r.status}：${number(r.count)}</title></path>`;a=b;});
-    donut+=text(130,121,number(identityTotal),'text-anchor="middle" class="svg-big"')+text(130,143,'主体画像','text-anchor="middle" class="svg-muted"');
-    $('gallery-identity-chart').innerHTML=svg(donut,'主体画像身份状态：临时身份与只做代码校验位检查的身份',260,245);
-    $('gallery-provisional-share').textContent=percent(provisional,identityTotal);
-    $('gallery-identity-counts').innerHTML=`<span><i style="background:#4269d0"></i>临时身份 <b>${number(provisional)}</b></span><span><i style="background:#ffb86a"></i>代码校验位通过 <b>${number(identityTotal-provisional)}</b></span>`;
 
     const points=data.progress.points, start=Date.parse(points[0].at), span=Date.parse(points.at(-1).at)-start;
     const timeFormatter=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
@@ -281,5 +226,5 @@
     }
     select(1,false,false);viewport.dataset.ready='true';win.requestAnimationFrame(tick);
   }
-  return {eventGroups,eventView,allocateSlots,autoplayStep,project,loopOrder,mount};
+  return {eventGroups,eventView,autoplayStep,loopOrder,mount};
 });

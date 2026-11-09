@@ -167,3 +167,61 @@ test('test-only deeper hierarchy supports zoom, breadcrumbs and center return',a
  await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(1);
  await expect(page.locator('[data-sun-node="aaa"]')).toHaveCount(0);
 });
+
+test('five-question notebook explains each method in place',async({page},info)=>{
+ await page.locator('[data-gallery-page="3"]').click();
+ await page.locator('[data-notebook="3"] .notebook-reader-open').click();
+ await expect(page.locator('#story-questions button')).toHaveCount(5);
+ await page.locator('[data-story="3"]').click();
+ await expect(page.locator('#story-method')).toContainText('独立标注评测');
+ await expect(page.locator('#story-code')).toContainText('schema_valid');
+ await page.locator('[data-story="4"]').click();
+ await expect(page.locator('#story-code')).toContainText('J(a, b)');
+ await page.screenshot({path:info.outputPath('story-notebook.png')});
+});
+
+test('expanded similarity network supports filtering, two graph modes, zoom and dragging',async({page},info)=>{
+ await expect(page.locator('#enterprise-network')).toHaveAttribute('data-ready','true');
+ await page.locator('[data-gallery-page="4"]').click();
+ await page.locator('[data-notebook="4"] .notebook-reader-open').click();
+ await expect(page.locator('[data-network-node]')).toHaveCount(24);
+ await page.locator('[data-network-node="demo-01"]').focus();
+ await expect(page.locator('#network-detail')).toContainText('合成企业01');
+ await page.locator('#network-zoom-in').click();await expect(page.locator('#network-zoom-value')).toHaveText('125%');
+ await page.locator('#network-reset').click();await expect(page.locator('#network-zoom-value')).toHaveText('100%');
+ if(page.viewportSize().width>1100){
+  const circle=page.locator('[data-network-node="demo-01"] circle'),box=await circle.boundingBox();
+  const before=await circle.locator('..').getAttribute('transform');
+  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();
+  await page.mouse.move(box.x+box.width/2+35,box.y+box.height/2+20,{steps:6});await page.mouse.up();
+  expect(await circle.locator('..').getAttribute('transform')).not.toBe(before);
+  const svgBox=await page.locator('#enterprise-network svg').boundingBox();
+  await page.mouse.move(svgBox.x+5,svgBox.y+5);await page.mouse.wheel(0,-120);
+  expect(await page.locator('#network-zoom-value').innerText()).not.toBe('100%');
+  const cameraBefore=await page.locator('#enterprise-network svg>g').getAttribute('transform');
+  await page.mouse.down();await page.mouse.move(svgBox.x+35,svgBox.y+25,{steps:4});await page.mouse.up();
+  expect(await page.locator('#enterprise-network svg>g').getAttribute('transform')).not.toBe(cameraBefore);
+
+ }
+ await page.locator('#network-mode').selectOption('bipartite');await expect(page.locator('[data-network-node]')).toHaveCount(34);
+ await page.locator('#network-mode').selectOption('similarity');
+ await page.locator('#network-category').selectOption('product_registration');
+ expect(await page.locator('[data-network-node]').count()).toBeLessThan(24);
+ await page.locator('#network-category').selectOption('');
+ await page.screenshot({path:info.outputPath('similarity-network.png')});
+});
+
+test('portrait separates real scale from synthetic company facts and can trace evidence',async({page},info)=>{
+ await expect(page.locator('#portrait-summary')).toHaveAttribute('data-ready','true');
+ await page.locator('[data-gallery-page="5"]').click();
+ await page.locator('[data-notebook="5"] .notebook-reader-open').click();
+ await expect(page.locator('#portrait-summary')).toContainText('5,006,073');
+ await expect(page.locator('#portrait-summary')).toContainText('837,961');
+ await expect(page.locator('#portrait-name')).toContainText('合成示例');
+ await page.locator('[data-portrait-evidence="0"]').click();
+ await expect(page.locator('#portrait-source-0')).toBeVisible();
+ await expect(page.locator('#portrait-source-0')).toContainText('原始行');
+ await page.locator('#portrait-company').selectOption('1');
+ await expect(page.locator('#portrait-timeline')).toContainText('拟议');
+ await page.screenshot({path:info.outputPath('enterprise-portrait.png')});
+});
