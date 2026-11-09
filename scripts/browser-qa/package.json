@@ -1,0 +1,7 @@
+{
+  "name": "bei-page-browser-qa",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {"test": "playwright test"},
+  "devDependencies": {"@playwright/test": "1.65.0"}
+}
