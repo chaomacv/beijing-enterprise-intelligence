@@ -27,6 +27,16 @@
     }
     return [...groups.values()].sort((a,b) => b.count - a.count || a.type.localeCompare(b.type));
   }
+  function eventView(data, state='all', scope='refined', metric='events') {
+    const categories=new Set(data.taxonomy.refined_types);
+    const groups=eventGroups(data.events,state).filter(r=>scope==='all' || categories.has(r.type));
+    if(metric==='profiles') {
+      const counts=new Map(state==='all' ? data.taxonomy.category_profiles.map(r=>[r.type,r.count]) :
+        data.events.filter(r=>r.status===state).map(r=>[r.type,r.associated_profiles]));
+      groups.forEach(r=>{r.count=counts.get(r.type)||0;});
+    }
+    return groups.sort((a,b)=>b.count-a.count||a.type.localeCompare(b.type));
+  }
   function allocateSlots(rows, slots) {
     const total = rows.reduce((s,r) => s+r.count,0);
     if (!(total > 0) || !Number.isInteger(slots) || slots < 1) throw new RangeError('Invalid allocation');
@@ -92,21 +102,28 @@
 
     function renderEvents() {
       const state=$('gallery-event-stage').value, log=$('gallery-event-log').checked;
-      const rows=eventGroups(data.events,state), total=rows.reduce((n,r)=>n+r.count,0), max=Math.max(1,...rows.map(r=>r.count));
+      const scope=$('gallery-event-scope').value, metric=$('gallery-event-metric').value;
+      const rows=eventView(data,state,scope,metric), total=rows.reduce((n,r)=>n+r.count,0), max=Math.max(1,...rows.map(r=>r.count));
+      const height=Math.max(340,rows.length*29+65), floor=height-48;
       let body='';const scale=n=>(log?Math.log10(1+n)/Math.log10(1+max):n/max)*475;
       for(let i=0;i<=4;i++) {
         const value=log?Math.round(Math.pow(1+max,i/4)-1):Math.round(max*i/4), x=112+i/4*475;
-        body+=`<path d="M${x} 20V291" stroke="#eceff3"/>`+text(x,313,number(value),'text-anchor="middle" class="svg-tick"');
+        body+=`<path d="M${x} 20V${floor}" stroke="#eceff3"/>`+text(x,floor+22,number(value),'text-anchor="middle" class="svg-tick"');
       }
       rows.forEach((row,i)=>{
         const y=27+i*29;
         body+=text(98,y+14,row.label,'text-anchor="end" class="svg-label"')+`<rect x="112" y="${y}" width="${scale(row.count)}" height="19" fill="${colors[i%colors.length]}"><title>${esc(row.label)}：${number(row.count)}</title></rect>`+text(603,y+14,number(row.count),'class="svg-tick"');
       });
-      $('gallery-event-chart').innerHTML=svg(body,`事件类别统计，${state==='all'?'全部阶段':eventStates[state]}，横轴${log?'为 log10(1+条数)':'为条目数'}`);
+      $('gallery-event-chart').innerHTML=svg(body,`${scope==='refined'?'原许可相关记录细分':'全部细分事件'}，${metric==='profiles'?'关联画像数':'事件观察数'}，${state==='all'?'全部阶段':eventStates[state]}，横轴${log?'为 log10(1+数量)':'为实际数量'}`,720,height);
       $('gallery-event-table').innerHTML=rows.map(r=>`<tr><td>${esc(r.label)}</td><td>${number(r.count)}</td><td>${esc(state==='all'?'全部':eventStates[state])}</td></tr>`).join('');
-      $('gallery-event-insight').textContent=total?`${rows[0].label}占当前选择的 ${percent(rows[0].count,total)} · ${log?'横轴为 log10(1+条数)':'横轴为实际条目数'}。类别构成不代表企业风险高低。`:'这一阶段没有观察条目。';
+      $('gallery-event-count-label').textContent=metric==='profiles'?'关联画像数':'事件观察数';
+      $('gallery-event-insight').textContent=metric==='profiles'?'各类别、阶段的关联画像可能重叠，不能相加为企业总数；画像仍包含临时身份。':
+        total?`${rows[0].label}占当前选择的 ${percent(rows[0].count,total)} · 共 ${number(total)} 条事件观察。记录数不能解释为独立证照数。`:'这一阶段没有观察条目。';
     }
-    $('gallery-event-stage').addEventListener('change',renderEvents);$('gallery-event-log').addEventListener('change',renderEvents);renderEvents();
+    for(const id of ['gallery-event-stage','gallery-event-log','gallery-event-scope','gallery-event-metric'])$(id).addEventListener('change',renderEvents);
+    $('gallery-taxonomy-total').textContent=number(data.taxonomy.legacy_qualification_events);
+    $('gallery-taxonomy-downgraded').textContent=number(data.taxonomy.downgraded_confirmed);
+    renderEvents();
 
     const dedup=data.dedup, ratio=dedup.representative_records/dedup.source_records;
     const uniqueHeight=200*ratio, duplicateHeight=200-uniqueHeight;
@@ -262,5 +279,5 @@
     }
     select(1,false,false);viewport.dataset.ready='true';win.requestAnimationFrame(tick);
   }
-  return {eventGroups,allocateSlots,autoplayStep,project,loopOrder,mount};
+  return {eventGroups,eventView,allocateSlots,autoplayStep,project,loopOrder,mount};
 });

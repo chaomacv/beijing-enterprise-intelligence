@@ -356,6 +356,13 @@ dialog { width: min(680px,calc(100% - 32px)); max-height: 88vh; color: var(--ink
 .notebook-toolbar label { display: flex; align-items: center; gap: 8px; }
 .notebook-toolbar select { background: #fff; border: 1px solid #d8dfe9; border-radius: 3px; color: #354258; padding: 5px 7px; font: inherit; max-width: 210px; }
 .notebook-toolbar input[type="checkbox"] { accent-color: #4269d0; }
+.taxonomy-reconciliation { display: flex; align-items: center; gap: 14px; padding: 11px 13px; margin-bottom: 13px; background: #f3f6fc; border-left: 3px solid #4269d0; }
+.taxonomy-reconciliation strong { font: 500 24px var(--mono); letter-spacing: -.8px; color: #263c68; }
+.taxonomy-reconciliation span { font-size: 10px; line-height: 1.7; color: #657187; }
+.taxonomy-toolbar { justify-content: flex-start; gap: 8px 12px; }
+.taxonomy-toolbar label { gap: 5px; }
+.taxonomy-toolbar select { max-width: 160px; }
+.taxonomy-note { margin-top: 9px; }
 .notebook-insight { font-size: 11px; line-height: 1.85; color: #556279; margin-block: 1px 4px; }
 .gallery-table-scroll { max-height: 113px; overflow-y: auto; border-bottom: 1px solid #e7ebf1; margin-bottom: 17px; }
 .gallery-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }

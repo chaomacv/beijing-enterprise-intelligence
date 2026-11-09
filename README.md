@@ -23,6 +23,8 @@
 
 当前版本 **v0.2**。已校验接收 5,200 个附件，完成全量文件卡片扫描；Qwen3-8B 已在私有 RTX 4090 上运行并完成小样本端到端验证。**全量 LLM 抽取和独立准确率评测尚未完成。** [实测范围与结果](docs/validation.md) · [GitHub 交付记录](https://github.com/chaomacv/beijing-enterprise-intelligence/pull/2)
 
+2026-11-09 已对阶段子集的“许可资质”宽类执行[十类细分与阶段校验](docs/event_classification.md)，并更新首页图表。事件记录、关联画像和独立有效证照采用不同口径；全量完成后执行同一修正阶段。
+
 ## 安装
 
 Python >=3.10。在服务器项目目录执行：

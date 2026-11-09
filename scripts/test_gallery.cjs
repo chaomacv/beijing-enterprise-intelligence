@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const {eventGroups, allocateSlots, autoplayStep, project, loopOrder} = require('../showcase/gallery.js');
+const {eventGroups, eventView, allocateSlots, autoplayStep, project, loopOrder} = require('../showcase/gallery.js');
 const data = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../showcase/assets/gallery-data.json'), 'utf8'));
 const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
 
@@ -19,13 +19,33 @@ test('gallery aggregates reconcile separately within the full corpus and selecte
   assert.ok(data.subset.events < data.subset.records);
 });
 test('public gallery exports counts and observed times without private identifiers or records', () => {
-  assert.deepEqual(Object.keys(data).sort(), ['schema_version','kind','generated_at','source_commit','final_pipeline_complete','corpus','subset','formats','file_space','events','record_statuses','identities','matching','dedup','progress'].sort());
+  assert.deepEqual(Object.keys(data).sort(), ['schema_version','kind','generated_at','source_commit','final_pipeline_complete','corpus','subset','formats','file_space','events','taxonomy','record_statuses','identities','matching','dedup','progress'].sort());
   assert.ok(!/\/opt\/|password|api_key|"cells"|"record_id"|"file_id"|"path"|10\.126\./i.test(JSON.stringify(data)));
   for (const bin of data.file_space.bins) {
     assert.deepEqual(Object.keys(bin).sort(), ['format','status','bucket','files'].sort());
     assert.ok(Number.isSafeInteger(bin.files) && bin.files > 0);
     assert.ok(bin.bucket >= 0 && bin.bucket < data.file_space.buckets.length);
   }
+});
+test('refinement conserves legacy observations without summing nonadditive profile counts',()=>{
+  const selected=eventView(data);
+  assert.equal(sum(selected,'count'),5031890);
+  assert.equal(selected.length,10);
+  assert.equal(data.taxonomy.legacy_qualification_events,5031890);
+  assert.equal(data.taxonomy.downgraded_confirmed,540317);
+  assert.ok(!data.events.some(r=>r.type==='qualification'));
+  assert.equal(data.taxonomy.unique_licences,null);
+  assert.equal(data.taxonomy.unique_registered_enterprises,null);
+  const profiles=eventView(data,'all','refined','profiles');
+  for(const row of profiles)assert.equal(row.count,data.taxonomy.category_profiles.find(p=>p.type===row.type).count);
+  const original=data.events.map(r=>({...r}));
+  const multi={...data,events:[
+    {type:'business_permit',label:'企业经营许可',status:'confirmed',count:7,associated_profiles:3},
+    {type:'business_permit',label:'企业经营许可',status:'unknown',count:9,associated_profiles:4}],
+    taxonomy:{...data.taxonomy,category_profiles:[{type:'business_permit',count:5}]}};
+  assert.equal(eventView(multi,'all','refined','profiles')[0].count,5);
+  assert.equal(eventView(multi,'unknown','refined','profiles')[0].count,4);
+  assert.deepEqual(data.events,original);
 });
 test('event-stage filters preserve categories and never mix record counts into event totals', () => {
   const all = eventGroups(data.events);
