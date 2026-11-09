@@ -204,7 +204,7 @@
     function updateControls(manual=false) {
       pages.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));
       cards.forEach((c,i)=>c.dataset.active=String(i===index));
-      $('gallery-play').textContent=playing?'暂停':'播放';$('gallery-play').setAttribute('aria-pressed',String(playing));
+      $('gallery-play').innerHTML=playing?'<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2"/></svg>':'<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M6 4l10 6-10 6Z" fill="currentColor"/></svg>';$('gallery-play').setAttribute('aria-pressed',String(playing));
       $('gallery-play').setAttribute('aria-label',playing?'暂停自动轮播':'播放自动轮播');
       if(manual)$('gallery-announcement').textContent=`第 ${index+1} / ${cards.length} 个笔记本：${cards[index].querySelector('h3').textContent}`;
     }
@@ -275,7 +275,7 @@
       const paused=!playing||hover||focused||dragging||reading||!visible||doc.hidden, dt=last?Math.min(250,now-last):0;last=now;
       const state=autoplayStep(elapsed,dt,8000,paused);elapsed=state.elapsed;
       if(state.advance)select(index+1,false,true);
-      $('gallery-clock').textContent=!playing?'已暂停':paused?'阅读时暂停':Math.ceil((8000-elapsed)/1000)+'s / 每张';
+      $('gallery-clock').textContent='';
       doc.querySelector('.gallery-pagination').style.setProperty('--play-progress',elapsed/8000);
       win.requestAnimationFrame(tick);
     }
