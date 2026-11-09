@@ -20,7 +20,7 @@ test('bounded viewport shows three full desktop cards with clipped neighbors',as
   await expect.poll(async()=>(await measure(page)).full).toBe(page.viewportSize().width>1100?3:1);
   const m=await measure(page);expect(m.left).toBeGreaterThan(5);expect(m.right).toBeLessThan(m.window-5);
   expect(m.pageWidth).toBeLessThanOrEqual(m.window+1);
-  if(m.window>1100){expect(m.partial).toBe(2);expect(m.cardWidth).toBeLessThanOrEqual(620);}
+  if(m.window>1100){expect(m.partial).toBe(2);expect(m.cardWidth).toBeLessThanOrEqual(558);}
   await page.screenshot({path:info.outputPath('bounded-gallery.png')});
 });
 test('hero actions move right on desktop and stack naturally on mobile',async({page},info)=>{
@@ -29,12 +29,17 @@ test('hero actions move right on desktop and stack naturally on mobile',async({p
   const lead=await page.locator('.hero-lead').boundingBox(),cta=await page.locator('.hero-cta').boundingBox();
   if(page.viewportSize().width>900)expect(cta.x).toBeGreaterThan(lead.x+lead.width);
   else expect(cta.y).toBeGreaterThanOrEqual(lead.y+lead.height);
-  if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(720);
+  if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(648);
   const title=page.locator('#hero-title');
   await expect(title).toHaveText('让公开数据，成为有据可查的企业情报。');
   expect(await title.locator('br').count()).toBe(0);
   expect(await title.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
   expect(await page.locator('.gallery-heading').count()).toBe(0);
+  expect(await page.locator('#gallery-play').innerText()).toBe('');
+  await expect(page.locator('#gallery-clock')).not.toBeVisible();
+  expect(await page.locator('.hero-bottom').evaluate(el=>parseFloat(getComputedStyle(el).marginTop))).toBe(64);
+  const size=await title.evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+  if(page.viewportSize().width>1100)expect(size).toBeCloseTo(Math.min(72,page.viewportSize().width*.04933333),1);
   await page.screenshot({path:info.outputPath('hero-actions.png')});
 });
 test('square notebooks have protruding topic tabs and a separate corner expansion icon',async({page},info)=>{
