@@ -5,7 +5,7 @@
 
 [![Beijing Enterprise Intelligence：从分散的数据到有据可查的企业情报](showcase/assets/project-preview.svg)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
 
-**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/)** · 九步流程、方法实验与证据追溯。交互案例使用合成数据；真实运行汇总与工程对照单独标明，全量抽取仍在进行中。[页面设计与复现](docs/project_page.md)
+**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/)** · 七张可探索的数据笔记本、九步流程与证据追溯。真实汇总按全批／阶段子集标明范围；方法实验使用合成数据，全量抽取仍在进行中。[页面设计与复现](docs/project_page.md)
 
 把北京公共数据平台下载的异构文件，转换为有来源证据的企业记录、业务事件与标签画像。语义理解使用私有环境中的 Qwen；读取、分块、校验和聚合使用 Python。
 
