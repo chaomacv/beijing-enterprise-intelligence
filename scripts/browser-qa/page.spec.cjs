@@ -23,6 +23,15 @@ test('bounded viewport shows three full desktop cards with clipped neighbors',as
   if(m.window>1100){expect(m.partial).toBe(2);expect(m.cardWidth).toBeLessThan(500);}
   await page.screenshot({path:info.outputPath('bounded-gallery.png')});
 });
+test('hero actions move right on desktop and stack naturally on mobile',async({page},info)=>{
+  await expect(page.locator('.hero .eyebrow')).toHaveText('本地模型、数据工程、可探索的公开信息');
+  await expect(page.locator('.hero-lead')).toContainText('探索这次公开数据处理的每一面。');
+  const lead=await page.locator('.hero-lead').boundingBox(),cta=await page.locator('.hero-cta').boundingBox();
+  if(page.viewportSize().width>900)expect(cta.x).toBeGreaterThan(lead.x+lead.width);
+  else expect(cta.y).toBeGreaterThanOrEqual(lead.y+lead.height);
+  if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(540);
+  await page.screenshot({path:info.outputPath('hero-actions.png')});
+});
 test('crossing either end keeps circular neighbors and unique interactive cards',async({page})=>{
   for(const n of [6,0,6,0,1]){
     if(n===6){await page.locator('[data-gallery-page="0"]').click();await page.locator('#gallery-prev').click();}

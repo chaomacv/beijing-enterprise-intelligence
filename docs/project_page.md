@@ -60,3 +60,5 @@ python -m http.server 8787 --bind 127.0.0.1 --directory showcase
 仓库的 Settings → Pages → Build and deployment → Source 选择 GitHub Actions，然后运行 `Deploy project page` 工作流。之后修改页面或处理逻辑并推送 main 会重新生成合成示例、运行页面检查并发布。工作流仅上传 `showcase` 目录。
 
 更新汇总快照时，需要核对[处理源码版本中的流程说明](https://github.com/chaomacv/beijing-enterprise-intelligence/blob/57748c4c4086432c4b129a0fee059018a1d6a4c1/docs/full_corpus.md)、私有运行验收和汇总字段口径。只有实际完成运行且总对账通过后，才设置完成状态、`final_audit_passed` 和 `final_counts`；独立语义准确率另作评测。禁止加入真实记录、模型输入或回复。当前合成案例中的“来源覆盖未知”“身份暂定”“拟议状态”应继续保留。
+
+首屏操作区在桌面移至说明文字右侧，窄屏回到纵向排列。卡片参照用户提供的 Observable 截图：宽屏约475×540px，较窄桌面按三张完整卡片的窗口缩放宽度，手机保持单主卡。两处文案改为“本地模型、数据工程、可探索的公开信息”和“探索这次公开数据处理的每一面。”。
