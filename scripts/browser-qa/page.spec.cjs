@@ -20,19 +20,24 @@ test('bounded viewport shows three full desktop cards with clipped neighbors',as
   await expect.poll(async()=>(await measure(page)).full).toBe(page.viewportSize().width>1100?3:1);
   const m=await measure(page);expect(m.left).toBeGreaterThan(5);expect(m.right).toBeLessThan(m.window-5);
   expect(m.pageWidth).toBeLessThanOrEqual(m.window+1);
-  if(m.window>1100){expect(m.partial).toBe(2);expect(m.cardWidth).toBeLessThanOrEqual(520);}
+  if(m.window>1100){expect(m.partial).toBe(2);expect(m.cardWidth).toBeLessThanOrEqual(620);}
   await page.screenshot({path:info.outputPath('bounded-gallery.png')});
 });
 test('hero actions move right on desktop and stack naturally on mobile',async({page},info)=>{
-  await expect(page.locator('.hero .eyebrow')).toHaveText('本地模型、数据工程、可探索的公开信息');
-  await expect(page.locator('.hero-lead')).toContainText('探索这次公开数据处理的每一面。');
+  await expect(page.locator('.hero .eyebrow')).toHaveText('从数千万条异构记录中，提取可信、可追溯的企业事实');
+  await expect(page.locator('.hero-lead')).toContainText('以公共数据为实践场景，结合数据工程与大模型技术');
   const lead=await page.locator('.hero-lead').boundingBox(),cta=await page.locator('.hero-cta').boundingBox();
   if(page.viewportSize().width>900)expect(cta.x).toBeGreaterThan(lead.x+lead.width);
   else expect(cta.y).toBeGreaterThanOrEqual(lead.y+lead.height);
-  if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(600);
+  if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(720);
+  const title=page.locator('#hero-title');
+  await expect(title).toHaveText('让公开数据，成为有据可查的企业情报。');
+  expect(await title.locator('br').count()).toBe(0);
+  expect(await title.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
+  expect(await page.locator('.gallery-heading').count()).toBe(0);
   await page.screenshot({path:info.outputPath('hero-actions.png')});
 });
-test('square notebooks have short oval badges and a separate corner expansion icon',async({page},info)=>{
+test('square notebooks have protruding topic tabs and a separate corner expansion icon',async({page},info)=>{
   const card=page.locator('[data-notebook="1"]');
   await page.locator('#explorations').scrollIntoViewIfNeeded();
   await expect(card.locator('.notebook-category')).toHaveText('事件分类');
@@ -42,9 +47,10 @@ test('square notebooks have short oval badges and a separate corner expansion ic
     const box=el.getBoundingClientRect(),button=el.querySelector('.notebook-reader-open').getBoundingClientRect();
     return {corner:getComputedStyle(el.querySelector('.notebook-page')).borderTopRightRadius,
       badge:getComputedStyle(el.querySelector('.notebook-category')).borderRadius,
+      tabAbove:el.querySelector('.notebook-category').getBoundingClientRect().bottom<=box.top+2,
       right:box.right-button.right,top:button.top-box.top};
   });
-  expect(geometry.corner).toBe('0px');expect(geometry.badge).toBe('999px');
+  expect(geometry.tabAbove).toBe(true);expect(geometry.corner).toBe('0px');expect(geometry.badge).toBe('4px 4px 0px 0px');
   expect(geometry.right).toBeLessThan(20);expect(geometry.top).toBeLessThan(20);
   await page.screenshot({path:info.outputPath('card-controls.png')});
   await card.locator('.notebook-reader-open').click();
