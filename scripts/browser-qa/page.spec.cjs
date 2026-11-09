@@ -20,7 +20,7 @@ test('bounded viewport shows three full desktop cards with clipped neighbors',as
   await expect.poll(async()=>(await measure(page)).full).toBe(page.viewportSize().width>1100?3:1);
   const m=await measure(page);expect(m.left).toBeGreaterThan(5);expect(m.right).toBeLessThan(m.window-5);
   expect(m.pageWidth).toBeLessThanOrEqual(m.window+1);
-  if(m.window>1100){expect(m.partial).toBe(2);expect(m.cardWidth).toBeLessThan(500);}
+  if(m.window>1100){expect(m.partial).toBe(2);expect(m.cardWidth).toBeLessThanOrEqual(520);}
   await page.screenshot({path:info.outputPath('bounded-gallery.png')});
 });
 test('hero actions move right on desktop and stack naturally on mobile',async({page},info)=>{
@@ -29,8 +29,27 @@ test('hero actions move right on desktop and stack naturally on mobile',async({p
   const lead=await page.locator('.hero-lead').boundingBox(),cta=await page.locator('.hero-cta').boundingBox();
   if(page.viewportSize().width>900)expect(cta.x).toBeGreaterThan(lead.x+lead.width);
   else expect(cta.y).toBeGreaterThanOrEqual(lead.y+lead.height);
-  if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(540);
+  if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(600);
   await page.screenshot({path:info.outputPath('hero-actions.png')});
+});
+test('square notebooks have short oval badges and a separate corner expansion icon',async({page},info)=>{
+  const card=page.locator('[data-notebook="1"]');
+  await page.locator('#explorations').scrollIntoViewIfNeeded();
+  await expect(card.locator('.notebook-category')).toHaveText('事件分类');
+  await expect(card.locator('.notebook-reader-open svg')).toHaveCount(1);
+  expect(await card.locator('.notebook-reader-open').innerText()).toBe('');
+  const geometry=await card.evaluate(el=>{
+    const box=el.getBoundingClientRect(),button=el.querySelector('.notebook-reader-open').getBoundingClientRect();
+    return {corner:getComputedStyle(el.querySelector('.notebook-page')).borderTopRightRadius,
+      badge:getComputedStyle(el.querySelector('.notebook-category')).borderRadius,
+      right:box.right-button.right,top:button.top-box.top};
+  });
+  expect(geometry.corner).toBe('0px');expect(geometry.badge).toBe('999px');
+  expect(geometry.right).toBeLessThan(20);expect(geometry.top).toBeLessThan(20);
+  await page.screenshot({path:info.outputPath('card-controls.png')});
+  await card.locator('.notebook-reader-open').click();
+  await expect(page.locator('#notebook-reader')).toBeVisible();
+  await expect(page.locator('#notebook-reader .notebook-reader-open')).not.toBeVisible();
 });
 test('crossing either end keeps circular neighbors and unique interactive cards',async({page})=>{
   for(const n of [6,0,6,0,1]){
