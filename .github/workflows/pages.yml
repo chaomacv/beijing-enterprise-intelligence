@@ -41,7 +41,7 @@ jobs:
           node --check showcase/run.js
           node --check showcase/gallery.js
           node --check showcase/methods.js
-          node --test scripts/test_showcase.cjs scripts/test_gallery.cjs scripts/test_methods.cjs scripts/test_event_sunburst.cjs
+          node --test scripts/test_showcase.cjs scripts/test_gallery.cjs scripts/test_methods.cjs scripts/test_event_sunburst.cjs scripts/test_enterprise_network.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
