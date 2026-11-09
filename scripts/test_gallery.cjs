@@ -1,0 +1,85 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const {eventGroups, allocateSlots, autoplayStep, project} = require('../showcase/gallery.js');
+const data = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../showcase/assets/gallery-data.json'), 'utf8'));
+const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
+
+test('gallery aggregates reconcile separately within the full corpus and selected subset', () => {
+  assert.equal(data.kind, 'aggregate_notebook_gallery');
+  assert.equal(data.final_pipeline_complete, false);
+  assert.equal(data.subset.partial_only, true);
+  assert.equal(data.subset.semantic_accuracy_evaluated, false);
+  assert.equal(sum(data.formats, 'files'), data.corpus.logical_files);
+  assert.equal(sum(data.file_space.bins, 'files'), data.corpus.logical_files);
+  assert.equal(sum(data.events, 'count'), data.subset.events);
+  assert.equal(sum(data.record_statuses, 'count'), data.subset.records);
+  assert.equal(sum(data.identities, 'count'), data.subset.profiles);
+  assert.equal(data.dedup.source_records, data.dedup.representative_records + data.dedup.exact_duplicate_source_records);
+  assert.ok(data.subset.events < data.subset.records);
+});
+test('public gallery exports counts and observed times without private identifiers or records', () => {
+  assert.deepEqual(Object.keys(data).sort(), ['schema_version','kind','generated_at','source_commit','final_pipeline_complete','corpus','subset','formats','file_space','events','record_statuses','identities','matching','dedup','progress'].sort());
+  assert.ok(!/\/opt\/|password|api_key|"cells"|"record_id"|"file_id"|"path"|10\.126\./i.test(JSON.stringify(data)));
+  for (const bin of data.file_space.bins) {
+    assert.deepEqual(Object.keys(bin).sort(), ['format','status','bucket','files'].sort());
+    assert.ok(Number.isSafeInteger(bin.files) && bin.files > 0);
+    assert.ok(bin.bucket >= 0 && bin.bucket < data.file_space.buckets.length);
+  }
+});
+test('event-stage filters preserve categories and never mix record counts into event totals', () => {
+  const all = eventGroups(data.events);
+  assert.equal(sum(all,'count'), data.subset.events);
+  let total = 0;
+  for (const state of new Set(data.events.map(r=>r.status))) {
+    const selected = eventGroups(data.events,state);
+    assert.equal(selected.length, all.length);
+    assert.ok(selected.every(r=>r.count >= 0));
+    total += sum(selected,'count');
+  }
+  assert.equal(total,data.subset.events);
+  assert.equal(sum(eventGroups(data.events,'removed'),'count'),0);
+});
+test('waffle rounding conserves all cells and is deterministic for tiny categories', () => {
+  for (const rows of [data.record_statuses,[{count:1},{count:1},{count:99998}]]) {
+    const result=allocateSlots(rows,200);
+    assert.equal(result.reduce((a,b)=>a+b,0),200);
+    assert.ok(result.every(n=>Number.isInteger(n)&&n>=0));
+    assert.deepEqual(result,allocateSlots(rows,200));
+  }
+});
+test('reading pauses the carousel clock and resuming preserves elapsed time', () => {
+  assert.deepEqual(autoplayStep(7900,200,8000,true),{advance:false,elapsed:7900});
+  assert.deepEqual(autoplayStep(7900,200,8000,false),{advance:true,elapsed:100});
+  assert.deepEqual(autoplayStep(2000,500,8000,false),{advance:false,elapsed:2500});
+  assert.throws(()=>autoplayStep(0,1,0,false),RangeError);
+});
+test('space projections remain finite across keyboard rotation and preserve source bins', () => {
+  for(const angle of [-Math.PI,-.5,0,.5,Math.PI]) for(const x of [-1,0,1]) {
+    const p=project(x,1,-1,angle,.4);
+    assert.ok(Object.values(p).every(Number.isFinite));
+    assert.ok(p.x > 0 && p.x < 720 && p.y > -40 && p.y < 410);
+  }
+});
+test('execution timeline uses ordered actual observations, not fabricated uniform intervals', () => {
+  const points=data.progress.points;
+  assert.equal(data.progress.series_kind,'observed_processing_snapshots_not_business_events');
+  const intervals=[];
+  for(let i=1;i<points.length;i++) {
+    intervals.push(Date.parse(points[i].at)-Date.parse(points[i-1].at));
+    assert.ok(intervals.at(-1)>0);
+    assert.ok(points[i].completed>=points[i-1].completed && points[i].completed<=data.progress.total);
+  }
+  assert.ok(new Set(intervals).size>1);
+});
+test('gallery mount targets exist and all seven slides have accessible navigation controls', () => {
+  const path=require('node:path');
+  const html=fs.readFileSync(path.join(__dirname,'../showcase/index.html'),'utf8');
+  const js=fs.readFileSync(path.join(__dirname,'../showcase/gallery.js'),'utf8');
+  const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
+  for(const match of js.matchAll(/\$\('([a-z0-9-]+)'\)/g)) assert.ok(ids.has(match[1]),match[1]);
+  assert.equal([...html.matchAll(/data-notebook="\d+"/g)].length,7);
+  assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,7);
+  assert.ok(html.includes('src="gallery.js"'));
+  assert.ok(html.includes('aria-roledescription="轮播"'));
+});

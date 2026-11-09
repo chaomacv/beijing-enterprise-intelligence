@@ -17,5 +17,7 @@ jobs:
       - run: python scripts/verify_local_model.py --backend rules --work-dir /tmp/bank-rule-regression
       - run: python scripts/build_showcase_demo.py
       - run: node --check showcase/app.js
-      - run: node --test scripts/test_showcase.cjs
+      - run: node --check showcase/run.js
+      - run: node --check showcase/gallery.js
+      - run: node --test scripts/test_showcase.cjs scripts/test_gallery.cjs
       - run: python scripts/check_repository.py
