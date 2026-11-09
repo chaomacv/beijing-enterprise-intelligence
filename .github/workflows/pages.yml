@@ -35,6 +35,7 @@ jobs:
         run: |
           python scripts/build_showcase_demo.py
           node --check showcase/app.js
+          node --check showcase/run.js
           node --test scripts/test_showcase.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
