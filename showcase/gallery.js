@@ -105,16 +105,18 @@
       const scope=$('gallery-event-scope').value, metric=$('gallery-event-metric').value;
       const rows=eventView(data,state,scope,metric), total=rows.reduce((n,r)=>n+r.count,0), max=Math.max(1,...rows.map(r=>r.count));
       const height=Math.max(340,rows.length*29+65), floor=height-48;
-      let body='';const scale=n=>(log?Math.log10(1+n)/Math.log10(1+max):n/max)*475;
-      for(let i=0;i<=4;i++) {
-        const value=log?Math.round(Math.pow(1+max,i/4)-1):Math.round(max*i/4), x=112+i/4*475;
-        body+=`<path d="M${x} 20V${floor}" stroke="#eceff3"/>`+text(x,floor+22,number(value),'text-anchor="middle" class="svg-tick"');
+      const width=Math.max(420,Math.min(720,$('gallery-event-chart').clientWidth)), left=120, plot=width-left-94, ticks=width<500?2:4;
+      let body='';const scale=n=>(log?Math.log10(1+n)/Math.log10(1+max):n/max)*plot;
+      for(let i=0;i<=ticks;i++) {
+        const value=log?Math.round(Math.pow(1+max,i/ticks)-1):Math.round(max*i/ticks), x=left+i/ticks*plot;
+        const label=width<500&&value>=10000?(value/10000).toFixed(1)+'万':number(value);
+        body+=`<path d="M${x} 20V${floor}" stroke="#eceff3"/>`+text(x,floor+22,label,'text-anchor="middle" class="svg-tick"');
       }
       rows.forEach((row,i)=>{
         const y=27+i*29;
-        body+=text(98,y+14,row.label,'text-anchor="end" class="svg-label"')+`<rect x="112" y="${y}" width="${scale(row.count)}" height="19" fill="${colors[i%colors.length]}"><title>${esc(row.label)}：${number(row.count)}</title></rect>`+text(603,y+14,number(row.count),'class="svg-tick"');
+        body+=text(left-13,y+14,row.label,'text-anchor="end" class="svg-label"')+`<rect x="${left}" y="${y}" width="${scale(row.count)}" height="19" fill="${colors[i%colors.length]}"><title>${esc(row.label)}：${number(row.count)}</title></rect>`+text(left+plot+12,y+14,number(row.count),'class="svg-tick"');
       });
-      $('gallery-event-chart').innerHTML=svg(body,`${scope==='refined'?'原许可相关记录细分':'全部细分事件'}，${metric==='profiles'?'关联画像数':'事件观察数'}，${state==='all'?'全部阶段':eventStates[state]}，横轴${log?'为 log10(1+数量)':'为实际数量'}`,720,height);
+      $('gallery-event-chart').innerHTML=svg(body,`${scope==='refined'?'原许可相关记录细分':'全部细分事件'}，${metric==='profiles'?'关联画像数':'事件观察数'}，${state==='all'?'全部阶段':eventStates[state]}，横轴${log?'为 log10(1+数量)':'为实际数量'}`,width,height);
       $('gallery-event-table').innerHTML=rows.map(r=>`<tr><td>${esc(r.label)}</td><td>${number(r.count)}</td><td>${esc(state==='all'?'全部':eventStates[state])}</td></tr>`).join('');
       $('gallery-event-count-label').textContent=metric==='profiles'?'关联画像数':'事件观察数';
       $('gallery-event-insight').textContent=metric==='profiles'?'各类别、阶段的关联画像可能重叠，不能相加为企业总数；画像仍包含临时身份。':
@@ -235,14 +237,14 @@
         const slot=doc.createElement('div');slot.className='notebook-slot';slot.setAttribute('aria-hidden','true');
         card.replaceWith(slot);reading={card,slot,button};$('notebook-reader-body').append(card);
         $('notebook-reader-title').textContent=card.querySelector('h3').textContent;
-        reader.showModal();$('notebook-reader-close').focus();
+        reader.showModal();renderEvents();$('notebook-reader-close').focus();
       });
     });
     $('notebook-reader-close').addEventListener('click',()=>reader.close());
     reader.addEventListener('close',()=>{
       if(!reading)return;
       const current=reading;current.slot.replaceWith(current.card);reading=null;
-      select(index,false,false);current.button.focus({preventScroll:true});
+      select(index,false,false);renderEvents();current.button.focus({preventScroll:true});
     });
     $('gallery-prev').addEventListener('click',()=>select(index-1));$('gallery-next').addEventListener('click',()=>select(index+1));
     pages.forEach((button,i)=>button.addEventListener('click',()=>select(i)));
@@ -268,7 +270,7 @@
     if(win.IntersectionObserver)new win.IntersectionObserver(entries=>{visible=entries[0].intersectionRatio>=.2;},{threshold:.2}).observe(viewport);
     reduced.addEventListener('change',e=>{if(e.matches){playing=false;updateControls();}});
     doc.addEventListener('visibilitychange',()=>{last=0;});
-    let resizeTimer;win.addEventListener('resize',()=>{win.clearTimeout(resizeTimer);resizeTimer=win.setTimeout(()=>select(index,false,false),120);});
+    let resizeTimer;win.addEventListener('resize',()=>{win.clearTimeout(resizeTimer);resizeTimer=win.setTimeout(()=>{select(index,false,false);renderEvents();},120);});
     function tick(now) {
       const paused=!playing||hover||focused||dragging||reading||!visible||doc.hidden, dt=last?Math.min(250,now-last):0;last=now;
       const state=autoplayStep(elapsed,dt,8000,paused);elapsed=state.elapsed;
