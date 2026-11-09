@@ -230,8 +230,8 @@
     }
     cards.forEach((card,i)=>{
       const button=doc.createElement('button');button.type='button';button.className='notebook-reader-open';
-      button.textContent='放大 ↗';button.setAttribute('aria-label','放大阅读：'+card.querySelector('h3').textContent);
-      card.querySelector('.notebook-category').append(button);
+      button.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M15 4h5v5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';button.setAttribute('aria-label','展开阅读：'+card.querySelector('h3').textContent);
+      card.append(button);
       button.addEventListener('click',()=>{
         select(i,false,false);
         const slot=doc.createElement('div');slot.className='notebook-slot';slot.setAttribute('aria-hidden','true');
