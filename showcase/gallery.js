@@ -45,6 +45,12 @@
     const up = y*Math.cos(pitch)-b*Math.sin(pitch), depth = y*Math.sin(pitch)+b*Math.cos(pitch);
     return {x:360+a*150, y:186-up*116, depth};
   }
+  function loopOrder(order, target) {
+    const position=order.indexOf(target);
+    if(position<0 || new Set(order).size!==order.length)throw new RangeError('Invalid circular order');
+    const shift=position-Math.floor(order.length/2), pivot=(shift+order.length)%order.length;
+    return {shift, order:order.slice(pivot).concat(order.slice(0,pivot))};
+  }
   function sector(cx,cy,inner,outer,start,end) {
     const point=(r,a)=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
     const a=point(outer,start), b=point(outer,end), c=point(inner,end), d=point(inner,start), large=end-start>Math.PI?1:0;
@@ -171,9 +177,11 @@
     $('gallery-time-scrub').max=points.length-1;$('gallery-time-scrub').value=points.length-1;$('gallery-time-scrub').addEventListener('input',renderTimeline);renderTimeline();
 
     // A real clock drives the pager. Reading, hidden tabs and reduced motion pause it.
-    const viewport=$('gallery-viewport'), cards=[...doc.querySelectorAll('[data-notebook]')], pages=[...doc.querySelectorAll('[data-gallery-page]')];
+    const viewport=$('gallery-viewport'), track=viewport.querySelector('.carousel-track');
+    const cards=[...doc.querySelectorAll('[data-notebook]')], pages=[...doc.querySelectorAll('[data-gallery-page]')];
     const reduced=win.matchMedia('(prefers-reduced-motion: reduce)');
-    let index=1, playing=!reduced.matches, hover=false, focused=false, dragging=false, visible=true, elapsed=0, last=0, settle;
+    const reader=$('notebook-reader');
+    let index=1, playing=!reduced.matches, hover=false, focused=false, dragging=false, visible=true, elapsed=0, last=0, settle, reading=null;
     function updateControls(manual=false) {
       pages.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));
       cards.forEach((c,i)=>c.dataset.active=String(i===index));
@@ -181,11 +189,44 @@
       $('gallery-play').setAttribute('aria-label',playing?'暂停自动轮播':'播放自动轮播');
       if(manual)$('gallery-announcement').textContent=`第 ${index+1} / ${cards.length} 个笔记本：${cards[index].querySelector('h3').textContent}`;
     }
-    function select(next,manual=true,smooth=true) {
-      index=(next+cards.length)%cards.length;elapsed=0;updateControls(manual);
-      const left=cards[index].offsetLeft-(viewport.clientWidth-cards[index].offsetWidth)/2;
-      viewport.scrollTo({left,behavior:smooth&&!reduced.matches?'smooth':'auto'});
+    function recenter() {
+      if(reading)return;
+      const order=[...track.children].map(c=>Number(c.dataset.notebook)), plan=loopOrder(order,index);
+      if(!plan.shift)return;
+      const before=cards[index].offsetLeft, scroll=viewport.scrollLeft;
+      viewport.style.scrollSnapType='none';
+      if(plan.shift>0)for(let i=0;i<plan.shift;i++)track.append(track.firstElementChild);
+      if(plan.shift<0)for(let i=0;i>plan.shift;i--)track.prepend(track.lastElementChild);
+      viewport.scrollTo({left:scroll+cards[index].offsetLeft-before,behavior:'auto'});
+      win.requestAnimationFrame(()=>{viewport.style.scrollSnapType='';});
     }
+    function select(next,manual=true,smooth=true) {
+      if(reading)return;
+      const previous=index;index=(next+cards.length)%cards.length;elapsed=0;updateControls(manual);
+      const distance=(index-previous+cards.length)%cards.length;
+      const adjacent=distance===1 || distance===cards.length-1;
+      if(!smooth || !adjacent || reduced.matches)recenter();
+      const left=cards[index].offsetLeft-(viewport.clientWidth-cards[index].offsetWidth)/2;
+      viewport.scrollTo({left,behavior:smooth&&adjacent&&!reduced.matches?'smooth':'auto'});
+    }
+    cards.forEach((card,i)=>{
+      const button=doc.createElement('button');button.type='button';button.className='notebook-reader-open';
+      button.textContent='放大 ↗';button.setAttribute('aria-label','放大阅读：'+card.querySelector('h3').textContent);
+      card.querySelector('.notebook-category').append(button);
+      button.addEventListener('click',()=>{
+        select(i,false,false);
+        const slot=doc.createElement('div');slot.className='notebook-slot';slot.setAttribute('aria-hidden','true');
+        card.replaceWith(slot);reading={card,slot,button};$('notebook-reader-body').append(card);
+        $('notebook-reader-title').textContent=card.querySelector('h3').textContent;
+        reader.showModal();$('notebook-reader-close').focus();
+      });
+    });
+    $('notebook-reader-close').addEventListener('click',()=>reader.close());
+    reader.addEventListener('close',()=>{
+      if(!reading)return;
+      const current=reading;current.slot.replaceWith(current.card);reading=null;
+      select(index,false,false);current.button.focus({preventScroll:true});
+    });
     $('gallery-prev').addEventListener('click',()=>select(index-1));$('gallery-next').addEventListener('click',()=>select(index+1));
     pages.forEach((button,i)=>button.addEventListener('click',()=>select(i)));
     $('gallery-play').addEventListener('click',()=>{playing=!playing;last=0;updateControls();});
@@ -200,24 +241,26 @@
       if(event.key==='Home'){event.preventDefault();select(0);}
       if(event.key==='End'){event.preventDefault();select(cards.length-1);}
     });
-    viewport.addEventListener('scroll',()=>{win.clearTimeout(settle);settle=win.setTimeout(()=>{
+    viewport.addEventListener('scroll',()=>{if(reading)return;win.clearTimeout(settle);settle=win.setTimeout(()=>{
+      if(reading)return;
       const center=viewport.scrollLeft+viewport.clientWidth/2;
       const nearest=cards.reduce((best,c,i)=>Math.abs(c.offsetLeft+c.offsetWidth/2-center)<Math.abs(cards[best].offsetLeft+cards[best].offsetWidth/2-center)?i:best,0);
       if(nearest!==index){index=nearest;elapsed=0;updateControls(false);}
+      recenter();
     },180);},{passive:true});
     if(win.IntersectionObserver)new win.IntersectionObserver(entries=>{visible=entries[0].intersectionRatio>=.2;},{threshold:.2}).observe(viewport);
     reduced.addEventListener('change',e=>{if(e.matches){playing=false;updateControls();}});
     doc.addEventListener('visibilitychange',()=>{last=0;});
     let resizeTimer;win.addEventListener('resize',()=>{win.clearTimeout(resizeTimer);resizeTimer=win.setTimeout(()=>select(index,false,false),120);});
     function tick(now) {
-      const paused=!playing||hover||focused||dragging||!visible||doc.hidden, dt=last?Math.min(250,now-last):0;last=now;
+      const paused=!playing||hover||focused||dragging||reading||!visible||doc.hidden, dt=last?Math.min(250,now-last):0;last=now;
       const state=autoplayStep(elapsed,dt,8000,paused);elapsed=state.elapsed;
-      if(state.advance)select(index+1,false,index<cards.length-1);
+      if(state.advance)select(index+1,false,true);
       $('gallery-clock').textContent=!playing?'已暂停':paused?'阅读时暂停':Math.ceil((8000-elapsed)/1000)+'s / 每张';
       doc.querySelector('.gallery-pagination').style.setProperty('--play-progress',elapsed/8000);
       win.requestAnimationFrame(tick);
     }
-    select(1,false,false);win.requestAnimationFrame(tick);
+    select(1,false,false);viewport.dataset.ready='true';win.requestAnimationFrame(tick);
   }
-  return {eventGroups,allocateSlots,autoplayStep,project,mount};
+  return {eventGroups,allocateSlots,autoplayStep,project,loopOrder,mount};
 });

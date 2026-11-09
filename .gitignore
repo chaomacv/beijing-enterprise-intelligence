@@ -25,3 +25,6 @@ reports/private/
 *.key
 *.p12
 .pytest_cache/
+node_modules/
+test-results/
+playwright-report/

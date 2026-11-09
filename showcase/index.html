@@ -17,6 +17,7 @@
   <script src="app.js" defer></script>
   <script src="run.js" defer></script>
   <script src="gallery.js" defer></script>
+  <script src="methods.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
@@ -92,7 +93,7 @@ else:
 # 横轴按真实时间间隔绘制；连接观测点，不补造中间测量</code></pre>
  <div class="notebook-callout">这是数据工程执行时间线。最后一个点是固定快照，页面不连接私有服务器；全量流程尚未完成。</div><footer class="notebook-scope">实际进度观测 · 时间统一为北京时间 · 不代表企业事件时间分布</footer></div></article></div></div>
   <div class="carousel-controls shell"><button class="gallery-nav" id="gallery-prev" type="button" aria-label="上一个笔记本">←</button><div class="gallery-pagination" role="group" aria-label="选择数据笔记本"><button type="button" data-gallery-page="0" aria-label="第 1 个：文件层级" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="1" aria-label="第 2 个：事件统计" aria-pressed="true"><span></span></button><button type="button" data-gallery-page="2" aria-label="第 3 个：精确去重" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="3" aria-label="第 4 个：三维文件空间" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="4" aria-label="第 5 个：记录去向" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="5" aria-label="第 6 个：主体身份" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="6" aria-label="第 7 个：执行时间线" aria-pressed="false"><span></span></button></div><button class="gallery-nav" id="gallery-next" type="button" aria-label="下一个笔记本">→</button><span class="carousel-divider" aria-hidden="true"></span><button id="gallery-play" class="gallery-play" type="button" aria-pressed="true">暂停</button><span id="gallery-clock" class="gallery-clock">8s / 每张</span><span class="sr-only" id="gallery-announcement" role="status"></span></div>
-  <p class="gallery-scope shell">真实汇总分为全批元数据和已完成的字段方案子集，各卡片单列口径。轮播每张约 8 秒，悬停或阅读时暂停。<a href="assets/gallery-data.json">查看公开汇总 JSON ↗</a></p>
+  <p class="gallery-scope shell">真实汇总分为全批元数据和已完成的字段方案子集，各卡片单列口径。轮播首尾循环，每张约 8 秒；悬停或阅读时暂停，卡片可放大阅读。<a href="assets/gallery-data.json">查看公开汇总 JSON ↗</a></p>
   <noscript><p class="shell fallback">开启 JavaScript 可查看图表并操作轮播。各卡片的代码、口径和说明仍可阅读；精确数值可下载上方汇总 JSON。</p></noscript>
  </section>
 </div>
@@ -101,11 +102,29 @@ else:
 
     <section class="section shell" id="approach" aria-labelledby="approach-title">
       <div class="section-intro"><div><p class="eyebrow">THE ENGINEERING QUESTION</p><h2 id="approach-title">每一种方法，<br>都对应一个具体困难。</h2></div><p>数千份表格，字段各异，信息分散。项目关注如何组合已有工具，以及如何验证这些选择是否有效。</p></div>
-      <div class="choices">
-        <article><div class="choice-visual mini-samples" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><p class="overline">01 / SELECT</p><h3>文件太多，先看什么？</h3><p>把文件名、表头和分层样本组织为文件卡片，交给本地模型判断相关性。保留、复核、排除，决策都有依据。</p><a href="#lab" data-open-lab="sample">探索文件抽样 <span aria-hidden="true">↗</span></a></article>
-        <article><div class="choice-visual mini-chunks" aria-hidden="true"><span>表头 + 记录 01–04</span><span>表头 + 记录 05–08</span><span>表头 + 记录 09–12</span></div><p class="overline">02 / EXTRACT</p><h3>表格太长，怎样分开看？</h3><p>完整记录进入分块，每块携带语境和表头。记录编号、输出预算与证据核验，共同约束抽取结果。</p><a href="#lab" data-open-lab="chunk">探索结构分块 <span aria-hidden="true">↗</span></a></article>
-        <article><div class="choice-visual mini-match" aria-hidden="true"><span>企业名称</span><i>＋</i><span>身份字段</span><b>→</b><span class="match-result">归属判断</span></div><p class="overline">03 / RESOLVE</p><h3>名称相近，是同一家吗？</h3><p>先找可靠标识，再核对名称和地址。相似记录进入候选；证据不足时保留独立主体，供后续复核。</p><a href="#lab" data-open-lab="match">探索匹配边界 <span aria-hidden="true">↗</span></a></article>
-      </div>
+      <div class="method-pager"><div class="method-tabs" role="tablist" aria-label="方法说明分页"><button type="button" role="tab" id="method-tab-select" aria-controls="method-panel-select" aria-selected="true" tabindex="0" data-method-tab="0"><span>01</span>文件筛选</button><button type="button" role="tab" id="method-tab-extract" aria-controls="method-panel-extract" aria-selected="false" tabindex="-1" data-method-tab="1"><span>02</span>结构抽取</button><button type="button" role="tab" id="method-tab-resolve" aria-controls="method-panel-resolve" aria-selected="false" tabindex="-1" data-method-tab="2"><span>03</span>主体关联</button></div><div class="method-panels"><article id="method-panel-select" class="method-panel" role="tabpanel" aria-labelledby="method-tab-select">
+ <div class="method-narrative"><p class="overline">01 / SELECT</p><h3>文件太多，先看什么？</h3><p class="method-lead">先让模型理解文件的主题与结构，再决定哪些内容值得完整处理。</p><ol class="method-steps"><li><strong>识别与抽样</strong><p>按实际内容识别格式，组织文件名、表头、首部、中部、尾部和固定种子随机样本。</p></li><li><strong>本地模型判断相关性</strong><p>结合企业主体、事件本体和样本语义，给出保留、排除或不确定判断。</p></li><li><strong>完整保留决策依据</strong><p>保存卡片、模型原回复与判断。不确定项继续规划或复核，排除也有台账。</p></li></ol><dl class="method-io"><dt>输入</dt><dd>文件名、表头、分布样本与文件语境</dd><dt>输出</dt><dd>相关性判断、理由与后续处理去向</dd></dl><a class="text-link" href="#lab" data-open-lab="sample">调整样本数量，观察输入变化<span aria-hidden="true">↗</span></a></div>
+ <div class="method-exhibit"><div class="method-exhibit-top"><span>METHOD NOTEBOOK</span><span class="small-tag">合成方法示意</span></div><div class="method-exhibit-heading"><h4>文件卡片，是模型看到的入口。</h4><p>示例：120 条原始记录，首中尾各 3 条，再补 6 条固定随机样本。</p></div><div id="method-sample-preview" class="method-sample-grid" role="img" aria-label="120 条合成记录中的 15 个样本位置"></div><div class="method-sample-metrics"><span><strong>15</strong> 行样本进入卡片</span><span><strong>120</strong> 行原始记录保留</span></div><div class="method-code"><span>输入卡片 · 概念结构</span><pre><code>{
+  filename: &quot;合成科技企业拟认定名单.csv&quot;,
+  headers: [&quot;企业名称&quot;, &quot;认定类型&quot;],
+  samples: [head, middle, tail, seeded_random],
+  context: &quot;拟认定名单&quot;
+}</code></pre></div><div class="method-result"><span class="method-result-label">输出示意</span><strong>KEEP / 保留</strong><p>出现具名企业与科技认定线索，保留进入字段规划；记录判断与依据。</p></div><p class="method-caveat">抽样不能保证发现罕见事件，排除文件仍需抽查。</p></div></article><article id="method-panel-extract" class="method-panel" role="tabpanel" aria-labelledby="method-tab-extract" hidden>
+ <div class="method-narrative"><p class="overline">02 / EXTRACT</p><h3>表格太长，怎样分开看？</h3><p class="method-lead">模型制定字段方案，程序执行结构化处理；复杂内容再按完整记录交给模型。</p><ol class="method-steps"><li><strong>分块携带共同语境</strong><p>完整行保留原值与记录编号，表头、单位、前置说明随块关联。</p></li><li><strong>按实际 token 预算拆批</strong><p>预留输出空间。优先减少每批记录数，长文本采用有位置的片段或可重建视图。</p></li><li><strong>逐条核对并保存检查点</strong><p>检查记录归属、主体和证据引用；失败缩批、重试或明确复核，已通过结果落盘。</p></li></ol><dl class="method-io"><dt>输入</dt><dd>完整记录、字段方案、表头和上下文</dd><dt>输出</dt><dd>主体／事件候选、原文引用及逐条处理状态</dd></dl><a class="text-link" href="#lab" data-open-lab="chunk">动手调整分块，检查编号覆盖<span aria-hidden="true">↗</span></a></div>
+ <div class="method-exhibit"><div class="method-exhibit-top"><span>METHOD NOTEBOOK</span><span class="small-tag">合成方法示意</span></div><div class="method-exhibit-heading"><h4>拆开的是批次，保留的是完整记录。</h4><p>12 条合成记录按每块 4 条划分，每块携带表头和共同语境。</p></div><div class="method-chunk-diagram"><div><span>CHUNK 01</span><b>表头 + 上下文</b><p>R-001 → R-004</p><small>4 条完整记录</small></div><div><span>CHUNK 02</span><b>表头 + 上下文</b><p>R-005 → R-008</p><small>4 条完整记录</small></div><div><span>CHUNK 03</span><b>表头 + 上下文</b><p>R-009 → R-012</p><small>4 条完整记录</small></div></div><div class="method-code"><span>分块与校验 · 概念伪代码</span><pre><code>for chunk in complete_record_chunks(records):
+    result = local_model.extract(chunk, context)
+    validate_record_ids(result)
+    validate_source_references(result)
+    save_checkpoint(result)</code></pre></div><div class="method-result"><span class="method-result-label">一条结果示意</span><strong>R-005 → EXTRACTED</strong><div class="method-result-fields"><span>主体：合成示例甲科技有限公司</span><span>政策支持 · proposed（拟议）</span><span>原文引用：“拟支持”</span></div></div><p class="method-caveat">编号覆盖与原文引用可检查；模型语义理解仍需独立评测。</p></div></article><article id="method-panel-resolve" class="method-panel" role="tabpanel" aria-labelledby="method-tab-resolve" hidden>
+ <div class="method-narrative"><p class="overline">03 / RESOLVE</p><h3>名称相近，是同一家吗？</h3><p class="method-lead">先核对可靠标识，再检查名称与地址。证据不足时保留独立主体与复核候选。</p><ol class="method-steps"><li><strong>可靠代码优先，冲突阻止归并</strong><p>验证信用代码的结构和校验位，明确冲突不因名称相似而被覆盖。</p></li><li><strong>完整名称与非空地址作弱证据</strong><p>缺码记录只有满足保守条件才关联；同名缺地址继续保留独立归属。</p></li><li><strong>相似度用于召回候选</strong><p>保存匹配依据与原始来源。暂定身份、事件阶段和来源质量随画像继续保留。</p></li></ol><dl class="method-io"><dt>输入</dt><dd>校验后的名称、代码、地址、角色与来源</dd><dt>输出</dt><dd>主体归属、关联依据、冲突与近名复核候选</dd></dl><a class="text-link" href="#lab" data-open-lab="match">试一试三种身份信息组合<span aria-hidden="true">↗</span></a></div>
+ <div class="method-exhibit"><div class="method-exhibit-top"><span>METHOD NOTEBOOK</span><span class="small-tag">合成方法示意</span></div><div class="method-exhibit-heading"><h4>把归并理由，留在结果旁边。</h4><p>下面两条合成记录名称与非空地址一致，但均缺少信用代码。</p></div><div class="method-identity-pair"><div><small>来源 A</small><strong>合成示例甲科技有限公司</strong><span>地址：示例路 1 号</span><span>信用代码：缺失</span></div><span class="method-pair-arrow" aria-hidden="true">↔</span><div><small>来源 B</small><strong>合成示例甲科技有限公司</strong><span>地址：示例路 1 号</span><span>信用代码：缺失</span></div></div><div class="method-code"><span>身份关联 · 条件示意</span><pre><code>if codes_conflict:
+    refuse_automatic_merge()
+elif checksum_valid_code:
+    link_by_code()
+elif exact_name_and_nonempty_address:
+    link_conservatively()
+else:
+    keep_separate_for_review()</code></pre></div><div class="method-result"><span class="method-result-label">归并依据示意</span><strong>exact_name_and_address</strong><p>按完整名称与非空地址关联；identity_status 仍为 provisional，未作权威工商核验。</p></div><p class="method-caveat">名称相似只给复核候选；缺失字段不作为一致证据。</p></div></article></div><div class="method-page-controls"><button type="button" id="method-prev" aria-label="上一页方法说明">← 上一部分</button><span id="method-page-position" role="status">01 / 03 · 文件筛选</span><button type="button" id="method-next" aria-label="下一页方法说明">下一部分 →</button></div></div>
     </section>
 
     <section class="section lab-section" id="lab" aria-labelledby="lab-title">
@@ -194,6 +213,7 @@ bank-data demo --work-dir ../demo_process_work</pre><p id="copy-status" role="st
     <div class="closing shell"><span class="closing-mark" aria-hidden="true">↳</span><p>让数据有来处，<br><span>让判断有依据。</span></p><a href="#top" aria-label="回到顶部">↑</a></div>
   </main>
   <footer class="footer shell"><a class="brand" href="#top"><img src="assets/mark.svg" width="25" height="25" alt=""><span>Beijing Enterprise Intelligence</span></a><span>工程实践 · 2026</span><a href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">源码与文档 ↗</a></footer>
+  <dialog id="notebook-reader" class="notebook-reader" aria-labelledby="notebook-reader-title"><div class="notebook-reader-heading"><h2 id="notebook-reader-title">数据笔记本</h2><button type="button" id="notebook-reader-close" aria-label="关闭放大阅读">关闭 ×</button></div><div id="notebook-reader-body"></div></dialog>
   <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><span class="overline">SOURCE INSPECTOR / SYNTHETIC</span><button id="close-source" aria-label="关闭原始证据" type="button">×</button></div><h2 id="source-title">原始证据</h2><div id="source-content"></div><button class="button primary dialog-close" type="button">返回企业画像 <span aria-hidden="true">↗</span></button></dialog>
 </body>
 </html>
