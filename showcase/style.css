@@ -296,18 +296,20 @@ dialog { width: min(680px,calc(100% - 32px)); max-height: 88vh; color: var(--ink
 .landing-stage { background: linear-gradient(180deg,#101827 0%,#101827 41%,#354155 58%,#e5e8ee 81%,#fff 100%); }
 .hero { padding-block: 70px 42px; }
 .hero-copy { text-align: left; }
+.hero-bottom { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 45px; }
+.hero-cta { justify-self: end; }
 .hero .eyebrow { font: 400 clamp(16px,1.8vw,24px)/1.6 Inter,"Segoe UI","Microsoft YaHei",sans-serif; color: #b9c2d2; letter-spacing: 0; }
 .hero h1 { color: #fff; margin: 11px 0 32px; font-size: clamp(46px,5.2vw,76px); line-height: 1.27; font-weight: 600; letter-spacing: -.045em; }
 .hero-emphasis { white-space: nowrap; }
 .hero-lead { color: #d2d8e2; font-size: 16px; line-height: 1.95; max-width: 790px; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 25px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 0; }
 .hero .primary { background: #fff; color: #101827; border-color: #fff; }
 .hero .primary:hover { background: #e7edf6; border-color: #e7edf6; }
 .hero .secondary { color: #fff; background: transparent; border-color: #667286; }
 .hero .secondary:hover { background: #ffffff10; border-color: #c5cedc; }
 .hero-footnote { margin-top: 18px; font-size: 11px; color: #aeb9cb; }
 .hero-footnote span { padding-inline: 12px; }
-.notebook-showcase { --gallery-window: min(1740px,86vw); --notebook-width: calc((var(--gallery-window) - 64px)/3.55); --gallery-gap: 16px; padding-block: 7px 36px; }
+.notebook-showcase { --gallery-window: min(1740px,86vw); --notebook-width: min(475px,calc((var(--gallery-window) - 64px)/3.55)); --gallery-gap: 16px; padding-block: 7px 36px; }
 .gallery-heading { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; color: #dce3ee; padding-top: 10px; }
 .gallery-heading h2 { color: #fff; font-size: 20px; font-weight: 450; margin: 0; letter-spacing: -.5px; }
 .gallery-heading>span { font: 11px/1.8 var(--mono); color: #b7c1d2; }
@@ -316,7 +318,7 @@ dialog { width: min(680px,calc(100% - 32px)); max-height: 88vh; color: var(--ink
 .carousel-track { display: flex; width: max-content; align-items: stretch; gap: var(--gallery-gap); padding-inline: calc((var(--gallery-window) - var(--notebook-width))/2); position: relative; overflow-anchor: none; }
 .data-notebook, .notebook-slot { position: relative; width: var(--notebook-width); flex: 0 0 var(--notebook-width); scroll-snap-align: center; scroll-snap-stop: always; min-width: 0; container-type: inline-size; }
 .notebook-category { position: absolute; left: 0; top: -33px; height: 34px; display: inline-flex; align-items: center; padding: 7px 19px; color: #354052; background: #fff; border: 1px solid #dde1e8; border-bottom: 0; border-radius: 5px 5px 0 0; font-size: 12px; z-index: 1; }
-.notebook-page { display: flex; flex-direction: column; height: 560px; padding: 22px 23px 18px; background: #fff; color: #20242c; border: 1px solid #e0e3e8; border-radius: 0 4px 4px 4px; box-shadow: 0 7px 24px #0f172a10; overflow-y: auto; scrollbar-width: thin; }
+.notebook-page { display: flex; flex-direction: column; height: 540px; padding: 22px 23px 18px; background: #fff; color: #20242c; border: 1px solid #e0e3e8; border-radius: 0 4px 4px 4px; box-shadow: 0 7px 24px #0f172a10; overflow-y: auto; scrollbar-width: thin; }
 .notebook-reader-open { border-left: 1px solid #dce1e9; padding: 0 0 0 9px; margin-left: 10px; color: #64748b; background: transparent; font-size: 10px; white-space: nowrap; }
 .notebook-reader-open:hover { color: #4269d0; }
 .notebook-reader { width: min(920px,calc(100% - 30px)); max-height: 92vh; padding: 18px 20px 22px; }
@@ -410,6 +412,10 @@ dialog { width: min(680px,calc(100% - 32px)); max-height: 88vh; color: var(--ink
 @media (max-width: 1050px) {
   .hero { padding-top: 55px; }.hero h1 { font-size: 59px; }.gallery-heading h2 { font-size: 18px; }
   .notebook-showcase { --gallery-window: 92vw; --notebook-width: min(580px,76vw); --gallery-gap: 14px; }
+}
+@media (max-width: 900px) {
+  .hero-bottom { grid-template-columns: minmax(0,1fr); gap: 22px; }
+  .hero-cta { justify-self: start; }
 }
 @media (max-width: 640px) {
   .hero { padding-top: 43px; padding-bottom: 32px; }.hero .eyebrow { font-size: 15px; }.hero h1 { font-size: clamp(34px,7.8vw,48px); margin-block: 13px 24px; line-height: 1.37; }.hero-lead { font-size: 13px; }.hero-lead br { display: none; }.hero-actions { gap: 10px; margin-top: 21px; }.hero-footnote { font-size: 10px; }
