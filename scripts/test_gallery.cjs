@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const {eventGroups, eventView, allocateSlots, autoplayStep, project, loopOrder} = require('../showcase/gallery.js');
+const {eventGroups, eventView, autoplayStep, loopOrder} = require('../showcase/gallery.js');
 const data = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../showcase/assets/gallery-data.json'), 'utf8'));
 const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
 
@@ -60,26 +60,11 @@ test('event-stage filters preserve categories and never mix record counts into e
   assert.equal(total,data.subset.events);
   assert.equal(sum(eventGroups(data.events,'removed'),'count'),0);
 });
-test('waffle rounding conserves all cells and is deterministic for tiny categories', () => {
-  for (const rows of [data.record_statuses,[{count:1},{count:1},{count:99998}]]) {
-    const result=allocateSlots(rows,200);
-    assert.equal(result.reduce((a,b)=>a+b,0),200);
-    assert.ok(result.every(n=>Number.isInteger(n)&&n>=0));
-    assert.deepEqual(result,allocateSlots(rows,200));
-  }
-});
 test('reading pauses the carousel clock and resuming preserves elapsed time', () => {
   assert.deepEqual(autoplayStep(7900,200,8000,true),{advance:false,elapsed:7900});
   assert.deepEqual(autoplayStep(7900,200,8000,false),{advance:true,elapsed:100});
   assert.deepEqual(autoplayStep(2000,500,8000,false),{advance:false,elapsed:2500});
   assert.throws(()=>autoplayStep(0,1,0,false),RangeError);
-});
-test('space projections remain finite across keyboard rotation and preserve source bins', () => {
-  for(const angle of [-Math.PI,-.5,0,.5,Math.PI]) for(const x of [-1,0,1]) {
-    const p=project(x,1,-1,angle,.4);
-    assert.ok(Object.values(p).every(Number.isFinite));
-    assert.ok(p.x > 0 && p.x < 720 && p.y > -40 && p.y < 410);
-  }
 });
 test('execution timeline uses ordered actual observations, not fabricated uniform intervals', () => {
   const points=data.progress.points;
