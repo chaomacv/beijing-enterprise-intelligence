@@ -92,14 +92,14 @@ test('execution timeline uses ordered actual observations, not fabricated unifor
   }
   assert.ok(new Set(intervals).size>1);
 });
-test('gallery mount targets exist and all seven slides have accessible navigation controls', () => {
+test('gallery mount targets exist and all eight slides have accessible navigation controls', () => {
   const path=require('node:path');
   const html=fs.readFileSync(path.join(__dirname,'../showcase/index.html'),'utf8');
   const js=fs.readFileSync(path.join(__dirname,'../showcase/gallery.js'),'utf8');
   const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
   for(const match of js.matchAll(/\$\('([a-z0-9-]+)'\)/g)) assert.ok(ids.has(match[1]),match[1]);
-  assert.equal([...html.matchAll(/data-notebook="\d+"/g)].length,7);
-  assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,7);
+  assert.equal([...html.matchAll(/data-notebook="\d+"/g)].length,8);
+  assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,8);
   assert.ok(html.includes('src="gallery.js"'));
   assert.ok(html.includes('aria-roledescription="轮播"'));
 });

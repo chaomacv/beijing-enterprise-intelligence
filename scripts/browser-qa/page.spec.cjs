@@ -63,14 +63,14 @@ test('square notebooks have protruding topic tabs and a separate corner expansio
   await expect(page.locator('#notebook-reader .notebook-reader-open')).not.toBeVisible();
 });
 test('crossing either end keeps circular neighbors and unique interactive cards',async({page})=>{
-  for(const n of [6,0,6,0,1]){
-    if(n===6){await page.locator('[data-gallery-page="0"]').click();await page.locator('#gallery-prev').click();}
-    else if(n===0){await page.locator('[data-gallery-page="6"]').click();await page.locator('#gallery-next').click();}
+  for(const n of [7,0,7,0,1]){
+    if(n===7){await page.locator('[data-gallery-page="0"]').click();await page.locator('#gallery-prev').click();}
+    else if(n===0){await page.locator('[data-gallery-page="7"]').click();await page.locator('#gallery-next').click();}
     else await page.locator('#gallery-next').click();
     await expect(page.locator(`[data-gallery-page="${n}"]`)).toHaveAttribute('aria-pressed','true');
-    await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[3].dataset.notebook))).toBe(n);
+    await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[4].dataset.notebook))).toBe(n);
     const order=await page.locator('.carousel-track').evaluate(el=>[...el.children].map(c=>Number(c.dataset.notebook)));
-    expect(new Set(order).size).toBe(7);expect(order[2]).toBe((n+6)%7);expect(order[4]).toBe((n+1)%7);
+    expect(new Set(order).size).toBe(8);expect(order[3]).toBe((n+7)%8);expect(order[5]).toBe((n+1)%8);
   }
   const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));expect(ids.length).toBe(new Set(ids).size);
 });
@@ -82,7 +82,7 @@ test('expanded notebook retains chart controls when restored',async({page})=>{
   await page.locator('#notebook-reader-close').click();
   await expect(page.locator('#notebook-reader')).not.toBeVisible();
   await expect(page.locator('#gallery-event-stage')).toHaveValue('unknown');
-  await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(7);
+  await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(8);
 });
 
 test('classification chart separates ten source topics and keeps profile counts explicit',async({page},info)=>{
@@ -107,11 +107,11 @@ test('classification chart separates ten source topics and keeps profile counts 
 });
 test('timed playback advances from the last notebook to the first',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.locator('[data-gallery-page="6"]').click();
+  await page.locator('[data-gallery-page="7"]').click();
   await page.locator('#gallery-play').click();
   await page.mouse.move(5,5);
   await expect(page.locator('[data-gallery-page="0"]')).toHaveAttribute('aria-pressed','true',{timeout:12000});
-  await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[3].dataset.notebook))).toBe(0);
+  await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[4].dataset.notebook))).toBe(0);
 });
 test('method pages replace in place with useful content and keyboard controls',async({page},info)=>{
   await page.locator('#approach').scrollIntoViewIfNeeded();
@@ -134,4 +134,36 @@ test('method pages replace in place with useful content and keyboard controls',a
   }
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
   await page.screenshot({path:info.outputPath('method-pager.png')});
+});
+
+test('real event sunburst reconciles counts, exposes honest depth and filters without changing denominator',async({page},info)=>{
+ await page.locator('[data-gallery-page="7"]').click();
+ await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-ready','true');
+ await expect(page.locator('#event-sunburst-chart [data-sun-node]')).toHaveCount(10);
+ await expect(page.locator('#event-sunburst-table tr')).toHaveCount(10);
+ await page.locator('[data-notebook="7"] .notebook-reader-open').click();
+ await page.locator('[data-sun-node="business_permit"]').focus();
+ await expect(page.locator('#event-sunburst-detail')).toContainText('1,090,473');
+ await expect(page.locator('#event-sunburst-detail')).toContainText('占父级');
+ await page.locator('[data-sun-node="business_permit"]').press('Enter');
+ await expect(page.locator('#event-sunburst-detail')).toContainText('未开放下钻');
+ await page.locator('#event-sunburst-filter').selectOption('business_permit');
+ await expect(page.locator('#event-sunburst-table tr')).toHaveCount(1);
+ await expect(page.locator('#event-sunburst-chart')).toContainText('5,031,890');
+ await page.screenshot({path:info.outputPath('event-sunburst.png')});
+});
+
+test('test-only deeper hierarchy supports zoom, breadcrumbs and center return',async({page})=>{
+ // Routed fixture exercises future verified descendants; it never enters published data.
+ const fixture={tree:{id:'all',name:'合成测试',value:10,children:[{id:'a',name:'测试甲',value:6,children:[{id:'aa',name:'甲一',value:2,children:[{id:'aaa',name:'标签一',value:1},{id:'aab',name:'标签二',value:1}]},{id:'ab',name:'甲二',value:4}]},{id:'b',name:'测试乙',value:4}]}};
+ await page.route('**/assets/event-hierarchy.json',route=>route.fulfill({json:fixture}));
+ await page.reload();await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-ready','true');
+ await page.locator('[data-gallery-page="7"]').click();
+ await page.locator('[data-notebook="7"] .notebook-reader-open').click();
+ await page.locator('[data-sun-node="a"]').focus();await page.locator('[data-sun-node="a"]').press('Enter');
+ await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(2);
+ await expect(page.locator('[data-sun-node="aaa"]')).toHaveCount(1);
+ await page.locator('[data-sun-up]').click();
+ await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(1);
+ await expect(page.locator('[data-sun-node="aaa"]')).toHaveCount(0);
 });
