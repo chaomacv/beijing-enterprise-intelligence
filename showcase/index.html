@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f6f0">
+  <meta name="theme-color" content="#ffffff">
   <title>Beijing Enterprise Intelligence · 从公开数据到有据可查的企业情报</title>
   <meta name="description" content="一项可探索的本地模型数据工程实践：理解文件、保留记录、核对证据，将北京公开数据组织为企业事实与标签。">
   <meta property="og:title" content="Beijing Enterprise Intelligence">
@@ -20,7 +20,7 @@
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
   <header class="header">
-    <a class="brand" href="#top" aria-label="Beijing Enterprise Intelligence 首页"><img src="assets/mark.svg" width="31" height="31" alt=""><span>BEI<span class="brand-rest"> / enterprise intelligence</span></span></a>
+    <a class="brand" href="#top" aria-label="Beijing Enterprise Intelligence 首页"><img src="assets/mark.svg" width="31" height="31" alt=""><span>BEI<span class="brand-rest">Enterprise Intelligence</span></span></a>
     <nav aria-label="主导航"><a href="#approach">方法选择</a><a href="#pipeline">全量流程</a><a href="#lab">交互实验</a><a href="#evidence">企业与证据</a><a href="#release">项目进展</a></nav>
     <a class="repo-link" href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
   </header>
@@ -28,40 +28,18 @@
   <main id="main">
     <section class="hero shell" id="top" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="signal-dot"></span> BEIJING OPEN DATA · LOCAL INTELLIGENCE</p>
-        <h1 id="hero-title">分散的数据，<br>有据可查的<br><span class="hero-emphasis">企业情报。</span></h1>
-        <p class="hero-lead">面向银行的企业信息梳理，用本地模型理解政务表格。<br class="desktop-break">从文件筛选到事件归并，让每条事实保留来处。</p>
-        <div class="hero-actions"><a class="button primary" href="#pipeline">查看完整流程 <span aria-hidden="true">↗</span></a><a class="text-link" href="#lab">进入交互实验 <span aria-hidden="true">↓</span></a></div>
-        <p class="hero-footnote">开放源码 <span>·</span> 本地 Qwen 方案 <span>·</span> 原始证据可追溯</p>
+        <p class="eyebrow">BEIJING ENTERPRISE INTELLIGENCE</p>
+        <h1 id="hero-title">让公开数据，<br>成为有据可查的<span class="hero-emphasis">企业情报。</span></h1>
+        <p class="hero-lead">用本地模型理解文件，用数据工程连接事实。<br>从分散的政务表格出发，探索每一种方法，追溯每一条证据。</p>
+        <div class="hero-actions"><a class="button primary" href="#pipeline">探索完整流程 <span aria-hidden="true">↗</span></a><a class="button secondary" href="#lab">动手试一试 <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-footnote">开放源码<span>·</span>本地 Qwen<span>·</span>证据可追溯</p>
       </div>
-      <div class="hero-figure">
-        <div class="figure-top"><span><i></i> A DATA STORY, IN THREE MOVES</span><span>FIG. 01</span></div>
-        <svg class="data-landscape" viewBox="0 0 610 440" role="img" aria-labelledby="landscape-title landscape-desc">
-          <title id="landscape-title">从分散文件到企业与证据的数据流示意</title>
-          <desc id="landscape-desc">多种颜色的源文件记录，经过筛选与结构化处理，归到企业节点，所有结果仍连接到来源。图形为方法示意，不表示全量运行统计。</desc>
-          <defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="#d8dcd0"/></pattern></defs>
-          <rect width="610" height="440" fill="url(#dots)"/>
-          <g class="flow-paths" fill="none" stroke-width="1.25">
-            <path d="M90 100 C190 100 180 210 303 210" stroke="#759d80"/><path d="M115 165 C190 165 200 210 303 210" stroke="#ce9d70"/>
-            <path d="M70 250 C180 250 185 210 303 210" stroke="#7a9eb1"/><path d="M113 326 C210 326 190 210 303 210" stroke="#9c99b0"/>
-            <path d="M305 210 C390 210 395 120 485 120" stroke="#527b62"/><path d="M305 210 C400 210 385 295 485 295" stroke="#85a1b4"/>
-            <path d="M485 120 C550 120 565 170 559 210" stroke="#c4ccbc" stroke-dasharray="3 5"/><path d="M485 295 C550 295 565 260 559 210" stroke="#c4ccbc" stroke-dasharray="3 5"/>
-          </g>
-          <g class="flow-particles"><circle r="3.5" fill="#6e9578"><animateMotion dur="5s" repeatCount="indefinite" path="M90 100 C190 100 180 210 303 210 C390 210 395 120 485 120"/></circle><circle r="3.5" fill="#7096aa"><animateMotion dur="6s" repeatCount="indefinite" path="M70 250 C180 250 185 210 303 210 C400 210 385 295 485 295"/></circle></g>
-          <g class="source-block" transform="translate(56 58)"><rect width="72" height="57" rx="5" fill="#e4ecd8"/><path d="M14 18h43M14 28h43M14 38h30" stroke="#92a583" stroke-width="3"/><text x="5" y="76">资质认定.csv</text></g>
-          <g class="source-block" transform="translate(82 140)"><rect width="72" height="57" rx="5" fill="#f2e2d3"/><path d="M14 18h43M14 28h43M14 38h30" stroke="#c49c76" stroke-width="3"/><text x="6" y="77">行政处罚.xlsx</text></g>
-          <g class="source-block" transform="translate(36 225)"><rect width="72" height="57" rx="5" fill="#dee8ec"/><path d="M14 18h43M14 28h43M14 38h30" stroke="#88a5b1" stroke-width="3"/><text x="4" y="77">采购合同.csv</text></g>
-          <g class="source-block" transform="translate(80 303)"><rect width="72" height="57" rx="5" fill="#e8e3ee"/><path d="M14 18h43M14 28h43M14 38h30" stroke="#aaa0b5" stroke-width="3"/><text x="4" y="77">更多公开文件</text></g>
-          <circle cx="303" cy="210" r="61" fill="#f7f8f1" stroke="#d1dac6"/><circle cx="303" cy="210" r="43" fill="#254f3d"/>
-          <g stroke="#dce9bd" stroke-width="2.5" fill="none"><path d="M284 199h38M284 209h27M284 219h32"/><path d="M315 209l7 7 10-14"/></g>
-          <text class="svg-label" x="303" y="295" text-anchor="middle">理解 · 抽取 · 核验</text><text class="svg-micro" x="303" y="315" text-anchor="middle">LOCAL MODEL + PYTHON</text>
-          <g class="entity-point"><circle cx="485" cy="120" r="32" fill="#dce8bc" stroke="#b9c99e"/><circle cx="485" cy="112" r="7" fill="#52704c"/><path d="M473 132q12-15 24 0" fill="#52704c"/><text class="svg-label" x="485" y="178" text-anchor="middle">企业 A</text></g>
-          <g class="entity-point"><circle cx="485" cy="295" r="32" fill="#dce8ed" stroke="#b3c8d0"/><circle cx="485" cy="287" r="7" fill="#608493"/><path d="M473 307q12-15 24 0" fill="#608493"/><text class="svg-label" x="485" y="353" text-anchor="middle">企业 B</text></g>
-          <g transform="translate(533 188)"><rect width="50" height="43" rx="5" fill="#fff" stroke="#d6dccd"/><path d="M546 201h23M546 209h23M546 217h15" stroke="#aab79e" stroke-width="2" transform="translate(-533 -188)"/></g>
-          <text class="svg-micro" x="559" y="254" text-anchor="middle">EVIDENCE</text>
-        </svg>
-        <div class="figure-bottom"><span class="legend"><i class="dot sage"></i>源文件 <i class="dot blue"></i>企业主体 <i class="dot sand"></i>事实证据</span><span>方法示意 · 非运行统计</span></div>
+      <div class="hero-gallery" aria-label="三个可探索的数据方法">
+        <a class="notebook-preview" href="#lab" data-open-lab="sample"><div class="preview-art"><img src="assets/notebook-sample.svg" width="400" height="260" alt="彩色点阵展示文件中不同位置的抽样，图形为合成方法示意"></div><div class="preview-caption"><span><small>01 / SELECT</small><strong>从一份文件开始</strong></span><span class="preview-arrow" aria-hidden="true">↗</span></div></a>
+        <a class="notebook-preview" href="#lab" data-open-lab="chunk"><div class="preview-art"><img src="assets/notebook-chunk.svg" width="400" height="260" alt="完整记录分成三组，每组携带表头，图形为合成方法示意"></div><div class="preview-caption"><span><small>02 / UNDERSTAND</small><strong>把复杂内容分开理解</strong></span><span class="preview-arrow" aria-hidden="true">↗</span></div></a>
+        <a class="notebook-preview" href="#lab" data-open-lab="match"><div class="preview-art"><img src="assets/notebook-match.svg" width="400" height="260" alt="两组来源节点及独立的歧义节点，图形为合成方法示意"></div><div class="preview-caption"><span><small>03 / CONNECT</small><strong>让事实与来源相连</strong></span><span class="preview-arrow" aria-hidden="true">↗</span></div></a>
       </div>
+      <p class="gallery-note">三个可操作的方法实验 / 图形与交互均使用合成示例</p>
     </section>
 
     <div class="principle-strip shell"><span><b>01</b> 先理解文件</span><span><b>02</b> 逐条保留证据</span><span><b>03</b> 谨慎归并企业</span><a href="#release">当前工程进展 <span aria-hidden="true">↗</span></a></div>
