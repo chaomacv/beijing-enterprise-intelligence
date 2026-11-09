@@ -296,7 +296,7 @@ dialog { width: min(680px,calc(100% - 32px)); max-height: 88vh; color: var(--ink
 .landing-stage { background: linear-gradient(180deg,#101827 0%,#101827 41%,#354155 58%,#e5e8ee 81%,#fff 100%); }
 .hero { padding-block: 54px 22px; }
 .hero-copy { text-align: left; }
-.hero-bottom { margin-top: 64px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 45px; }
+.hero-bottom { margin-top: 88px; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 45px; }
 .hero-cta { justify-self: end; }
 .hero .eyebrow { font: 400 clamp(16px,1.8vw,24px)/1.6 Inter,"Segoe UI","Microsoft YaHei",sans-serif; color: #b9c2d2; letter-spacing: 0; }
 .hero h1 { color: #fff; margin: 11px 0 32px; font-size: clamp(20px,4.933333vw,72px); width: max-content; max-width: none; white-space: nowrap; line-height: 1.27; font-weight: 600; letter-spacing: -.045em; }

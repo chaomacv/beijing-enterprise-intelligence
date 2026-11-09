@@ -37,7 +37,7 @@ test('hero actions move right on desktop and stack naturally on mobile',async({p
   expect(await page.locator('.gallery-heading').count()).toBe(0);
   expect(await page.locator('#gallery-play').innerText()).toBe('');
   await expect(page.locator('#gallery-clock')).not.toBeVisible();
-  expect(await page.locator('.hero-bottom').evaluate(el=>parseFloat(getComputedStyle(el).marginTop))).toBe(64);
+  expect(await page.locator('.hero-bottom').evaluate(el=>parseFloat(getComputedStyle(el).marginTop))).toBe(88);
   const size=await title.evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
   if(page.viewportSize().width>1100)expect(size).toBeCloseTo(Math.min(72,page.viewportSize().width*.04933333),1);
   await page.screenshot({path:info.outputPath('hero-actions.png')});
