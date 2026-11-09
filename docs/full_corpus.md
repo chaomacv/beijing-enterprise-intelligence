@@ -2,6 +2,8 @@
 
 全量入口是 `python -m bank_data.bulk_run`。小样本 SQLite 工作流继续可用；大量记录采用流式 JSONL 分区与 DuckDB 磁盘聚合。
 
+新启动的全量运行在原始聚合与覆盖对账后自动执行[事件细分与阶段校验](event_classification.md)，版本化输出位于 `10_classification/<attempt>/`，入口指针保存在 `08_results/summary.json` 的 `classification`。已在运行的冻结版本通过一次性 `scripts/refine_completed_run.py --wait` 接续，输出 `10_classification_v1/`，不会为了分类修正重新推理。下游采用修正后的 `classified_events` 和 `classified_profile_tags`；旧宽类结果继续保留作基线。
+
 原始文件保持只读。文件名、表头、首中尾和固定种子随机样本交给本地 Qwen 做相关性判断；没有把每张表的全部内容一次性输入模型。相关的结构化表由模型生成字段、条件和阶段映射，程序逐行复制原值并校验；需要语义理解的段落再按记录输入模型。这样能减少重复推理和模型转抄原值的错误。文件筛选仍可能遗漏相关文件，不能把处理覆盖率当成语义准确率。
 
 ## 运行

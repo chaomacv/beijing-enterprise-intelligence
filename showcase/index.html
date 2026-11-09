@@ -39,14 +39,17 @@
       
  <div class="sunburst-layout"><div id="gallery-sunburst" class="gallery-figure"></div><div><p class="notebook-kicker">LOGICAL FILES</p><strong class="notebook-big-number" id="gallery-file-total">11,701</strong><p class="notebook-small">包含展开成员和转换结果</p><div id="gallery-format-legend" class="format-legend"></div></div></div>
  <div class="cell-output" id="gallery-format-detail" role="status">悬停扇区可查看格式与解析状态。</div><pre class="gallery-code"><code>formats[kind, status] += 1
-# 按实际处理器格式分组，保留转换与复核状态</code></pre><footer class="notebook-scope">全批文件元数据 · 固定输入 2026-11-07 · 文件数不等于企业数</footer></div></article><article class="data-notebook" data-notebook="1" aria-roledescription="幻灯片" aria-label="2 / 7：我们观察到了哪些企业事件？">
-      <span class="notebook-category">统计图 / 真实汇总</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[02]</span><div><h3>我们观察到了哪些企业事件？</h3><p>切换事件阶段，比较类别分布；查看图表下面的实际统计。</p></div></div>
+# 按实际处理器格式分组，保留转换与复核状态</code></pre><footer class="notebook-scope">全批文件元数据 · 固定输入 2026-11-07 · 文件数不等于企业数</footer></div></article><article class="data-notebook" data-notebook="1" aria-roledescription="幻灯片" aria-label="2 / 7：把许可资质拆成十类。">
+      <span class="notebook-category">统计图 / 分类修正</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[02]</span><div><h3>把“许可资质”，拆开来看。</h3><p>分清企业、人员、设备与产品，再区分申请、检查和获批记录。</p></div></div>
       
- <div class="notebook-toolbar"><label>事件阶段 <select id="gallery-event-stage"><option value="all">全部阶段</option><option value="confirmed">来源标为 confirmed</option><option value="proposed">拟议 proposed</option><option value="unknown">阶段未明 unknown</option></select></label><label><input id="gallery-event-log" type="checkbox"> 对数刻度</label></div>
+ <div class="taxonomy-reconciliation"><strong id="gallery-taxonomy-total">5,031,890</strong><span>条旧类记录 → 10 类<br>原始事件与来源全部保留</span></div>
+ <div class="notebook-toolbar taxonomy-toolbar"><label>范围 <select id="gallery-event-scope"><option value="refined">原许可相关记录细分</option><option value="all">全部细分事件</option></select></label><label>数量 <select id="gallery-event-metric"><option value="events">事件观察数</option><option value="profiles">关联画像数</option></select></label><label>阶段 <select id="gallery-event-stage"><option value="all">全部阶段</option><option value="confirmed">有阶段依据 confirmed</option><option value="proposed">拟议 proposed</option><option value="unknown">阶段未明 unknown</option></select></label><label><input id="gallery-event-log" type="checkbox"> 对数刻度</label></div>
  <div id="gallery-event-chart" class="gallery-figure"></div><p class="notebook-insight" id="gallery-event-insight"></p>
- <pre class="gallery-code"><code>SELECT event_type, status, count(*) AS observed_events
-FROM events GROUP BY event_type, status;</code></pre>
- <div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">事件类别及选定阶段的观察条目数</caption><thead><tr><th>事件类别</th><th>观察条目数</th><th>选定阶段</th></tr></thead><tbody id="gallery-event-table"></tbody></table></div><footer class="notebook-scope">字段方案子集 · 1,884 个文件 · 2026-11-08 · 观察条目不是独立事件发生数</footer></div></article><article class="data-notebook" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 7：相同内容理解一次，来源全部保留。">
+ <div class="notebook-callout taxonomy-note">申请不算获批，人员、设备与产品单独归类。<strong id="gallery-taxonomy-downgraded">540,317</strong> 条原 confirmed 记录因分类或阶段证据不足改为阶段未明。独立有效证照数暂不统计。</div>
+ <pre class="gallery-code"><code>SELECT event_type, status, count(*) AS observations
+FROM classified_events GROUP BY event_type, status;
+-- 原 event_id、原分类、原阶段与依据可追溯</code></pre>
+ <div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">细分类别及选定阶段的数量</caption><thead><tr><th>细分类别</th><th id="gallery-event-count-label">事件观察数</th><th>选定阶段</th></tr></thead><tbody id="gallery-event-table"></tbody></table></div><footer class="notebook-scope">1,884 文件阶段子集 · 2026-11-09 分类修正 · 依据来源主题与结构化证据，独立准确率尚未评测 · <a href="assets/event-classification.json">分类汇总 JSON ↗</a></footer></div></article><article class="data-notebook" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 7：相同内容理解一次，来源全部保留。">
       <span class="notebook-category">公式 + 代码 / 工程分析</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[03]</span><div><h3>相同内容理解一次，来源全部保留。</h3><p>从 144 万条待语义记录中，找出真正不同的内容。</p></div></div>
       
  <div id="gallery-dedup-chart" class="gallery-figure"></div>

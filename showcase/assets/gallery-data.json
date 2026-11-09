@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "kind": "aggregate_notebook_gallery",
-  "generated_at": "2026-11-09T08:13:49.483295+00:00",
+  "generated_at": "2026-11-09T10:29:25.301544+00:00",
   "source_commit": "57748c4c4086432c4b129a0fee059018a1d6a4c1",
   "final_pipeline_complete": false,
   "corpus": {
@@ -450,141 +450,385 @@
       "type": "administrative_penalty",
       "label": "行政处罚",
       "status": "confirmed",
-      "count": 20041
+      "count": 20041,
+      "associated_profiles": 14963
     },
     {
       "type": "administrative_penalty",
       "label": "行政处罚",
       "status": "proposed",
-      "count": 59
+      "count": 59,
+      "associated_profiles": 53
     },
     {
       "type": "administrative_penalty",
       "label": "行政处罚",
       "status": "unknown",
-      "count": 198836
+      "count": 198836,
+      "associated_profiles": 125101
     },
     {
       "type": "business_abnormal",
       "label": "经营异常",
       "status": "confirmed",
-      "count": 12051
+      "count": 12051,
+      "associated_profiles": 12051
     },
     {
       "type": "business_abnormal",
       "label": "经营异常",
       "status": "unknown",
-      "count": 314714
+      "count": 314714,
+      "associated_profiles": 313971
+    },
+    {
+      "type": "business_permit",
+      "label": "企业经营许可",
+      "status": "confirmed",
+      "count": 764409,
+      "associated_profiles": 522145
+    },
+    {
+      "type": "business_permit",
+      "label": "企业经营许可",
+      "status": "unknown",
+      "count": 326064,
+      "associated_profiles": 271134
+    },
+    {
+      "type": "enterprise_qualification",
+      "label": "企业行业资质",
+      "status": "confirmed",
+      "count": 76438,
+      "associated_profiles": 53772
+    },
+    {
+      "type": "enterprise_qualification",
+      "label": "企业行业资质",
+      "status": "proposed",
+      "count": 504,
+      "associated_profiles": 504
+    },
+    {
+      "type": "enterprise_qualification",
+      "label": "企业行业资质",
+      "status": "unknown",
+      "count": 205869,
+      "associated_profiles": 87656
     },
     {
       "type": "environment",
       "label": "环保监管",
       "status": "confirmed",
-      "count": 362
+      "count": 362,
+      "associated_profiles": 356
     },
     {
       "type": "environment",
       "label": "环保监管",
       "status": "unknown",
-      "count": 46764
+      "count": 46764,
+      "associated_profiles": 15856
+    },
+    {
+      "type": "equipment_inspection",
+      "label": "设备检验登记",
+      "status": "confirmed",
+      "count": 619327,
+      "associated_profiles": 57814
+    },
+    {
+      "type": "equipment_inspection",
+      "label": "设备检验登记",
+      "status": "unknown",
+      "count": 376075,
+      "associated_profiles": 371923
+    },
+    {
+      "type": "industry_assessment",
+      "label": "行业考核与年检",
+      "status": "confirmed",
+      "count": 62018,
+      "associated_profiles": 20767
+    },
+    {
+      "type": "industry_assessment",
+      "label": "行业考核与年检",
+      "status": "unknown",
+      "count": 259377,
+      "associated_profiles": 230909
     },
     {
       "type": "innovation",
       "label": "科技认定",
       "status": "confirmed",
-      "count": 96927
+      "count": 96927,
+      "associated_profiles": 51469
     },
     {
       "type": "innovation",
       "label": "科技认定",
       "status": "proposed",
-      "count": 860
+      "count": 860,
+      "associated_profiles": 860
     },
     {
       "type": "innovation",
       "label": "科技认定",
       "status": "unknown",
-      "count": 3857
+      "count": 3857,
+      "associated_profiles": 3095
     },
     {
       "type": "operating_status",
       "label": "经营状态",
       "status": "confirmed",
-      "count": 35299
+      "count": 35299,
+      "associated_profiles": 35219
     },
     {
       "type": "operating_status",
       "label": "经营状态",
       "status": "unknown",
-      "count": 41636
+      "count": 41636,
+      "associated_profiles": 40983
+    },
+    {
+      "type": "personnel_qualification",
+      "label": "人员执业资格",
+      "status": "confirmed",
+      "count": 680347,
+      "associated_profiles": 680347
+    },
+    {
+      "type": "personnel_qualification",
+      "label": "人员执业资格",
+      "status": "unknown",
+      "count": 284664,
+      "associated_profiles": 126210
     },
     {
       "type": "procurement",
       "label": "采购中标",
       "status": "confirmed",
-      "count": 46223
+      "count": 46223,
+      "associated_profiles": 42067
     },
     {
       "type": "procurement",
       "label": "采购中标",
       "status": "proposed",
-      "count": 596
+      "count": 596,
+      "associated_profiles": 502
     },
     {
       "type": "procurement",
       "label": "采购中标",
       "status": "unknown",
-      "count": 70190
+      "count": 70190,
+      "associated_profiles": 32746
     },
     {
-      "type": "qualification",
-      "label": "许可资质",
+      "type": "product_registration",
+      "label": "产品注册备案",
       "status": "confirmed",
-      "count": 3149626
+      "count": 119560,
+      "associated_profiles": 16941
     },
     {
-      "type": "qualification",
-      "label": "许可资质",
-      "status": "proposed",
-      "count": 14050
-    },
-    {
-      "type": "qualification",
-      "label": "许可资质",
+      "type": "product_registration",
+      "label": "产品注册备案",
       "status": "unknown",
-      "count": 1868214
+      "count": 134684,
+      "associated_profiles": 134684
+    },
+    {
+      "type": "project_approval",
+      "label": "项目审批与验收",
+      "status": "confirmed",
+      "count": 157299,
+      "associated_profiles": 65305
+    },
+    {
+      "type": "project_approval",
+      "label": "项目审批与验收",
+      "status": "proposed",
+      "count": 31,
+      "associated_profiles": 21
+    },
+    {
+      "type": "project_approval",
+      "label": "项目审批与验收",
+      "status": "unknown",
+      "count": 78282,
+      "associated_profiles": 51373
+    },
+    {
+      "type": "qualification_application",
+      "label": "申请办理",
+      "status": "unknown",
+      "count": 246846,
+      "associated_profiles": 71740
+    },
+    {
+      "type": "qualification_review",
+      "label": "待分类复核",
+      "status": "unknown",
+      "count": 408733,
+      "associated_profiles": 280764
+    },
+    {
+      "type": "regulatory_inspection",
+      "label": "监督检查",
+      "status": "confirmed",
+      "count": 129911,
+      "associated_profiles": 74847
+    },
+    {
+      "type": "regulatory_inspection",
+      "label": "监督检查",
+      "status": "proposed",
+      "count": 4,
+      "associated_profiles": 2
+    },
+    {
+      "type": "regulatory_inspection",
+      "label": "监督检查",
+      "status": "unknown",
+      "count": 101448,
+      "associated_profiles": 99966
     },
     {
       "type": "subsidy",
       "label": "政策支持",
       "status": "confirmed",
-      "count": 5840
+      "count": 5840,
+      "associated_profiles": 3925
     },
     {
       "type": "subsidy",
       "label": "政策支持",
       "status": "proposed",
-      "count": 2181
+      "count": 2181,
+      "associated_profiles": 1408
     },
     {
       "type": "subsidy",
       "label": "政策支持",
       "status": "unknown",
-      "count": 2092
+      "count": 2092,
+      "associated_profiles": 696
     },
     {
       "type": "tax_credit",
       "label": "税务信用",
       "status": "confirmed",
-      "count": 7959
+      "count": 7959,
+      "associated_profiles": 7805
     },
     {
       "type": "tax_credit",
       "label": "税务信用",
       "status": "unknown",
-      "count": 22854
+      "count": 22854,
+      "associated_profiles": 3541
     }
   ],
+  "taxonomy": {
+    "version": "qualification-refinement-v1",
+    "updated_at": "2026-11-09T10:24:48.930053+00:00",
+    "basis": "source_topic_rules_and_structured_stage_evidence_not_manual_row_validation",
+    "legacy_qualification_events": 5031890,
+    "refined_types": [
+      "business_permit",
+      "enterprise_qualification",
+      "personnel_qualification",
+      "product_registration",
+      "equipment_inspection",
+      "qualification_application",
+      "regulatory_inspection",
+      "industry_assessment",
+      "project_approval",
+      "qualification_review"
+    ],
+    "unique_licences": null,
+    "unique_registered_enterprises": null,
+    "category_profiles": [
+      {
+        "type": "administrative_penalty",
+        "count": 134966
+      },
+      {
+        "type": "business_abnormal",
+        "count": 326022
+      },
+      {
+        "type": "business_permit",
+        "count": 711532
+      },
+      {
+        "type": "enterprise_qualification",
+        "count": 99767
+      },
+      {
+        "type": "environment",
+        "count": 16192
+      },
+      {
+        "type": "equipment_inspection",
+        "count": 429706
+      },
+      {
+        "type": "industry_assessment",
+        "count": 244251
+      },
+      {
+        "type": "innovation",
+        "count": 54903
+      },
+      {
+        "type": "operating_status",
+        "count": 62088
+      },
+      {
+        "type": "personnel_qualification",
+        "count": 806557
+      },
+      {
+        "type": "procurement",
+        "count": 74917
+      },
+      {
+        "type": "product_registration",
+        "count": 151625
+      },
+      {
+        "type": "project_approval",
+        "count": 113047
+      },
+      {
+        "type": "qualification_application",
+        "count": 71740
+      },
+      {
+        "type": "qualification_review",
+        "count": 280764
+      },
+      {
+        "type": "regulatory_inspection",
+        "count": 174804
+      },
+      {
+        "type": "subsidy",
+        "count": 5761
+      },
+      {
+        "type": "tax_credit",
+        "count": 11337
+      }
+    ],
+    "downgraded_confirmed": 540317
+  },
   "record_statuses": [
     {
       "status": "EXTRACTED",

@@ -45,6 +45,27 @@ test('expanded notebook retains chart controls when restored',async({page})=>{
   await expect(page.locator('#gallery-event-stage')).toHaveValue('unknown');
   await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(7);
 });
+
+test('classification chart separates ten source topics and keeps profile counts explicit',async({page},info)=>{
+  await page.locator('[data-notebook="1"] .notebook-reader-open').click();
+  await expect(page.locator('#gallery-event-table tr')).toHaveCount(10);
+  await expect(page.locator('#gallery-event-table')).toContainText('人员执业资格');
+  await expect(page.locator('#gallery-event-table')).toContainText('申请办理');
+  await expect(page.locator('#gallery-taxonomy-total')).toHaveText('5,031,890');
+  await expect(page.locator('#gallery-taxonomy-downgraded')).toHaveText('540,317');
+  await page.locator('#gallery-event-scope').selectOption('all');
+  await expect(page.locator('#gallery-event-table tr')).toHaveCount(18);
+  await page.locator('#gallery-event-metric').selectOption('profiles');
+  await expect(page.locator('#gallery-event-count-label')).toHaveText('关联画像数');
+  await expect(page.locator('#gallery-event-insight')).toContainText('不能相加为企业总数');
+  await page.locator('#gallery-event-stage').selectOption('unknown');
+  await expect(page.locator('#gallery-event-table')).toContainText('阶段未明');
+  await page.locator('#gallery-event-scope').selectOption('refined');
+  await page.locator('#gallery-event-metric').selectOption('events');
+  await page.locator('#gallery-event-stage').selectOption('all');
+  await page.screenshot({path:info.outputPath('event-classification.png')});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+});
 test('timed playback advances from the last notebook to the first',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.locator('[data-gallery-page="6"]').click();

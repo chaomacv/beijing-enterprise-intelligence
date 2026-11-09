@@ -158,7 +158,17 @@ def run(args):
         result=aggregate(root,profiles)
         stage('08_results')
         checks=audit(root,profiles,original_count)
-        stage('09_review','COMPLETED_WITH_REVIEW' if checks['unsupported_or_unreadable_files'] or result['record_statuses'].get('REVIEW',0) else 'COMPLETED',result)
+        from .event_taxonomy import refine
+        classification_dir=root/'10_classification'/attempt
+        classified=refine(root/'07_entities/results.duckdb',classification_dir)
+        if classified['total_events']!=result['counts']['events']:
+            raise ValueError('Refined events differ from the original event ledger')
+        result['classification']={'version':classified['version'],
+            'output':str(classification_dir.relative_to(root)),
+            'event_ids_conserved':True,'current_validity_verified':False,
+            'requires_classification_review':any(x['event_type']=='qualification_review' and x['observed_events'] for x in classified['category_status'])}
+        dump(root/'08_results/summary.json',result)
+        stage('09_review','COMPLETED_WITH_REVIEW' if checks['unsupported_or_unreadable_files'] or result['record_statuses'].get('REVIEW',0) or result['classification']['requires_classification_review'] else 'COMPLETED',result)
         return result
     except Exception as error:
         stage(state['current_stage'],'FAILED',{'error':type(error).__name__,'detail':str(error)[:300]})
