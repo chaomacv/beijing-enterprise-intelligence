@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const {eventGroups, allocateSlots, autoplayStep, project} = require('../showcase/gallery.js');
+const {eventGroups, allocateSlots, autoplayStep, project, loopOrder} = require('../showcase/gallery.js');
 const data = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../showcase/assets/gallery-data.json'), 'utf8'));
 const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
 
@@ -82,4 +82,18 @@ test('gallery mount targets exist and all seven slides have accessible navigatio
   assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,7);
   assert.ok(html.includes('src="gallery.js"'));
   assert.ok(html.includes('aria-roledescription="轮播"'));
+});
+test('circular recentering keeps both neighbors at every wrap without cloning cards',()=>{
+  for(const direction of [-1,1]){
+    let order=[0,1,2,3,4,5,6],center=1;
+    for(let i=0;i<35;i++){
+      order=loopOrder(order,center).order;
+      assert.equal(order[3],center);
+      assert.equal(order[2],(center+6)%7);
+      assert.equal(order[4],(center+1)%7);
+      assert.deepEqual([...order].sort(),[0,1,2,3,4,5,6]);
+      center=(center+direction+7)%7;
+    }
+  }
+  assert.throws(()=>loopOrder([0,0,1],0),RangeError);
 });

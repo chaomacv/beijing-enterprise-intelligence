@@ -7,6 +7,7 @@ on:
       - 'scripts/build_showcase_demo.py'
       - 'scripts/test_showcase.cjs'
       - 'scripts/test_gallery.cjs'
+      - 'scripts/test_methods.cjs'
       - 'scripts/build_gallery_data.py'
       - 'src/**'
       - '.github/workflows/pages.yml'
@@ -39,7 +40,8 @@ jobs:
           node --check showcase/app.js
           node --check showcase/run.js
           node --check showcase/gallery.js
-          node --test scripts/test_showcase.cjs scripts/test_gallery.cjs
+          node --check showcase/methods.js
+          node --test scripts/test_showcase.cjs scripts/test_gallery.cjs scripts/test_methods.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

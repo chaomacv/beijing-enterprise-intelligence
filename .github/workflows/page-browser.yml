@@ -1,0 +1,33 @@
+name: Page browser checks
+on:
+  pull_request:
+    paths: ['showcase/**', 'scripts/browser-qa/**', '.github/workflows/page-browser.yml']
+  push:
+    branches: [main]
+    paths: ['showcase/**', 'scripts/browser-qa/**', '.github/workflows/page-browser.yml']
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: npm ci
+        working-directory: scripts/browser-qa
+      - run: npx playwright install --with-deps chromium
+        working-directory: scripts/browser-qa
+      - run: npx playwright test
+        working-directory: scripts/browser-qa
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: page-browser-screenshots
+          path: scripts/browser-qa/test-results/
+          retention-days: 14

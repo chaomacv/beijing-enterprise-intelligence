@@ -8,6 +8,10 @@ Project Page 源码位于 `showcase/`，部署地址为 https://chaomacv.github.
 
 七张卡片分别展示格式／解析状态层级、事件类别与阶段、精确内容复用、三维文件分箱、记录处理状态、主体身份及实际执行时间线。统计图可筛阶段并切换对数刻度；三维图可拖动或用滑块旋转；时间线按真实时间间隔回放已核对快照。它们使用 SVG 和浏览器原生交互独立实现，没有加载远程图表库。
 
+轮播窗口限制在居中的页面区域，宽屏显示三张完整卡片及两侧有限的预览，卡片约 560px 高。首尾循环通过移动已有节点并补偿滚动位置实现，不克隆表单或图表，不产生重复 ID；查看最后一张后，下一张继续向前到第一张。平板和手机保留单张主卡及侧边预览。卡片可放大阅读，关闭后保留原控件状态。
+
+方法选择区改为三个原位分页：文件筛选、结构抽取、主体关联。每页包含输入／输出、三步方法说明、代码或条件示意、图形与合成结果，提供标签、前后翻页及方向键／Home／End。它们继续链接到已有交互实验，分页本身不跳转页面。
+
 ## 页面内容与数据
 
 - `index.html` / `style.css`：中文项目介绍、方法、交互实验、证据追溯、九步流程、工程案例和复现入口。
@@ -17,6 +21,7 @@ Project Page 源码位于 `showcase/`，部署地址为 https://chaomacv.github.
 - `assets/project-preview.svg`：README 的独立绘制预览图，图形是方法示意。
 - `assets/notebook-*.svg`：三份独立绘制的静态合成图形，不依赖远程图片、字体或可视化库。
 - `gallery.js` / `assets/gallery-data.json`：大型轮播与真实汇总分析；只包含计数、分箱和已核对的执行时间点，不含文件名、路径、业务记录或私有接口。
+- `methods.js`：方法说明的三页切换、键盘操作与合成抽样图示。
 
 交互实验和企业证据案例均为合成示例；实际规模与工程对照在对应区域单独标明。没有把真实业务明细、下载会话、服务器路径、凭据或模型推理日志放入页面。页面不调用模型服务，也不接受业务文件上传。当前全量运行尚未完成，画像、事件等最终数量为空；完成总对账前不会展示最终结果。
 
@@ -34,7 +39,8 @@ python scripts/build_showcase_demo.py
 node --check showcase/app.js
 node --check showcase/run.js
 node --check showcase/gallery.js
-node --test scripts/test_showcase.cjs scripts/test_gallery.cjs
+node --check showcase/methods.js
+node --test scripts/test_showcase.cjs scripts/test_gallery.cjs scripts/test_methods.cjs
 ```
 
 本地预览：
@@ -44,6 +50,8 @@ python -m http.server 8787 --bind 127.0.0.1 --directory showcase
 ```
 
 浏览器打开 http://127.0.0.1:8787/ 。GitHub Pages 的项目子路径由相对资源链接支持，不需要构建器。
+
+`Page browser checks` 在隔离的 Ubuntu 24.04 / Chromium 中运行桌面、宽屏、390px 和 320px 视口检查，测试三卡窗口、循环边界、计时播放、放大后的控件保留、方法区分页及横向溢出，并保存截图和失败 trace。Playwright 仅用于开发检查，不进入公开页面运行时；精确版本与依赖哈希保存在 `scripts/browser-qa/package-lock.json`。
 
 ## 发布与更新
 

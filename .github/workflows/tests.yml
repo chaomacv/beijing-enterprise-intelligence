@@ -19,5 +19,6 @@ jobs:
       - run: node --check showcase/app.js
       - run: node --check showcase/run.js
       - run: node --check showcase/gallery.js
-      - run: node --test scripts/test_showcase.cjs scripts/test_gallery.cjs
+      - run: node --check showcase/methods.js
+      - run: node --test scripts/test_showcase.cjs scripts/test_gallery.cjs scripts/test_methods.cjs
       - run: python scripts/check_repository.py
