@@ -3,7 +3,7 @@ on:
   pull_request:
     paths: ['showcase/**', 'scripts/browser-qa/**', '.github/workflows/page-browser.yml']
   push:
-    branches: [main]
+    branches: [main, 'feat/**']
     paths: ['showcase/**', 'scripts/browser-qa/**', '.github/workflows/page-browser.yml']
 permissions:
   contents: read
