@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "kind": "verified_event_hierarchy",
+  "unit": "event_observation",
+  "scope": "completed_1884_file_subset_legacy_qualification_only",
+  "snapshot_at": "2026-11-09T10:24:48.930053+00:00",
+  "source": "event-classification.json",
+  "excluded_other_event_observations": 929341,
+  "available_levels": [
+    "event_category"
+  ],
+  "pending_levels": [
+    "business_subcategory",
+    "event_label"
+  ],
+  "tree": {
+    "id": "all",
+    "name": "全部事件（当前十类范围）",
+    "value": 5031890,
+    "children": [
+      {
+        "id": "business_permit",
+        "name": "企业经营许可",
+        "value": 1090473
+      },
+      {
+        "id": "enterprise_qualification",
+        "name": "企业行业资质",
+        "value": 282811
+      },
+      {
+        "id": "personnel_qualification",
+        "name": "人员执业资格",
+        "value": 965011
+      },
+      {
+        "id": "product_registration",
+        "name": "产品注册备案",
+        "value": 254244
+      },
+      {
+        "id": "equipment_inspection",
+        "name": "设备检验登记",
+        "value": 995402
+      },
+      {
+        "id": "qualification_application",
+        "name": "申请办理",
+        "value": 246846
+      },
+      {
+        "id": "regulatory_inspection",
+        "name": "监督检查",
+        "value": 231363
+      },
+      {
+        "id": "industry_assessment",
+        "name": "行业考核与年检",
+        "value": 321395
+      },
+      {
+        "id": "project_approval",
+        "name": "项目审批与验收",
+        "value": 235612
+      },
+      {
+        "id": "qualification_review",
+        "name": "待分类复核",
+        "value": 408733
+      }
+    ]
+  }
+}
