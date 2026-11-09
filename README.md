@@ -1,11 +1,11 @@
 # Beijing Enterprise Intelligence
 
-[![Project Page](https://img.shields.io/badge/Project-Page-56734b?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
-[![Interactive Methods](https://img.shields.io/badge/Interactive-Methods-8aa6b6?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/#lab)
+[![Project Page](https://img.shields.io/badge/Project-Page-191919?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
+[![Interactive Methods](https://img.shields.io/badge/Interactive-Methods-4269d0?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/#lab)
 
 [![Beijing Enterprise Intelligence：从分散的数据到有据可查的企业情报](showcase/assets/project-preview.svg)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
 
-**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/)** · 文件抽样、结构分块、企业匹配与证据追溯。页面案例为现有规则 Demo 生成的合成示例，不代表真实模型或全量处理效果。
+**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/)** · 九步流程、方法实验与证据追溯。交互案例使用合成数据；真实运行汇总与工程对照单独标明，全量抽取仍在进行中。[页面设计与复现](docs/project_page.md)
 
 把北京公共数据平台下载的异构文件，转换为有来源证据的企业记录、业务事件与标签画像。语义理解使用私有环境中的 Qwen；读取、分块、校验和聚合使用 Python。
 
