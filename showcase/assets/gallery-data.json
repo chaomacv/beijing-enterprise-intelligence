@@ -1,0 +1,677 @@
+{
+  "schema_version": 1,
+  "kind": "aggregate_notebook_gallery",
+  "generated_at": "2026-11-09T08:13:49.483295+00:00",
+  "source_commit": "57748c4c4086432c4b129a0fee059018a1d6a4c1",
+  "final_pipeline_complete": false,
+  "corpus": {
+    "snapshot_date": "2026-11-07",
+    "catalog_datasets": 4710,
+    "attachments": 5200,
+    "attachment_bytes": 8447438913,
+    "distinct_file_contents": 5077,
+    "logical_files": 11701,
+    "scopes": 13281,
+    "known_logical_records": 43653625,
+    "upstream_failed_downloads": 22,
+    "pages_without_recognized_attachments": 4,
+    "unreadable_logical_files": 65
+  },
+  "subset": {
+    "snapshot_at": "2026-11-08T18:59:43.271773+08:00",
+    "files": 1884,
+    "records": 14419963,
+    "events": 5961231,
+    "profiles": 5006073,
+    "partial_only": true,
+    "semantic_accuracy_evaluated": false
+  },
+  "formats": [
+    {
+      "format": "CSV",
+      "status": "EMPTY",
+      "files": 2
+    },
+    {
+      "format": "CSV",
+      "status": "PROFILED",
+      "files": 4520
+    },
+    {
+      "format": "CSV",
+      "status": "REVIEW",
+      "files": 2
+    },
+    {
+      "format": "Excel",
+      "status": "PROFILED",
+      "files": 841
+    },
+    {
+      "format": "Excel",
+      "status": "REVIEW",
+      "files": 27
+    },
+    {
+      "format": "JSONL · 派生",
+      "status": "PROFILED",
+      "files": 2526
+    },
+    {
+      "format": "PDF",
+      "status": "CONVERTED",
+      "files": 175
+    },
+    {
+      "format": "PDF",
+      "status": "PROFILED",
+      "files": 181
+    },
+    {
+      "format": "PDF",
+      "status": "REVIEW",
+      "files": 1
+    },
+    {
+      "format": "Word",
+      "status": "EMPTY",
+      "files": 1
+    },
+    {
+      "format": "Word",
+      "status": "PROFILED",
+      "files": 662
+    },
+    {
+      "format": "Word",
+      "status": "REVIEW",
+      "files": 15
+    },
+    {
+      "format": "XML / RDF",
+      "status": "CONVERTED",
+      "files": 1162
+    },
+    {
+      "format": "XML / RDF",
+      "status": "EMPTY",
+      "files": 1
+    },
+    {
+      "format": "XML / RDF",
+      "status": "PROFILED",
+      "files": 49
+    },
+    {
+      "format": "XML / RDF",
+      "status": "REVIEW",
+      "files": 7
+    },
+    {
+      "format": "其他",
+      "status": "REVIEW",
+      "files": 6
+    },
+    {
+      "format": "压缩包",
+      "status": "CONTAINER",
+      "files": 97
+    },
+    {
+      "format": "地理库组件",
+      "status": "COMPONENT",
+      "files": 103
+    },
+    {
+      "format": "影像",
+      "status": "CONVERTED",
+      "files": 1189
+    },
+    {
+      "format": "影像",
+      "status": "REVIEW",
+      "files": 6
+    },
+    {
+      "format": "文本 / HTML",
+      "status": "EMPTY",
+      "files": 2
+    },
+    {
+      "format": "文本 / HTML",
+      "status": "PROFILED",
+      "files": 125
+    },
+    {
+      "format": "文本 / HTML",
+      "status": "REVIEW",
+      "files": 1
+    }
+  ],
+  "file_space": {
+    "buckets": [
+      "未知",
+      "0",
+      "1–10",
+      "11–100",
+      "101–1千",
+      "1千–1万",
+      "1万–10万",
+      "10万–100万",
+      "100万以上"
+    ],
+    "bins": [
+      {
+        "format": "CSV",
+        "status": "EMPTY",
+        "bucket": 1,
+        "files": 2
+      },
+      {
+        "format": "CSV",
+        "status": "PROFILED",
+        "bucket": 2,
+        "files": 213
+      },
+      {
+        "format": "CSV",
+        "status": "PROFILED",
+        "bucket": 3,
+        "files": 2184
+      },
+      {
+        "format": "CSV",
+        "status": "PROFILED",
+        "bucket": 4,
+        "files": 1212
+      },
+      {
+        "format": "CSV",
+        "status": "PROFILED",
+        "bucket": 5,
+        "files": 613
+      },
+      {
+        "format": "CSV",
+        "status": "PROFILED",
+        "bucket": 6,
+        "files": 226
+      },
+      {
+        "format": "CSV",
+        "status": "PROFILED",
+        "bucket": 7,
+        "files": 59
+      },
+      {
+        "format": "CSV",
+        "status": "PROFILED",
+        "bucket": 8,
+        "files": 13
+      },
+      {
+        "format": "CSV",
+        "status": "REVIEW",
+        "bucket": 1,
+        "files": 2
+      },
+      {
+        "format": "Excel",
+        "status": "PROFILED",
+        "bucket": 2,
+        "files": 39
+      },
+      {
+        "format": "Excel",
+        "status": "PROFILED",
+        "bucket": 3,
+        "files": 514
+      },
+      {
+        "format": "Excel",
+        "status": "PROFILED",
+        "bucket": 4,
+        "files": 201
+      },
+      {
+        "format": "Excel",
+        "status": "PROFILED",
+        "bucket": 5,
+        "files": 64
+      },
+      {
+        "format": "Excel",
+        "status": "PROFILED",
+        "bucket": 6,
+        "files": 22
+      },
+      {
+        "format": "Excel",
+        "status": "PROFILED",
+        "bucket": 7,
+        "files": 1
+      },
+      {
+        "format": "Excel",
+        "status": "REVIEW",
+        "bucket": 1,
+        "files": 27
+      },
+      {
+        "format": "JSONL · 派生",
+        "status": "PROFILED",
+        "bucket": 2,
+        "files": 1357
+      },
+      {
+        "format": "JSONL · 派生",
+        "status": "PROFILED",
+        "bucket": 3,
+        "files": 1168
+      },
+      {
+        "format": "JSONL · 派生",
+        "status": "PROFILED",
+        "bucket": 4,
+        "files": 1
+      },
+      {
+        "format": "PDF",
+        "status": "CONVERTED",
+        "bucket": 1,
+        "files": 175
+      },
+      {
+        "format": "PDF",
+        "status": "PROFILED",
+        "bucket": 2,
+        "files": 106
+      },
+      {
+        "format": "PDF",
+        "status": "PROFILED",
+        "bucket": 3,
+        "files": 32
+      },
+      {
+        "format": "PDF",
+        "status": "PROFILED",
+        "bucket": 4,
+        "files": 25
+      },
+      {
+        "format": "PDF",
+        "status": "PROFILED",
+        "bucket": 5,
+        "files": 18
+      },
+      {
+        "format": "PDF",
+        "status": "REVIEW",
+        "bucket": 1,
+        "files": 1
+      },
+      {
+        "format": "Word",
+        "status": "EMPTY",
+        "bucket": 1,
+        "files": 1
+      },
+      {
+        "format": "Word",
+        "status": "PROFILED",
+        "bucket": 2,
+        "files": 391
+      },
+      {
+        "format": "Word",
+        "status": "PROFILED",
+        "bucket": 3,
+        "files": 158
+      },
+      {
+        "format": "Word",
+        "status": "PROFILED",
+        "bucket": 4,
+        "files": 113
+      },
+      {
+        "format": "Word",
+        "status": "REVIEW",
+        "bucket": 1,
+        "files": 15
+      },
+      {
+        "format": "XML / RDF",
+        "status": "CONVERTED",
+        "bucket": 1,
+        "files": 1162
+      },
+      {
+        "format": "XML / RDF",
+        "status": "EMPTY",
+        "bucket": 1,
+        "files": 1
+      },
+      {
+        "format": "XML / RDF",
+        "status": "PROFILED",
+        "bucket": 2,
+        "files": 1
+      },
+      {
+        "format": "XML / RDF",
+        "status": "PROFILED",
+        "bucket": 3,
+        "files": 27
+      },
+      {
+        "format": "XML / RDF",
+        "status": "PROFILED",
+        "bucket": 4,
+        "files": 15
+      },
+      {
+        "format": "XML / RDF",
+        "status": "PROFILED",
+        "bucket": 5,
+        "files": 4
+      },
+      {
+        "format": "XML / RDF",
+        "status": "PROFILED",
+        "bucket": 6,
+        "files": 1
+      },
+      {
+        "format": "XML / RDF",
+        "status": "PROFILED",
+        "bucket": 7,
+        "files": 1
+      },
+      {
+        "format": "XML / RDF",
+        "status": "REVIEW",
+        "bucket": 1,
+        "files": 7
+      },
+      {
+        "format": "其他",
+        "status": "REVIEW",
+        "bucket": 1,
+        "files": 6
+      },
+      {
+        "format": "压缩包",
+        "status": "CONTAINER",
+        "bucket": 1,
+        "files": 97
+      },
+      {
+        "format": "地理库组件",
+        "status": "COMPONENT",
+        "bucket": 1,
+        "files": 103
+      },
+      {
+        "format": "影像",
+        "status": "CONVERTED",
+        "bucket": 1,
+        "files": 1189
+      },
+      {
+        "format": "影像",
+        "status": "REVIEW",
+        "bucket": 1,
+        "files": 6
+      },
+      {
+        "format": "文本 / HTML",
+        "status": "EMPTY",
+        "bucket": 1,
+        "files": 2
+      },
+      {
+        "format": "文本 / HTML",
+        "status": "PROFILED",
+        "bucket": 3,
+        "files": 125
+      },
+      {
+        "format": "文本 / HTML",
+        "status": "REVIEW",
+        "bucket": 1,
+        "files": 1
+      }
+    ]
+  },
+  "events": [
+    {
+      "type": "administrative_penalty",
+      "label": "行政处罚",
+      "status": "confirmed",
+      "count": 20041
+    },
+    {
+      "type": "administrative_penalty",
+      "label": "行政处罚",
+      "status": "proposed",
+      "count": 59
+    },
+    {
+      "type": "administrative_penalty",
+      "label": "行政处罚",
+      "status": "unknown",
+      "count": 198836
+    },
+    {
+      "type": "business_abnormal",
+      "label": "经营异常",
+      "status": "confirmed",
+      "count": 12051
+    },
+    {
+      "type": "business_abnormal",
+      "label": "经营异常",
+      "status": "unknown",
+      "count": 314714
+    },
+    {
+      "type": "environment",
+      "label": "环保监管",
+      "status": "confirmed",
+      "count": 362
+    },
+    {
+      "type": "environment",
+      "label": "环保监管",
+      "status": "unknown",
+      "count": 46764
+    },
+    {
+      "type": "innovation",
+      "label": "科技认定",
+      "status": "confirmed",
+      "count": 96927
+    },
+    {
+      "type": "innovation",
+      "label": "科技认定",
+      "status": "proposed",
+      "count": 860
+    },
+    {
+      "type": "innovation",
+      "label": "科技认定",
+      "status": "unknown",
+      "count": 3857
+    },
+    {
+      "type": "operating_status",
+      "label": "经营状态",
+      "status": "confirmed",
+      "count": 35299
+    },
+    {
+      "type": "operating_status",
+      "label": "经营状态",
+      "status": "unknown",
+      "count": 41636
+    },
+    {
+      "type": "procurement",
+      "label": "采购中标",
+      "status": "confirmed",
+      "count": 46223
+    },
+    {
+      "type": "procurement",
+      "label": "采购中标",
+      "status": "proposed",
+      "count": 596
+    },
+    {
+      "type": "procurement",
+      "label": "采购中标",
+      "status": "unknown",
+      "count": 70190
+    },
+    {
+      "type": "qualification",
+      "label": "许可资质",
+      "status": "confirmed",
+      "count": 3149626
+    },
+    {
+      "type": "qualification",
+      "label": "许可资质",
+      "status": "proposed",
+      "count": 14050
+    },
+    {
+      "type": "qualification",
+      "label": "许可资质",
+      "status": "unknown",
+      "count": 1868214
+    },
+    {
+      "type": "subsidy",
+      "label": "政策支持",
+      "status": "confirmed",
+      "count": 5840
+    },
+    {
+      "type": "subsidy",
+      "label": "政策支持",
+      "status": "proposed",
+      "count": 2181
+    },
+    {
+      "type": "subsidy",
+      "label": "政策支持",
+      "status": "unknown",
+      "count": 2092
+    },
+    {
+      "type": "tax_credit",
+      "label": "税务信用",
+      "status": "confirmed",
+      "count": 7959
+    },
+    {
+      "type": "tax_credit",
+      "label": "税务信用",
+      "status": "unknown",
+      "count": 22854
+    }
+  ],
+  "record_statuses": [
+    {
+      "status": "EXTRACTED",
+      "count": 6293885
+    },
+    {
+      "status": "NO_EVENT",
+      "count": 2091911
+    },
+    {
+      "status": "REVIEW",
+      "count": 6034167
+    }
+  ],
+  "identities": [
+    {
+      "status": "provisional",
+      "count": 4168112
+    },
+    {
+      "status": "code_checksum_only_not_registry_verified",
+      "count": 837961
+    }
+  ],
+  "matching": [
+    {
+      "reason": "checksum_valid_code",
+      "mentions": 3578521
+    },
+    {
+      "reason": "insufficient_identity_fields",
+      "mentions": 3447316
+    },
+    {
+      "reason": "exact_name_and_address",
+      "mentions": 996943
+    },
+    {
+      "reason": "conflicting_codes_require_review",
+      "mentions": 317416
+    },
+    {
+      "reason": "exact_name_address_to_unique_code",
+      "mentions": 261380
+    }
+  ],
+  "dedup": {
+    "source_records": 1440619,
+    "representative_records": 388349,
+    "exact_duplicate_source_records": 1052270
+  },
+  "progress": {
+    "total": 388349,
+    "points": [
+      {
+        "at": "2026-11-08T10:40:11Z",
+        "completed": 42540
+      },
+      {
+        "at": "2026-11-08T10:53:22Z",
+        "completed": 44840
+      },
+      {
+        "at": "2026-11-08T11:03:36Z",
+        "completed": 46560
+      },
+      {
+        "at": "2026-11-08T11:56:04Z",
+        "completed": 55020
+      },
+      {
+        "at": "2026-11-08T14:36:14Z",
+        "completed": 79960
+      },
+      {
+        "at": "2026-11-09T05:11:21Z",
+        "completed": 256520
+      },
+      {
+        "at": "2026-11-09T06:01:48Z",
+        "completed": 263240
+      },
+      {
+        "at": "2026-11-09T08:11:01Z",
+        "completed": 280360
+      }
+    ],
+    "series_kind": "observed_processing_snapshots_not_business_events"
+  }
+}

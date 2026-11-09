@@ -6,6 +6,8 @@ on:
       - 'showcase/**'
       - 'scripts/build_showcase_demo.py'
       - 'scripts/test_showcase.cjs'
+      - 'scripts/test_gallery.cjs'
+      - 'scripts/build_gallery_data.py'
       - 'src/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
@@ -36,7 +38,8 @@ jobs:
           python scripts/build_showcase_demo.py
           node --check showcase/app.js
           node --check showcase/run.js
-          node --test scripts/test_showcase.cjs
+          node --check showcase/gallery.js
+          node --test scripts/test_showcase.cjs scripts/test_gallery.cjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
