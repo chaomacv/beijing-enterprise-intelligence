@@ -1,0 +1,2028 @@
+{
+  "schema_version": 1,
+  "kind": "real_enterprise_sample",
+  "sample_size": 100,
+  "snapshot_at": "2026-11-10T05:56:48.093902+08:00",
+  "source": "completed_private_run_corrected_profile_tags",
+  "population_profiles": 5202714,
+  "eligible_coded_companies": 429291,
+  "selection": "deterministic_category_and_tag_richness_stratified_demonstration_not_random_population_sample",
+  "selection_seed": "enterprise-network-100-v1",
+  "identity_basis": "company_named_business_profile_checksum_valid_code_not_registry_verified",
+  "anonymized": true,
+  "one_node_per_company": true,
+  "event_unit": "source_event_observations_including_uncertain_stages",
+  "excluded_similarity_tags": [
+    "qualification_review"
+  ],
+  "categories": [
+    {
+      "id": "business_permit",
+      "label": "企业经营许可",
+      "color": "#1f77b4"
+    },
+    {
+      "id": "equipment_inspection",
+      "label": "设备检验登记",
+      "color": "#ff7f0e"
+    },
+    {
+      "id": "personnel_qualification",
+      "label": "人员执业资格",
+      "color": "#2ca02c"
+    },
+    {
+      "id": "qualification_review",
+      "label": "待分类复核",
+      "color": "#d62728"
+    },
+    {
+      "id": "industry_assessment",
+      "label": "行业考核与年检",
+      "color": "#9467bd"
+    },
+    {
+      "id": "enterprise_qualification",
+      "label": "企业行业资质",
+      "color": "#8c564b"
+    },
+    {
+      "id": "product_registration",
+      "label": "产品注册备案",
+      "color": "#e377c2"
+    },
+    {
+      "id": "qualification_application",
+      "label": "申请办理",
+      "color": "#7f7f7f"
+    },
+    {
+      "id": "project_approval",
+      "label": "项目审批与验收",
+      "color": "#bcbd22"
+    },
+    {
+      "id": "regulatory_inspection",
+      "label": "监督检查",
+      "color": "#17becf"
+    },
+    {
+      "id": "administrative_penalty",
+      "label": "行政处罚",
+      "color": "#1f77b4"
+    },
+    {
+      "id": "business_abnormal",
+      "label": "经营异常",
+      "color": "#ff7f0e"
+    },
+    {
+      "id": "environment",
+      "label": "环保监管或绿色认定",
+      "color": "#2ca02c"
+    },
+    {
+      "id": "innovation",
+      "label": "科技认定",
+      "color": "#d62728"
+    },
+    {
+      "id": "operating_status",
+      "label": "经营状态",
+      "color": "#9467bd"
+    },
+    {
+      "id": "procurement",
+      "label": "政府采购或中标",
+      "color": "#8c564b"
+    },
+    {
+      "id": "subsidy",
+      "label": "政策支持",
+      "color": "#e377c2"
+    },
+    {
+      "id": "tax_credit",
+      "label": "税务或纳税信用",
+      "color": "#7f7f7f"
+    }
+  ],
+  "companies": [
+    {
+      "id": "enterprise-001",
+      "label": "企业001",
+      "event_counts": {
+        "qualification_application": 1
+      },
+      "stage_counts": {
+        "qualification_application": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-002",
+      "label": "企业002",
+      "event_counts": {
+        "business_permit": 2,
+        "procurement": 3,
+        "qualification_review": 1
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 2
+        },
+        "procurement": {
+          "unknown": 3
+        },
+        "qualification_review": {
+          "unknown": 1
+        }
+      },
+      "event_count": 5,
+      "tag_count": 2,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-003",
+      "label": "企业003",
+      "event_counts": {
+        "enterprise_qualification": 1,
+        "personnel_qualification": 2
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "confirmed": 1
+        },
+        "personnel_qualification": {
+          "unknown": 2
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-004",
+      "label": "企业004",
+      "event_counts": {
+        "personnel_qualification": 2
+      },
+      "stage_counts": {
+        "personnel_qualification": {
+          "unknown": 2
+        }
+      },
+      "event_count": 2,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-005",
+      "label": "企业005",
+      "event_counts": {
+        "business_permit": 1,
+        "product_registration": 12
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 1
+        },
+        "product_registration": {
+          "confirmed": 12
+        }
+      },
+      "event_count": 13,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-006",
+      "label": "企业006",
+      "event_counts": {
+        "business_abnormal": 1,
+        "innovation": 1,
+        "qualification_review": 1,
+        "subsidy": 1
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 1
+        },
+        "innovation": {
+          "unknown": 1
+        },
+        "qualification_review": {
+          "unknown": 1
+        },
+        "subsidy": {
+          "unknown": 1
+        }
+      },
+      "event_count": 3,
+      "tag_count": 3,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-007",
+      "label": "企业007",
+      "event_counts": {
+        "innovation": 1,
+        "project_approval": 2,
+        "qualification_review": 2
+      },
+      "stage_counts": {
+        "innovation": {
+          "confirmed": 1
+        },
+        "project_approval": {
+          "confirmed": 2
+        },
+        "qualification_review": {
+          "unknown": 2
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 2
+    },
+    {
+      "id": "enterprise-008",
+      "label": "企业008",
+      "event_counts": {
+        "project_approval": 1
+      },
+      "stage_counts": {
+        "project_approval": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-009",
+      "label": "企业009",
+      "event_counts": {
+        "business_permit": 4
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 4
+        }
+      },
+      "event_count": 4,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-010",
+      "label": "企业010",
+      "event_counts": {
+        "business_permit": 4
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 2,
+          "unknown": 2
+        }
+      },
+      "event_count": 4,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-011",
+      "label": "企业011",
+      "event_counts": {
+        "environment": 4,
+        "equipment_inspection": 16
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 4
+        },
+        "equipment_inspection": {
+          "confirmed": 16
+        }
+      },
+      "event_count": 20,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-012",
+      "label": "企业012",
+      "event_counts": {
+        "enterprise_qualification": 1,
+        "qualification_application": 2
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "unknown": 1
+        },
+        "qualification_application": {
+          "unknown": 2
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-013",
+      "label": "企业013",
+      "event_counts": {
+        "enterprise_qualification": 1
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-014",
+      "label": "企业014",
+      "event_counts": {
+        "business_permit": 3
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 3
+        }
+      },
+      "event_count": 3,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-015",
+      "label": "企业015",
+      "event_counts": {
+        "operating_status": 2
+      },
+      "stage_counts": {
+        "operating_status": {
+          "confirmed": 1,
+          "unknown": 1
+        }
+      },
+      "event_count": 2,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-016",
+      "label": "企业016",
+      "event_counts": {
+        "business_permit": 2,
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 2
+        },
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-017",
+      "label": "企业017",
+      "event_counts": {
+        "personnel_qualification": 4,
+        "project_approval": 2,
+        "qualification_review": 9
+      },
+      "stage_counts": {
+        "personnel_qualification": {
+          "unknown": 4
+        },
+        "project_approval": {
+          "confirmed": 2
+        },
+        "qualification_review": {
+          "unknown": 9
+        }
+      },
+      "event_count": 6,
+      "tag_count": 2,
+      "review_event_count": 9
+    },
+    {
+      "id": "enterprise-018",
+      "label": "企业018",
+      "event_counts": {
+        "business_abnormal": 1,
+        "business_permit": 2
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 1
+        },
+        "business_permit": {
+          "confirmed": 2
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-019",
+      "label": "企业019",
+      "event_counts": {
+        "subsidy": 1
+      },
+      "stage_counts": {
+        "subsidy": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-020",
+      "label": "企业020",
+      "event_counts": {
+        "equipment_inspection": 2
+      },
+      "stage_counts": {
+        "equipment_inspection": {
+          "confirmed": 2
+        }
+      },
+      "event_count": 2,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-021",
+      "label": "企业021",
+      "event_counts": {
+        "business_permit": 1,
+        "operating_status": 1,
+        "regulatory_inspection": 1
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 1
+        },
+        "operating_status": {
+          "unknown": 1
+        },
+        "regulatory_inspection": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 3,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-022",
+      "label": "企业022",
+      "event_counts": {
+        "procurement": 2,
+        "qualification_application": 1
+      },
+      "stage_counts": {
+        "procurement": {
+          "unknown": 2
+        },
+        "qualification_application": {
+          "unknown": 1
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-023",
+      "label": "企业023",
+      "event_counts": {
+        "operating_status": 2
+      },
+      "stage_counts": {
+        "operating_status": {
+          "confirmed": 1,
+          "unknown": 1
+        }
+      },
+      "event_count": 2,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-024",
+      "label": "企业024",
+      "event_counts": {
+        "innovation": 1,
+        "project_approval": 1,
+        "qualification_review": 1
+      },
+      "stage_counts": {
+        "innovation": {
+          "confirmed": 1
+        },
+        "project_approval": {
+          "confirmed": 1
+        },
+        "qualification_review": {
+          "unknown": 1
+        }
+      },
+      "event_count": 2,
+      "tag_count": 2,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-025",
+      "label": "企业025",
+      "event_counts": {
+        "business_abnormal": 1,
+        "business_permit": 2
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 1
+        },
+        "business_permit": {
+          "confirmed": 2
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-026",
+      "label": "企业026",
+      "event_counts": {
+        "business_permit": 2,
+        "innovation": 4,
+        "regulatory_inspection": 3
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 2
+        },
+        "innovation": {
+          "confirmed": 4
+        },
+        "regulatory_inspection": {
+          "confirmed": 3
+        }
+      },
+      "event_count": 9,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-027",
+      "label": "企业027",
+      "event_counts": {
+        "regulatory_inspection": 1
+      },
+      "stage_counts": {
+        "regulatory_inspection": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-028",
+      "label": "企业028",
+      "event_counts": {
+        "industry_assessment": 30
+      },
+      "stage_counts": {
+        "industry_assessment": {
+          "unknown": 30
+        }
+      },
+      "event_count": 30,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-029",
+      "label": "企业029",
+      "event_counts": {
+        "environment": 4
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 4
+        }
+      },
+      "event_count": 4,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-030",
+      "label": "企业030",
+      "event_counts": {
+        "business_abnormal": 3,
+        "innovation": 7,
+        "qualification_review": 3,
+        "subsidy": 3
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 3
+        },
+        "innovation": {
+          "confirmed": 4,
+          "unknown": 3
+        },
+        "qualification_review": {
+          "unknown": 3
+        },
+        "subsidy": {
+          "unknown": 3
+        }
+      },
+      "event_count": 13,
+      "tag_count": 3,
+      "review_event_count": 3
+    },
+    {
+      "id": "enterprise-031",
+      "label": "企业031",
+      "event_counts": {
+        "enterprise_qualification": 1,
+        "industry_assessment": 2
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "unknown": 1
+        },
+        "industry_assessment": {
+          "unknown": 2
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-032",
+      "label": "企业032",
+      "event_counts": {
+        "business_permit": 5,
+        "enterprise_qualification": 4,
+        "industry_assessment": 5,
+        "personnel_qualification": 1,
+        "project_approval": 2,
+        "qualification_application": 2,
+        "qualification_review": 5,
+        "subsidy": 3
+      },
+      "stage_counts": {
+        "business_permit": {
+          "confirmed": 5
+        },
+        "enterprise_qualification": {
+          "confirmed": 2,
+          "unknown": 2
+        },
+        "industry_assessment": {
+          "unknown": 5
+        },
+        "personnel_qualification": {
+          "unknown": 1
+        },
+        "project_approval": {
+          "unknown": 2
+        },
+        "qualification_application": {
+          "unknown": 2
+        },
+        "qualification_review": {
+          "unknown": 5
+        },
+        "subsidy": {
+          "confirmed": 3
+        }
+      },
+      "event_count": 22,
+      "tag_count": 7,
+      "review_event_count": 5
+    },
+    {
+      "id": "enterprise-033",
+      "label": "企业033",
+      "event_counts": {
+        "equipment_inspection": 8,
+        "qualification_review": 1
+      },
+      "stage_counts": {
+        "equipment_inspection": {
+          "confirmed": 8
+        },
+        "qualification_review": {
+          "unknown": 1
+        }
+      },
+      "event_count": 8,
+      "tag_count": 1,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-034",
+      "label": "企业034",
+      "event_counts": {
+        "equipment_inspection": 4,
+        "personnel_qualification": 2
+      },
+      "stage_counts": {
+        "equipment_inspection": {
+          "confirmed": 4
+        },
+        "personnel_qualification": {
+          "unknown": 2
+        }
+      },
+      "event_count": 6,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-035",
+      "label": "企业035",
+      "event_counts": {
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-036",
+      "label": "企业036",
+      "event_counts": {
+        "business_abnormal": 1
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-037",
+      "label": "企业037",
+      "event_counts": {
+        "enterprise_qualification": 1
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-038",
+      "label": "企业038",
+      "event_counts": {
+        "business_abnormal": 1
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-039",
+      "label": "企业039",
+      "event_counts": {
+        "business_abnormal": 7,
+        "business_permit": 4,
+        "environment": 6,
+        "innovation": 8,
+        "qualification_review": 13,
+        "subsidy": 7
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 7
+        },
+        "business_permit": {
+          "confirmed": 3,
+          "unknown": 1
+        },
+        "environment": {
+          "unknown": 6
+        },
+        "innovation": {
+          "confirmed": 1,
+          "unknown": 7
+        },
+        "qualification_review": {
+          "unknown": 13
+        },
+        "subsidy": {
+          "unknown": 7
+        }
+      },
+      "event_count": 32,
+      "tag_count": 5,
+      "review_event_count": 13
+    },
+    {
+      "id": "enterprise-040",
+      "label": "企业040",
+      "event_counts": {
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-041",
+      "label": "企业041",
+      "event_counts": {
+        "administrative_penalty": 2,
+        "environment": 1
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "unknown": 2
+        },
+        "environment": {
+          "unknown": 1
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-042",
+      "label": "企业042",
+      "event_counts": {
+        "enterprise_qualification": 1,
+        "qualification_review": 2
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "unknown": 1
+        },
+        "qualification_review": {
+          "unknown": 2
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 2
+    },
+    {
+      "id": "enterprise-043",
+      "label": "企业043",
+      "event_counts": {
+        "enterprise_qualification": 2,
+        "personnel_qualification": 5,
+        "qualification_application": 1
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "confirmed": 1,
+          "unknown": 1
+        },
+        "personnel_qualification": {
+          "unknown": 5
+        },
+        "qualification_application": {
+          "unknown": 1
+        }
+      },
+      "event_count": 8,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-044",
+      "label": "企业044",
+      "event_counts": {
+        "business_abnormal": 1,
+        "business_permit": 2
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 1
+        },
+        "business_permit": {
+          "confirmed": 2
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-045",
+      "label": "企业045",
+      "event_counts": {
+        "equipment_inspection": 4
+      },
+      "stage_counts": {
+        "equipment_inspection": {
+          "confirmed": 4
+        }
+      },
+      "event_count": 4,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-046",
+      "label": "企业046",
+      "event_counts": {
+        "qualification_review": 1,
+        "subsidy": 1
+      },
+      "stage_counts": {
+        "qualification_review": {
+          "unknown": 1
+        },
+        "subsidy": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-047",
+      "label": "企业047",
+      "event_counts": {
+        "administrative_penalty": 6,
+        "business_permit": 1,
+        "operating_status": 1
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "unknown": 6
+        },
+        "business_permit": {
+          "confirmed": 1
+        },
+        "operating_status": {
+          "unknown": 1
+        }
+      },
+      "event_count": 8,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-048",
+      "label": "企业048",
+      "event_counts": {
+        "innovation": 1
+      },
+      "stage_counts": {
+        "innovation": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-049",
+      "label": "企业049",
+      "event_counts": {
+        "regulatory_inspection": 1
+      },
+      "stage_counts": {
+        "regulatory_inspection": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-050",
+      "label": "企业050",
+      "event_counts": {
+        "regulatory_inspection": 4,
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "regulatory_inspection": {
+          "confirmed": 4
+        },
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 5,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-051",
+      "label": "企业051",
+      "event_counts": {
+        "personnel_qualification": 3
+      },
+      "stage_counts": {
+        "personnel_qualification": {
+          "unknown": 3
+        }
+      },
+      "event_count": 3,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-052",
+      "label": "企业052",
+      "event_counts": {
+        "innovation": 3
+      },
+      "stage_counts": {
+        "innovation": {
+          "confirmed": 3
+        }
+      },
+      "event_count": 3,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-053",
+      "label": "企业053",
+      "event_counts": {
+        "industry_assessment": 20,
+        "personnel_qualification": 30,
+        "project_approval": 2
+      },
+      "stage_counts": {
+        "industry_assessment": {
+          "unknown": 20
+        },
+        "personnel_qualification": {
+          "unknown": 30
+        },
+        "project_approval": {
+          "confirmed": 2
+        }
+      },
+      "event_count": 52,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-054",
+      "label": "企业054",
+      "event_counts": {
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-055",
+      "label": "企业055",
+      "event_counts": {
+        "administrative_penalty": 3,
+        "business_permit": 4
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "unknown": 3
+        },
+        "business_permit": {
+          "confirmed": 4
+        }
+      },
+      "event_count": 7,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-056",
+      "label": "企业056",
+      "event_counts": {
+        "qualification_application": 1
+      },
+      "stage_counts": {
+        "qualification_application": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-057",
+      "label": "企业057",
+      "event_counts": {
+        "procurement": 1,
+        "qualification_review": 1
+      },
+      "stage_counts": {
+        "procurement": {
+          "confirmed": 1
+        },
+        "qualification_review": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-058",
+      "label": "企业058",
+      "event_counts": {
+        "qualification_application": 1
+      },
+      "stage_counts": {
+        "qualification_application": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-059",
+      "label": "企业059",
+      "event_counts": {
+        "innovation": 1
+      },
+      "stage_counts": {
+        "innovation": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-060",
+      "label": "企业060",
+      "event_counts": {
+        "innovation": 4,
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "innovation": {
+          "confirmed": 4
+        },
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 5,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-061",
+      "label": "企业061",
+      "event_counts": {
+        "operating_status": 1
+      },
+      "stage_counts": {
+        "operating_status": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-062",
+      "label": "企业062",
+      "event_counts": {
+        "project_approval": 1,
+        "qualification_review": 3
+      },
+      "stage_counts": {
+        "project_approval": {
+          "confirmed": 1
+        },
+        "qualification_review": {
+          "unknown": 3
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 3
+    },
+    {
+      "id": "enterprise-063",
+      "label": "企业063",
+      "event_counts": {
+        "administrative_penalty": 1,
+        "business_permit": 4,
+        "product_registration": 2
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "unknown": 1
+        },
+        "business_permit": {
+          "confirmed": 3,
+          "unknown": 1
+        },
+        "product_registration": {
+          "confirmed": 2
+        }
+      },
+      "event_count": 7,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-064",
+      "label": "企业064",
+      "event_counts": {
+        "industry_assessment": 1
+      },
+      "stage_counts": {
+        "industry_assessment": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-065",
+      "label": "企业065",
+      "event_counts": {
+        "administrative_penalty": 1
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-066",
+      "label": "企业066",
+      "event_counts": {
+        "environment": 2,
+        "industry_assessment": 1
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 2
+        },
+        "industry_assessment": {
+          "unknown": 1
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-067",
+      "label": "企业067",
+      "event_counts": {
+        "administrative_penalty": 1,
+        "business_permit": 19,
+        "equipment_inspection": 47,
+        "product_registration": 31,
+        "qualification_review": 5
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "unknown": 1
+        },
+        "business_permit": {
+          "confirmed": 2,
+          "unknown": 17
+        },
+        "equipment_inspection": {
+          "confirmed": 47
+        },
+        "product_registration": {
+          "confirmed": 31
+        },
+        "qualification_review": {
+          "unknown": 5
+        }
+      },
+      "event_count": 98,
+      "tag_count": 4,
+      "review_event_count": 5
+    },
+    {
+      "id": "enterprise-068",
+      "label": "企业068",
+      "event_counts": {
+        "administrative_penalty": 1,
+        "industry_assessment": 2
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "unknown": 1
+        },
+        "industry_assessment": {
+          "unknown": 2
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-069",
+      "label": "企业069",
+      "event_counts": {
+        "personnel_qualification": 1
+      },
+      "stage_counts": {
+        "personnel_qualification": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-070",
+      "label": "企业070",
+      "event_counts": {
+        "environment": 2,
+        "qualification_review": 4
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 2
+        },
+        "qualification_review": {
+          "unknown": 4
+        }
+      },
+      "event_count": 2,
+      "tag_count": 1,
+      "review_event_count": 4
+    },
+    {
+      "id": "enterprise-071",
+      "label": "企业071",
+      "event_counts": {
+        "procurement": 1,
+        "qualification_review": 1
+      },
+      "stage_counts": {
+        "procurement": {
+          "unknown": 1
+        },
+        "qualification_review": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-072",
+      "label": "企业072",
+      "event_counts": {
+        "environment": 2
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 2
+        }
+      },
+      "event_count": 2,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-073",
+      "label": "企业073",
+      "event_counts": {
+        "project_approval": 1,
+        "qualification_review": 2
+      },
+      "stage_counts": {
+        "project_approval": {
+          "confirmed": 1
+        },
+        "qualification_review": {
+          "unknown": 2
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 2
+    },
+    {
+      "id": "enterprise-074",
+      "label": "企业074",
+      "event_counts": {
+        "business_abnormal": 1
+      },
+      "stage_counts": {
+        "business_abnormal": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-075",
+      "label": "企业075",
+      "event_counts": {
+        "industry_assessment": 24,
+        "operating_status": 1,
+        "personnel_qualification": 2,
+        "procurement": 33,
+        "project_approval": 5
+      },
+      "stage_counts": {
+        "industry_assessment": {
+          "unknown": 24
+        },
+        "operating_status": {
+          "confirmed": 1
+        },
+        "personnel_qualification": {
+          "unknown": 2
+        },
+        "procurement": {
+          "unknown": 33
+        },
+        "project_approval": {
+          "confirmed": 5
+        }
+      },
+      "event_count": 65,
+      "tag_count": 5,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-076",
+      "label": "企业076",
+      "event_counts": {
+        "industry_assessment": 4
+      },
+      "stage_counts": {
+        "industry_assessment": {
+          "unknown": 4
+        }
+      },
+      "event_count": 4,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-077",
+      "label": "企业077",
+      "event_counts": {
+        "regulatory_inspection": 1
+      },
+      "stage_counts": {
+        "regulatory_inspection": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-078",
+      "label": "企业078",
+      "event_counts": {
+        "procurement": 4,
+        "project_approval": 7,
+        "qualification_review": 7
+      },
+      "stage_counts": {
+        "procurement": {
+          "unknown": 4
+        },
+        "project_approval": {
+          "confirmed": 7
+        },
+        "qualification_review": {
+          "unknown": 7
+        }
+      },
+      "event_count": 11,
+      "tag_count": 2,
+      "review_event_count": 7
+    },
+    {
+      "id": "enterprise-079",
+      "label": "企业079",
+      "event_counts": {
+        "subsidy": 2
+      },
+      "stage_counts": {
+        "subsidy": {
+          "confirmed": 2
+        }
+      },
+      "event_count": 2,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-080",
+      "label": "企业080",
+      "event_counts": {
+        "procurement": 1
+      },
+      "stage_counts": {
+        "procurement": {
+          "unknown": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-081",
+      "label": "企业081",
+      "event_counts": {
+        "product_registration": 4
+      },
+      "stage_counts": {
+        "product_registration": {
+          "confirmed": 4
+        }
+      },
+      "event_count": 4,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-082",
+      "label": "企业082",
+      "event_counts": {
+        "industry_assessment": 2,
+        "qualification_application": 2
+      },
+      "stage_counts": {
+        "industry_assessment": {
+          "unknown": 2
+        },
+        "qualification_application": {
+          "unknown": 2
+        }
+      },
+      "event_count": 4,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-083",
+      "label": "企业083",
+      "event_counts": {
+        "administrative_penalty": 4
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "unknown": 4
+        }
+      },
+      "event_count": 4,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-084",
+      "label": "企业084",
+      "event_counts": {
+        "procurement": 1,
+        "project_approval": 8,
+        "qualification_review": 2
+      },
+      "stage_counts": {
+        "procurement": {
+          "unknown": 1
+        },
+        "project_approval": {
+          "confirmed": 8
+        },
+        "qualification_review": {
+          "unknown": 2
+        }
+      },
+      "event_count": 9,
+      "tag_count": 2,
+      "review_event_count": 2
+    },
+    {
+      "id": "enterprise-085",
+      "label": "企业085",
+      "event_counts": {
+        "administrative_penalty": 2
+      },
+      "stage_counts": {
+        "administrative_penalty": {
+          "confirmed": 1,
+          "unknown": 1
+        }
+      },
+      "event_count": 2,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-086",
+      "label": "企业086",
+      "event_counts": {
+        "personnel_qualification": 3,
+        "qualification_application": 1
+      },
+      "stage_counts": {
+        "personnel_qualification": {
+          "unknown": 3
+        },
+        "qualification_application": {
+          "unknown": 1
+        }
+      },
+      "event_count": 4,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-087",
+      "label": "企业087",
+      "event_counts": {
+        "environment": 2,
+        "industry_assessment": 1
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 2
+        },
+        "industry_assessment": {
+          "unknown": 1
+        }
+      },
+      "event_count": 3,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-088",
+      "label": "企业088",
+      "event_counts": {
+        "industry_assessment": 28,
+        "personnel_qualification": 1,
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "industry_assessment": {
+          "unknown": 28
+        },
+        "personnel_qualification": {
+          "unknown": 1
+        },
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 30,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-089",
+      "label": "企业089",
+      "event_counts": {
+        "enterprise_qualification": 3,
+        "operating_status": 1,
+        "qualification_application": 2
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "unknown": 3
+        },
+        "operating_status": {
+          "unknown": 1
+        },
+        "qualification_application": {
+          "unknown": 2
+        }
+      },
+      "event_count": 6,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-090",
+      "label": "企业090",
+      "event_counts": {
+        "enterprise_qualification": 5,
+        "project_approval": 2,
+        "qualification_application": 5,
+        "qualification_review": 1
+      },
+      "stage_counts": {
+        "enterprise_qualification": {
+          "confirmed": 1,
+          "unknown": 4
+        },
+        "project_approval": {
+          "unknown": 2
+        },
+        "qualification_application": {
+          "unknown": 5
+        },
+        "qualification_review": {
+          "unknown": 1
+        }
+      },
+      "event_count": 12,
+      "tag_count": 3,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-091",
+      "label": "企业091",
+      "event_counts": {
+        "industry_assessment": 24,
+        "personnel_qualification": 4
+      },
+      "stage_counts": {
+        "industry_assessment": {
+          "unknown": 24
+        },
+        "personnel_qualification": {
+          "unknown": 4
+        }
+      },
+      "event_count": 28,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-092",
+      "label": "企业092",
+      "event_counts": {
+        "regulatory_inspection": 1,
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "regulatory_inspection": {
+          "confirmed": 1
+        },
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 2,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-093",
+      "label": "企业093",
+      "event_counts": {
+        "environment": 2,
+        "innovation": 1,
+        "tax_credit": 1
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 2
+        },
+        "innovation": {
+          "confirmed": 1
+        },
+        "tax_credit": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 4,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-094",
+      "label": "企业094",
+      "event_counts": {
+        "equipment_inspection": 1,
+        "project_approval": 1,
+        "qualification_review": 3
+      },
+      "stage_counts": {
+        "equipment_inspection": {
+          "confirmed": 1
+        },
+        "project_approval": {
+          "confirmed": 1
+        },
+        "qualification_review": {
+          "unknown": 3
+        }
+      },
+      "event_count": 2,
+      "tag_count": 2,
+      "review_event_count": 3
+    },
+    {
+      "id": "enterprise-095",
+      "label": "企业095",
+      "event_counts": {
+        "environment": 1,
+        "industry_assessment": 1,
+        "qualification_review": 1,
+        "subsidy": 3
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 1
+        },
+        "industry_assessment": {
+          "unknown": 1
+        },
+        "qualification_review": {
+          "unknown": 1
+        },
+        "subsidy": {
+          "confirmed": 3
+        }
+      },
+      "event_count": 5,
+      "tag_count": 3,
+      "review_event_count": 1
+    },
+    {
+      "id": "enterprise-096",
+      "label": "企业096",
+      "event_counts": {
+        "equipment_inspection": 1,
+        "regulatory_inspection": 7,
+        "subsidy": 1
+      },
+      "stage_counts": {
+        "equipment_inspection": {
+          "unknown": 1
+        },
+        "regulatory_inspection": {
+          "confirmed": 7
+        },
+        "subsidy": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 9,
+      "tag_count": 3,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-097",
+      "label": "企业097",
+      "event_counts": {
+        "equipment_inspection": 6,
+        "innovation": 3
+      },
+      "stage_counts": {
+        "equipment_inspection": {
+          "confirmed": 6
+        },
+        "innovation": {
+          "confirmed": 3
+        }
+      },
+      "event_count": 9,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-098",
+      "label": "企业098",
+      "event_counts": {
+        "personnel_qualification": 2,
+        "qualification_application": 3
+      },
+      "stage_counts": {
+        "personnel_qualification": {
+          "unknown": 2
+        },
+        "qualification_application": {
+          "unknown": 3
+        }
+      },
+      "event_count": 5,
+      "tag_count": 2,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-099",
+      "label": "企业099",
+      "event_counts": {
+        "product_registration": 1
+      },
+      "stage_counts": {
+        "product_registration": {
+          "confirmed": 1
+        }
+      },
+      "event_count": 1,
+      "tag_count": 1,
+      "review_event_count": 0
+    },
+    {
+      "id": "enterprise-100",
+      "label": "企业100",
+      "event_counts": {
+        "environment": 2,
+        "equipment_inspection": 1,
+        "innovation": 1,
+        "qualification_review": 2
+      },
+      "stage_counts": {
+        "environment": {
+          "unknown": 2
+        },
+        "equipment_inspection": {
+          "confirmed": 1
+        },
+        "innovation": {
+          "confirmed": 1
+        },
+        "qualification_review": {
+          "unknown": 2
+        }
+      },
+      "event_count": 4,
+      "tag_count": 3,
+      "review_event_count": 2
+    }
+  ]
+}

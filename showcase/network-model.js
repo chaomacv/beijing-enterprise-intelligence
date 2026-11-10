@@ -1,44 +1,40 @@
-/* Complete tag-signature census: aggregate membership, then construct real edges. */
+/* One company per node. Similarity uses shared category and event counts. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.NetworkModel=api;})(typeof self==='object'?self:globalThis,function(){
  'use strict';
  const palette=['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'];
- function jaccard(a,b){const x=new Set(a.filter(t=>t!=='qualification_review')),y=new Set(b.filter(t=>t!=='qualification_review'));const shared=[...x].filter(t=>y.has(t)).length,total=new Set([...x,...y]).size;return total?shared/total:0;}
- function groups(data,scope='all',category=''){
-  const allowed=new Set(data.categories.filter((c,i)=>scope==='all'||i<10).map(c=>c.id)),bins=new Map();
-  for(const g of data.groups){const tags=g.tags.filter(t=>allowed.has(t)).sort();if(category&&!tags.includes(category))continue;
-   const key=tags.join('|');if(!bins.has(key))bins.set(key,{id:'signature-'+(key||'empty'),tags,profiles:0,provisional_profiles:0});
-   const n=bins.get(key);n.profiles+=g.profiles;n.provisional_profiles+=g.provisional_profiles;
-  }
-  return [...bins.values()].sort((a,b)=>b.profiles-a.profiles||a.id.localeCompare(b.id));
+ function companies(data,scope='all',category=''){
+  const allowed=new Set(data.categories.filter((c,i)=>scope==='all'||i<10).map(c=>c.id));
+  return data.companies.map(c=>{
+   const event_counts=Object.fromEntries(Object.entries(c.event_counts).filter(([t,n])=>allowed.has(t)&&n>0));
+   const tags=Object.keys(event_counts).filter(t=>t!=='qualification_review');
+   return {...c,event_counts,tags,tag_count:tags.length,event_count:tags.reduce((s,t)=>s+event_counts[t],0)};
+  }).filter(c=>!category||c.event_counts[category]>0);
  }
- function popcount(n){n-=n>>>1&0x55555555;n=(n&0x33333333)+(n>>>2&0x33333333);return ((n+(n>>>4)&0x0f0f0f0f)*0x01010101)>>>24;}
- function overview(nodes,categories){
-  const order=new Map(categories.map((c,i)=>[c.id,i])),bins=new Map();
-  for(const n of nodes){
-   const tags=n.tags.filter(t=>t!=='qualification_review').sort((a,b)=>order.get(a)-order.get(b)).slice(0,2),key=tags.join('|');
-   if(!bins.has(key))bins.set(key,{id:'overview-'+(key||'empty'),tags,profiles:0,provisional_profiles:0,members:[]});
-   const g=bins.get(key);g.profiles+=n.profiles;g.provisional_profiles+=n.provisional_profiles;g.members.push(n);
-  }
-  return [...bins.values()].sort((a,b)=>b.profiles-a.profiles||a.id.localeCompare(b.id));
+ function normalizers(nodes){return {tag_count:Math.max(1,...nodes.map(n=>n.tag_count)),event_count:Math.max(1,...nodes.map(n=>n.event_count))};}
+ function similarity(a,b,scale){
+  const shared=a.tags.filter(t=>b.tags.includes(t));
+  const shared_events=shared.reduce((s,t)=>s+Math.min(a.event_counts[t],b.event_counts[t]),0);
+  const score=shared.length?.65*shared.length/scale.tag_count+.35*Math.log1p(shared_events)/Math.log1p(scale.event_count):0;
+  return {shared_types:shared.length,shared_events,similarity:Math.min(1,score),distance:220-160*Math.min(1,score)};
  }
- function links(nodes,threshold=.6,neighbors=6){
-  const members=nodes.map(n=>n.members||[n]),tags=[...new Set(members.flatMap(list=>list.flatMap(n=>n.tags)))].filter(t=>t!=='qualification_review');if(tags.length>30)throw Error('Too many mask dimensions');
-  const vectors=members.map(list=>list.map(n=>({mask:n.tags.reduce((m,t)=>t==='qualification_review'?m:m|(1<<tags.indexOf(t)),0),count:n.profiles||1})));
-  const totals=vectors.map(list=>list.reduce((sum,v)=>sum+v.count,0));
-  const candidates=nodes.map(()=>[]);
+ function connections(nodes,threshold=.1,neighbors=3,scale=normalizers(nodes)){
+  const pairs=[],candidates=nodes.map(()=>[]);
   for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
-   let similarity=0;
-   if(vectors[i].length===1&&vectors[j].length===1){const a=vectors[i][0],b=vectors[j][0],union=popcount(a.mask|b.mask);similarity=union?popcount(a.mask&b.mask)/union:0;}
-   else{let weighted=0;for(const a of vectors[i])for(const b of vectors[j]){const union=popcount(a.mask|b.mask);if(union)weighted+=popcount(a.mask&b.mask)/union*a.count*b.count;}similarity=weighted/totals[i]/totals[j];}
-   if(similarity>0&&similarity>=threshold){
-    for(const index of [i,j]){const list=candidates[index];
-     if(list.length<neighbors||similarity>list.at(-1).similarity){list.push({i,j,similarity});list.sort((a,b)=>b.similarity-a.similarity||a.i-b.i||a.j-b.j);if(list.length>neighbors)list.pop();}
-    }
-   }
+   const metrics=similarity(nodes[i],nodes[j],scale);if(!metrics.shared_types)continue;
+   const edge={source:nodes[i].id,target:nodes[j].id,...metrics};pairs.push(edge);
+   if(metrics.similarity>=threshold){candidates[i].push(edge);candidates[j].push(edge);}
   }
-  const result=new Map();for(const list of candidates){list.sort((a,b)=>b.similarity-a.similarity||a.i-b.i||a.j-b.j);for(const e of list.slice(0,neighbors))result.set(e.i+':'+e.j,e);}
-  return [...result.values()].map(e=>({source:nodes[e.i].id,target:nodes[e.j].id,similarity:e.similarity,distance:160-100*e.similarity}));
+  const visible=new Map();for(const list of candidates){list.sort((a,b)=>b.similarity-a.similarity||a.source.localeCompare(b.source)||a.target.localeCompare(b.target));
+   for(const e of list.slice(0,neighbors))visible.set(e.source+'|'+e.target,e);}
+  return {edges:[...visible.values()],forces:pairs};
  }
+ function tagPositions(categories,dimensions){
+  return categories.map((c,i)=>{const a=i/categories.length*Math.PI*2-Math.PI/2;
+   const x=Math.cos(a)*235,y=Math.sin(a)*155,z=dimensions===3?Math.sin(a*2)*70:0;
+   return {...c,id:'tag-'+c.id,category:c.id,isTag:true,x,y,z,fx:x,fy:y,fz:z};
+  });
+ }
+ function tagEdges(nodes){return nodes.flatMap(n=>Object.entries(n.event_counts).map(([tag,count])=>({source:n.id,target:'tag-'+tag,event_count:count,distance:100,similarity:1})));}
  function project(n,camera,dimensions){
   let x=n.x,y=n.y,z=dimensions===3?n.z:0;
   if(dimensions===3){const xx=x*Math.cos(camera.yaw)+z*Math.sin(camera.yaw),zz=-x*Math.sin(camera.yaw)+z*Math.cos(camera.yaw);x=xx;z=zz;
@@ -46,5 +42,5 @@
   const perspective=dimensions===3?700/(700+z):1;
   return {x:360+camera.x+x*camera.k*perspective,y:220+camera.y+y*camera.k*perspective,z,scale:perspective};
  }
- return {palette,jaccard,groups,overview,popcount,links,project};
+ return {palette,companies,normalizers,similarity,connections,tagPositions,tagEdges,project};
 });
