@@ -33,15 +33,13 @@ s.append('<rect x="13" y="249" width="268" height="40" fill="#f6f8fb"/><text x="
 s.append(card(758,'相同内容，只理解一次。','内容去重'))
 s.append('<text x="17" y="78" fill="#6b7789" font-size="11">1,440,619 条来源记录</text><path d="M25 105C110 105 150 93 251 93L251 127C150 127 110 138 25 138Z" fill="#4269d0"/><path d="M25 140C110 140 150 147 251 147L251 221C150 221 110 216 25 216Z" fill="#bdd0f5"/><text x="147" y="259" text-anchor="middle" fill="#4269d0" font-size="25">1 − U/N = 73.0%</text><text x="18" y="290" fill="#7b8799" font-size="9">比例表示重复来源，原始位置全部保留</text></g></g>')
 s.append(card(1062,'标签相近，画像相似。','画像网络'))
-network=json.loads((r/'assets/network-demo.json').read_text(encoding='utf-8'))
-points=[(147+math.cos(i*2.4)*95,155+math.sin(i*2.4)*85) for i in range(len(network['companies']))]
-for i,c in enumerate(network['companies']):
- for j,demo in enumerate(network['companies'][:i]):
-  left=set(c['tags'])-{'qualification_review'};right=set(demo['tags'])-{'qualification_review'}
-  score=len(left&right)/len(left|right) if left|right else 0
-  if score>=.3:s.append(f'<path d="M{points[i][0]} {points[i][1]}L{points[j][0]} {points[j][1]}" stroke="#c7d1e1"/>')
-for i,(x,y) in enumerate(points):s.append(f'<circle cx="{x}" cy="{y}" r="4" fill="{colors[i//6]}" stroke="white"/>')
-s.append('<text x="18" y="290" fill="#7b8799" font-size="9">24个合成企业 / 方法示例 / 非业务关系</text></g></g></g>')
+network=json.loads((r/'assets/real-network.json').read_text(encoding='utf-8'))
+# Preview marks are a decorative thumbnail, not a sampled graph result.
+for i in range(48):
+ x=147+math.cos(i*2.4)*min(95,math.sqrt(i+1)*14);y=155+math.sin(i*2.4)*min(85,math.sqrt(i+1)*12)
+ if i:s.append(f'<path d="M147 155L{x} {y}" stroke="#bbb" stroke-opacity=".6"/>')
+ s.append(f'<circle cx="{x}" cy="{y}" r="3" fill="{network["categories"][i%10]["color"]}" stroke="white"/>')
+s.append('<text x="18" y="290" fill="#7b8799" font-size="9">全量真实标签组合 / 2D与3D / 预览图形示意</text></g></g></g>')
 for i in range(8):s.append(f'<circle cx="{520+i*21}" cy="659" r="4" fill="#cdd5df"/>')
 s.append('<rect x="536" y="655" width="43" height="8" rx="4" fill="#344155"/><text x="600" y="697" text-anchor="middle" fill="#7b8799" font-size="10">独立绘制的项目预览示意 / 原位方法分页 / 可展开操作 / 合成示例与真实汇总分别标明</text></g></svg>')
 (r/'assets/project-preview.svg').write_text(''.join(s),encoding='utf-8')

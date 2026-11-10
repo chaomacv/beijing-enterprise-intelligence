@@ -4,13 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "beijing-enterprise-intelligence"
-version = "0.2.0"
+version = "0.3.0"
 description = "Local-model processing of Beijing public-data files into evidenced enterprise events."
 requires-python = ">=3.10"
 dependencies = ["openpyxl>=3.1,<4", "xlrd>=2.0,<3", "defusedxml>=0.7,<1"]
 
 [project.optional-dependencies]
 test = ["jsonschema==4.23.0"]
+bulk = ["duckdb==1.4.5", "pymupdf==1.26.7", "libarchive-c==5.1", "jsonschema==4.23.0"]
+native = ["rapidocr_onnxruntime==1.4.4", "onnxruntime==1.23.2", "pyogrio==0.12.1"]
 taxonomy = ["duckdb==1.4.5"]
 llm = ["transformers>=4.51,<5"]
 serve = ["transformers==4.51.3", "accelerate==1.6.0", "lm-format-enforcer==0.11.3", "jsonschema==4.23.0"]

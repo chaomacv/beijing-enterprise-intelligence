@@ -17,7 +17,12 @@
   <script src="app.js" defer></script>
   <script src="run.js" defer></script>
   <script src="gallery.js" defer></script>
+  <script src="vendor/d3.v7.min.js" defer></script>
+  <script src="vendor/d3-binarytree.min.js" defer></script>
+  <script src="vendor/d3-octree.min.js" defer></script>
+  <script src="vendor/d3-force-3d.min.js" defer></script>
   <script src="event-sunburst.js" defer></script>
+  <script src="network-model.js" defer></script>
   <script src="enterprise-network.js" defer></script>
   <script src="story-portrait.js" defer></script>
   <script src="methods.js" defer></script>
@@ -44,14 +49,14 @@
 # 按实际处理器格式分组，保留转换与复核状态</code></pre><footer class="notebook-scope">全批文件元数据 · 固定输入 2026-11-07 · 文件数不等于企业数</footer></div></article><article class="data-notebook" data-notebook="1" aria-roledescription="幻灯片" aria-label="2 / 8：把许可资质拆成十类。">
       <span class="notebook-category">事件分类</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[02]</span><div><h3>把“许可资质”，拆开来看。</h3><p>分清企业、人员、设备与产品，再区分申请、检查和获批记录。</p></div></div>
       
- <div class="taxonomy-reconciliation"><strong id="gallery-taxonomy-total">5,031,890</strong><span>条旧类记录 → 10 类<br>原始事件与来源全部保留</span></div>
+ <div class="taxonomy-reconciliation"><strong id="gallery-taxonomy-total">5,032,506</strong><span>条旧类记录 → 10 类<br>原始事件与来源全部保留</span></div>
  <div class="notebook-toolbar taxonomy-toolbar"><label>范围 <select id="gallery-event-scope"><option value="refined">原许可相关记录细分</option><option value="all">全部细分事件</option></select></label><label>数量 <select id="gallery-event-metric"><option value="events">事件观察数</option><option value="profiles">关联画像数</option></select></label><label>阶段 <select id="gallery-event-stage"><option value="all">全部阶段</option><option value="confirmed">有阶段依据 confirmed</option><option value="proposed">拟议 proposed</option><option value="unknown">阶段未明 unknown</option></select></label><label><input id="gallery-event-log" type="checkbox"> 对数刻度</label></div>
  <div id="gallery-event-chart" class="gallery-figure"></div><p class="notebook-insight" id="gallery-event-insight"></p>
- <div class="notebook-callout taxonomy-note">申请不算获批，人员、设备与产品单独归类。<strong id="gallery-taxonomy-downgraded">540,317</strong> 条原 confirmed 记录因分类或阶段证据不足改为阶段未明。独立有效证照数暂不统计。</div>
+ <div class="notebook-callout taxonomy-note">申请不算获批，人员、设备与产品单独归类。<strong id="gallery-taxonomy-downgraded">540,486</strong> 条原 confirmed 记录因分类或阶段证据不足改为阶段未明。独立有效证照数暂不统计。</div>
  <pre class="gallery-code"><code>SELECT event_type, status, count(*) AS observations
 FROM classified_events GROUP BY event_type, status;
 -- 原 event_id、原分类、原阶段与依据可追溯</code></pre>
- <div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">细分类别及选定阶段的数量</caption><thead><tr><th>细分类别</th><th id="gallery-event-count-label">事件观察数</th><th>选定阶段</th></tr></thead><tbody id="gallery-event-table"></tbody></table></div><footer class="notebook-scope">1,884 文件阶段子集 · 2026-11-09 分类修正 · 依据来源主题与结构化证据，独立准确率尚未评测 · <a href="assets/event-classification.json">分类汇总 JSON ↗</a></footer></div></article><article class="data-notebook" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 8：相同内容理解一次，来源全部保留。">
+ <div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">细分类别及选定阶段的数量</caption><thead><tr><th>细分类别</th><th id="gallery-event-count-label">事件观察数</th><th>选定阶段</th></tr></thead><tbody id="gallery-event-table"></tbody></table></div><footer class="notebook-scope">全批最终结果 · 2026-11-10 分类修正 · 依据来源主题与结构化证据，独立准确率尚未评测 · <a href="assets/event-classification.json">分类汇总 JSON ↗</a></footer></div></article><article class="data-notebook" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 8：相同内容理解一次，来源全部保留。">
       <span class="notebook-category">内容去重</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[03]</span><div><h3>相同内容理解一次，来源全部保留。</h3><p>从 144 万条待语义记录中，找出真正不同的内容。</p></div></div>
       
  <div id="gallery-dedup-chart" class="gallery-figure"></div>
@@ -67,23 +72,27 @@ representatives[key].append(record_id)
 <div id="story-method" class="story-method" aria-live="polite"></div>
 <div class="story-equation">可追溯画像 = 来源证据 + 保守关联 + 标签结构</div>
 <pre class="gallery-code"><code id="story-code"></code></pre>
-<footer class="notebook-scope">方法说明 · 来源校验与独立语义准确率分别验证 · 不自动形成授信结论</footer></div></article><article class="data-notebook" data-notebook="4" aria-roledescription="幻灯片" aria-label="5 / 8：共享的标签，构成相似的画像。"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[05]</span><div><h3>共享的标签，构成相似的画像。</h3><p>共享标签越多、结构越相似，布局中的目标连线越短。</p></div></div>
-<div class="network-notice"><i></i><span>方法示例 · 24个合成企业 · 十类标签定义</span></div>
-<div class="network-toolbar"><label>视图 <select id="network-mode"><option value="similarity">画像相似网络</option><option value="bipartite">企业—标签网络</option></select></label><label>类别 <select id="network-category"></select></label></div>
-<label class="network-threshold">相似度阈值 <input id="network-threshold" type="range" min="0.1" max="1" step="0.05" value="0.3"><output id="network-threshold-value">0.30</output></label>
-<div id="enterprise-network" class="enterprise-network" tabindex="0" aria-label="合成企业画像网络，展开后可拖动和缩放"></div>
-<div class="network-controls"><span id="network-size"></span><div><button id="network-zoom-out" type="button" aria-label="缩小网络">−</button><output id="network-zoom-value">100%</output><button id="network-zoom-in" type="button" aria-label="放大网络">+</button><button id="network-reset" type="button">复位</button></div></div>
-<div id="network-detail" class="network-detail" role="status"><strong>画像相似，不表示业务联系。</strong><span>展开卡片后可拖动节点、拖动空白平移、滚轮缩放。选择节点查看标签。</span></div>
+<footer class="notebook-scope">方法说明 · 来源校验与独立语义准确率分别验证 · 不自动形成授信结论</footer></div></article><article class="data-notebook" data-notebook="4" aria-roledescription="幻灯片" aria-label="5 / 8：共享的标签，构成相似的画像。"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[05]</span><div><h3>共享的标签，构成相似的画像。</h3><p>真实标签构成画像结构。越相似，目标连线越短；可切换二维与三维。</p></div></div>
+<div class="network-notice real-network-notice"><i></i><span id="network-total">正在读取全量真实画像…</span></div>
+<div class="network-toolbar"><label>视图 <select id="network-mode"><option value="similarity">画像相似网络</option><option value="bipartite">画像—标签网络</option></select></label><label>空间 <select id="network-dimension"><option value="2">二维 · D3</option><option value="3">三维 · 可旋转</option></select></label><label>范围 <select id="network-scope"><option value="all">全部18类事件</option><option value="refined">许可相关十类</option></select></label></div>
+<div class="network-toolbar"><label>类别 <select id="network-category"></select></label><label class="network-label-toggle"><input id="network-labels" type="checkbox"> 显示标签</label></div>
+<label class="network-threshold">相似度阈值 <input id="network-threshold" type="range" min="0.1" max="1" step="0.05" value="0.6"><output id="network-threshold-value">0.60</output></label>
+<div id="enterprise-network" class="enterprise-network" tabindex="0" aria-label="全量真实画像标签组合网络，展开后可拖动、缩放和三维旋转"></div>
+<div class="network-controls"><span id="network-edge-count"></span><div><button id="network-zoom-out" type="button" aria-label="缩小网络">−</button><output id="network-zoom-value">100%</output><button id="network-zoom-in" type="button" aria-label="放大网络">+</button><button id="network-reset" type="button">复位</button></div></div>
+<p id="network-size" class="network-census"></p><p id="network-hint" class="network-interaction-hint"></p>
+<div id="network-detail" class="network-detail" role="status"><strong>真实全量统计 · 标签组合聚合展示</strong><span>每个节点代表标签集合完全相同的一组主体画像。无标签画像也计入总数；包含临时身份，不能等同于独立企业数量。</span></div>
+<div id="network-legend" class="network-legend" aria-label="D3 Category10 标签配色"></div>
 <pre class="gallery-code"><code>J(a, b) = |tags(a) ∩ tags(b)| / |tags(a) ∪ tags(b)|
-link_distance = 160 - 100 * J(a, b)
-# 排除“待分类复核”维度；距离同时受布局影响</code></pre>
-<footer class="notebook-scope">合成企业与示意标签，不是真实企业共现数据 · 相似度用于方法展示，不是业务关系或信用评分 · <a href="assets/network-demo.json">示例数据 ↗</a></footer></div></article><article class="data-notebook" data-notebook="5" aria-roledescription="幻灯片" aria-label="6 / 8：企业画像，保留每一条证据。"><span class="notebook-category">企业画像</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[06]</span><div><h3>企业画像，保留每一条证据。</h3><p>从真实处理规模，到一条可回查的企业记录。</p></div></div>
+color = d3.scaleOrdinal(d3.schemeCategory10)
+simulation.numDimensions(3) // 相同全量数据，三维力布局
+// 每组召回6个近邻后取并集；排除“待分类复核”相似维度</code></pre>
+<footer class="notebook-scope">全批最终结果，未抽样 · 同标签组合聚合，非单企业节点 · 标签包含阶段未明的来源观察 · <a href="assets/real-network.json">全量网络统计 ↗</a> · <a href="https://observablehq.com/@d3/force-directed-graph/2">D3 参考 ↗</a></footer></div></article><article class="data-notebook" data-notebook="5" aria-roledescription="幻灯片" aria-label="6 / 8：企业画像，保留每一条证据。"><span class="notebook-category">企业画像</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[06]</span><div><h3>企业画像，保留每一条证据。</h3><p>从真实处理规模，到一条可回查的企业记录。</p></div></div>
 <div id="portrait-summary" class="portrait-summary">正在读取真实阶段汇总…</div>
 <div class="portrait-example-heading"><span>以下为合成企业示例</span><select id="portrait-company" aria-label="选择合成企业画像"></select></div>
 <div class="portrait-business"><span class="portrait-provisional">PROVISIONAL · 暂定身份</span><div class="portrait-heading"><h4 id="portrait-name"></h4><span class="portrait-avatar" aria-hidden="true">企</span></div><p id="portrait-address"></p><div id="portrait-tags" class="portrait-tags"></div></div>
 <div id="portrait-timeline" class="portrait-timeline"></div>
 <p class="portrait-boundary">每条事实保留来源和阶段。未观察到某类事件，不代表该类事件不存在；拟认定也不等于已认定。</p>
-<footer class="notebook-scope">数量：已完成1,884文件阶段子集 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-notebook="6" aria-roledescription="幻灯片" aria-label="7 / 8：看见这次处理，是怎样向前推进的。">
+<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-notebook="6" aria-roledescription="幻灯片" aria-label="7 / 8：看见这次处理，是怎样向前推进的。">
       <span class="notebook-category">执行进度</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[07]</span><div><h3>看见这次处理，是怎样向前推进的。</h3><p>沿时间轴回放已经核对的快照，观察复杂内容的推理进度。</p></div></div>
       
  <div class="timeline-reading"><strong id="gallery-time-count">280,360</strong><span id="gallery-time-percent">72.2% 个内容代表已处理</span><time id="gallery-time-at">2026-11-09 16:11（北京时间）</time></div>
@@ -91,16 +100,20 @@ link_distance = 160 - 100 * J(a, b)
  <label class="space-control" for="gallery-time-scrub">回放观测点 <input id="gallery-time-scrub" type="range" min="0" max="7" value="7"><output id="gallery-time-index" for="gallery-time-scrub">8 / 8</output></label>
  <pre class="gallery-code"><code>progress = completed_representatives / 388_349
 # 横轴按真实时间间隔绘制；连接观测点，不补造中间测量</code></pre>
- <div class="notebook-callout">这是数据工程执行时间线。最后一个点是固定快照，页面不连接私有服务器；全量流程尚未完成。</div><footer class="notebook-scope">实际进度观测 · 时间统一为北京时间 · 不代表企业事件时间分布</footer></div></article><article class="data-notebook" data-notebook="7" aria-roledescription="幻灯片" aria-label="8 / 8：事件分类旭日图">
+ <div class="notebook-callout">这是数据工程执行时间线。最后一个点来自全批完成汇总，推理、关联、分类修正及验收均已结束；待复核项继续保留。</div><footer class="notebook-scope">实际进度观测 · 时间统一为北京时间 · 不代表企业事件时间分布</footer></div></article><article class="data-notebook" data-notebook="7" aria-roledescription="幻灯片" aria-label="8 / 8：事件分类旭日图">
 <span class="notebook-category">事件层级</span><div class="notebook-page">
-<div class="notebook-heading"><span class="cell-number">[08]</span><div><h3>用面积，看清事件分类。</h3><p>同层扇区面积按记录数量分配；有真实下级时可点击缩放。</p></div></div>
-<label class="sunburst-filter">类别筛选 <select id="event-sunburst-filter" aria-label="旭日图类别筛选"></select></label>
+<div class="notebook-heading"><span class="cell-number">[08]</span><div><h3>用面积，看清事件分类。</h3><p>三种真实口径，两层可见。点击扇区深入，点击中心返回。</p></div></div>
+<div id="event-sunburst-modes" class="sunburst-modes" role="group" aria-label="旭日图探索模式"></div>
+<div class="sunburst-explore-bar"><span id="event-sunburst-levels"></span><label class="sunburst-filter"><select id="event-sunburst-filter" aria-label="旭日图类别筛选"></select></label></div>
 <nav id="event-sunburst-breadcrumb" class="sunburst-breadcrumb" aria-label="事件分类面包屑"></nav>
 <div id="event-sunburst-chart" class="event-sunburst-chart"></div>
 <p id="event-sunburst-detail" class="sunburst-detail" role="status" aria-live="polite"></p>
-<p class="notebook-callout">当前为许可相关十类阶段子集，共5,031,890条；其余929,341条其他类别不在此范围。仅有真实大类汇总，业务子类和具体标签尚未开放下钻。筛选保留全部十类的面积分母。</p>
-<div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">分类记录数与占父级比例</caption><thead><tr><th>分类</th><th>记录数</th><th>占父级</th></tr></thead><tbody id="event-sunburst-table"></tbody></table></div>
-<footer class="notebook-scope">1,884文件阶段子集 · 原许可相关宽类细分 · 未评测独立语义准确率 · <a href="assets/event-hierarchy.json">层级数据接口 ↗</a></footer>
+<p id="event-sunburst-note" class="notebook-callout"></p>
+<div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">分类数量与占父级比例</caption><thead><tr><th>分类</th><th id="event-sunburst-unit">文件数</th><th>占父级</th></tr></thead><tbody id="event-sunburst-table"></tbody></table></div>
+<pre class="gallery-code"><code>root = d3.hierarchy(data).sum(d =&gt; d.children ? 0 : d.value)
+partition.size([2 * Math.PI, root.height + 1])(root)
+// 每条记录只计一次；点击后重新映射角度和可见层级</code></pre>
+<footer class="notebook-scope">全批最终结果 · 同层面积按数量分配 · <a href="https://observablehq.com/@d3/zoomable-sunburst">D3 Zoomable Sunburst ↗</a> · <a href="assets/event-hierarchy.json">真实层级接口 ↗</a></footer>
 </div></article></div></div>
   <div class="carousel-controls shell"><button class="gallery-nav" id="gallery-prev" type="button" aria-label="上一个笔记本">←</button><div class="gallery-pagination" role="group" aria-label="选择数据笔记本"><button type="button" data-gallery-page="0" aria-label="第 1 个：文件层级" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="1" aria-label="第 2 个：事件统计" aria-pressed="true"><span></span></button><button type="button" data-gallery-page="2" aria-label="第 3 个：精确去重" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="3" aria-label="第 4 个：方法说明" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="4" aria-label="第 5 个：画像网络" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="5" aria-label="第 6 个：企业画像" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="6" aria-label="第 7 个：执行时间线" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="7" aria-label="第8个：事件层级" aria-pressed="false"><span></span></button></div><button class="gallery-nav" id="gallery-next" type="button" aria-label="下一个笔记本">→</button><span class="carousel-divider" aria-hidden="true"></span><button id="gallery-play" class="gallery-play" type="button" aria-pressed="true"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2"/></svg></button><span id="gallery-clock" class="gallery-clock">8s / 每张</span><span class="sr-only" id="gallery-announcement" role="status"></span></div>
 
@@ -171,7 +184,7 @@ else:
     <section class="section shell architecture" id="pipeline" aria-labelledby="pipeline-title">
       <div class="section-intro"><div><p class="eyebrow">NINE STAGES / ONE SOURCE MAP</p><h2 id="pipeline-title">从原始附件，<br>一路走到可核对的结果。</h2></div><p>选择一个步骤，查看输入、方法和中间产物。每一步有独立去向；业务明细与模型原回复保留在私有环境。</p></div>
       <div class="run-notebook">
-        <div class="run-topline"><span id="run-snapshot-date">固定输入 / 2026-11-07 · 汇总更新 / 2026-11-08</span><span class="run-state" id="run-overall-state" data-state="running" role="status">本批全量抽取进行中</span></div>
+        <div class="run-topline"><span id="run-snapshot-date">固定输入 / 2026-11-07 · 汇总更新 / 2026-11-08</span><span class="run-state" id="run-overall-state" data-state="complete" role="status">本批流程已完成，含待复核结果</span></div>
         <div class="run-explorer">
           <div class="run-step-tabs" role="tablist" aria-label="九步处理流程">
             <button id="run-tab-01" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="0" data-state="complete"><span>01</span><strong>固定输入</strong><small class="run-step-status">已完成</small></button>
@@ -179,13 +192,13 @@ else:
             <button id="run-tab-03" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="2" data-state="complete"><span>03</span><strong>文件筛选</strong><small class="run-step-status">已完成</small></button>
             <button id="run-tab-04" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="3" data-state="complete"><span>04</span><strong>字段方案</strong><small class="run-step-status">已完成</small></button>
             <button id="run-tab-05" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="4" data-state="complete"><span>05</span><strong>完整读取</strong><small class="run-step-status">已完成</small></button>
-            <button id="run-tab-06" type="button" role="tab" aria-selected="true" aria-controls="run-step-panel" data-run-step="5" data-state="running"><span>06</span><strong>抽取与核验</strong><small class="run-step-status">进行中</small></button>
-            <button id="run-tab-07" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="6" data-state="pending"><span>07</span><strong>身份关联</strong><small class="run-step-status">尚未执行</small></button>
-            <button id="run-tab-08" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="7" data-state="pending"><span>08</span><strong>结果导出</strong><small class="run-step-status">尚未执行</small></button>
-            <button id="run-tab-09" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="8" data-state="pending"><span>09</span><strong>复核与验收</strong><small class="run-step-status">尚未执行</small></button>
+            <button id="run-tab-06" type="button" role="tab" aria-selected="true" aria-controls="run-step-panel" data-run-step="5" data-state="complete"><span>06</span><strong>抽取与核验</strong><small class="run-step-status">已完成</small></button>
+            <button id="run-tab-07" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="6" data-state="complete"><span>07</span><strong>身份关联</strong><small class="run-step-status">已完成</small></button>
+            <button id="run-tab-08" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="7" data-state="complete"><span>08</span><strong>结果导出</strong><small class="run-step-status">已完成</small></button>
+            <button id="run-tab-09" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="8" data-state="complete"><span>09</span><strong>复核与验收</strong><small class="run-step-status">已完成</small></button>
           </div>
           <article id="run-step-panel" class="run-detail" role="tabpanel" aria-labelledby="run-tab-06" tabindex="0">
-            <div class="run-detail-heading"><h3 id="run-detail-title">06 / 抽取与核验</h3><span class="run-state" id="run-detail-state" data-state="running">进行中</span></div>
+            <div class="run-detail-heading"><h3 id="run-detail-title">06 / 抽取与核验</h3><span class="run-state" id="run-detail-state" data-state="complete">已完成</span></div>
             <div class="run-detail-metric"><strong id="run-detail-number">388,349</strong><span id="run-detail-label">个不同内容代表需语义处置</span></div>
             <dl><dt>输入</dt><dd id="run-detail-input">复杂内容代表及各自表头、语境与来源 ID</dd><dt>方法</dt><dd id="run-detail-method">完整内容精确分组后推理；按实际 tokenizer 预算拆组，再批量提交。核对主体、原文引用与记录归属，逐条回填重复来源；不确定项进入复核。</dd><dt>产出</dt><dd id="run-detail-output">逐条状态、来源引用、模型请求与原回复</dd></dl>
             <div class="run-detail-files" id="run-detail-files"><code>06_validation/内容去重总表.csv</code><code>06_validation/content_indices/</code><code>06_validation/&lt;file_id&gt;/record_results.jsonl</code></div>
@@ -212,7 +225,7 @@ else:
 
     <section class="section release-section" id="release" aria-labelledby="release-title"><div class="shell">
       <div class="section-intro"><div><p class="eyebrow">WHERE THE PROJECT STANDS</p><h2 id="release-title">把已完成与待验证，写清楚。</h2></div><p id="release-run-copy">本地模型已完成文件筛选与字段规划，全量复杂内容抽取继续运行。完整汇总随来源回填、关联和总对账完成后更新。</p></div>
-      <div class="release-grid"><div class="release-column"><span class="status-label"><i class="dot sage"></i> 已有实现</span><h3>完整流程的实现</h3><ul><li>容器、表格、文档、XML、OCR 与地理库读取</li><li>本地模型筛选、字段方案与逐条来源核验</li><li>精确内容复用、预算拆组与检查点续跑</li><li>DuckDB 身份关联与 JSONL／Parquet 导出</li></ul></div><div class="release-column"><span class="status-label"><i class="dot sand"></i> 当前批次</span><h3 id="release-run-title">全量验收进行中</h3><ul><li>复杂内容抽取与原始来源回填</li><li>主体画像、事件及逐条台账汇总</li><li>原附件与已知逻辑记录覆盖对账</li><li>排除、失败、结构与语义复核分别留存</li></ul></div><div class="release-column"><span class="status-label"><i class="dot blue"></i> 后续评估</span><h3>用实验选择增量</h3><ul><li>独立标注的文件筛选与事件语义评测</li><li>排除文件抽查、罕见事件与主体错配分析</li><li>向量召回对候选匹配的实际增益</li><li>人工复核反馈与跨版本增量更新</li></ul></div></div>
+      <div class="release-grid"><div class="release-column"><span class="status-label"><i class="dot sage"></i> 已有实现</span><h3>完整流程的实现</h3><ul><li>容器、表格、文档、XML、OCR 与地理库读取</li><li>本地模型筛选、字段方案与逐条来源核验</li><li>精确内容复用、预算拆组与检查点续跑</li><li>DuckDB 身份关联与 JSONL／Parquet 导出</li></ul></div><div class="release-column"><span class="status-label"><i class="dot sand"></i> 当前批次</span><h3 id="release-run-title">本批全量验收完成</h3><ul><li>复杂内容抽取与原始来源回填</li><li>主体画像、事件及逐条台账汇总</li><li>原附件与已知逻辑记录覆盖对账</li><li>排除、失败、结构与语义复核分别留存</li></ul></div><div class="release-column"><span class="status-label"><i class="dot blue"></i> 后续评估</span><h3>用实验选择增量</h3><ul><li>独立标注的文件筛选与事件语义评测</li><li>排除文件抽查、罕见事件与主体错配分析</li><li>向量召回对候选匹配的实际增益</li><li>人工复核反馈与跨版本增量更新</li></ul></div></div>
       <a class="release-source" href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/main/docs/validation.md" target="_blank" rel="noopener">查看仓库验证记录 <span aria-hidden="true">↗</span></a>
     </div></section>
 

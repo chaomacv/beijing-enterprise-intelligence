@@ -1,0 +1,293 @@
+import ctypes.util
+import importlib.util
+import json
+from pathlib import Path
+import tempfile
+import unittest
+import zipfile
+
+from bank_data.bulk_aggregate import aggregate
+from bank_data.bulk_inputs import prepare_inputs,member_name
+from bank_data.bulk_plan import validate_plan
+from bank_data.bulk_rows import apply_plan,materialize
+from bank_data.bulk_semantics import finalize_validation
+from bank_data.common import dump,file_hash
+from bank_data.document_readers import document_records,text_fragments
+from bank_data.scan import scan
+
+
+def mapping():
+    return {'mode':'map','reason':'synthetic fixture','entities':[{'role':'subject','kind':'business',
+        'name_field':'企业名称','code_field':None,'address_field':'地址'}],
+        'events':[{'subject_index':0,'event_type':'innovation','default_status':'confirmed','date_field':'日期',
+            'amount_field':None,'document_field':None,'evidence_fields':['事件内容','__filename__'],
+            'when':[],'unless':[],'status_rules':[]}]}
+
+
+class BulkTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
+        self.raw=self.root/'input';self.raw.mkdir();self.work=self.root/'results'
+    def tearDown(self):self.temp.cleanup()
+
+    def test_long_text_fragments_preserve_every_character_and_positions(self):
+        value='合成文字'*2000;spans=list(text_fragments(value));coverage=set()
+        for start,end,text in spans:
+            self.assertEqual(text,value[start:end]);coverage.update(range(start,end));self.assertLessEqual(len(text),2000)
+        self.assertEqual(len(coverage),len(value))
+
+    def test_budget_reduction_retains_head_middle_tail_samples(self):
+        from bank_data.bulk_plan import reduce_sample
+        rows=list(range(13));selected=reduce_sample(rows)
+        self.assertEqual(selected[0],0);self.assertEqual(selected[-1],12)
+        self.assertIn(6,selected)
+
+    def test_clients_initialize_non_threadsafe_tokenizers_without_losing_a_worker(self):
+        from concurrent.futures import ThreadPoolExecutor
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        from bank_data.bulk_client import BatchClient
+        import threading,time
+        active=threading.Event()
+        def initialize(*args,**kwargs):
+            if active.is_set():raise ImportError('Concurrent lazy initialization')
+            active.set();time.sleep(0.01);active.clear();return object()
+        fake=SimpleNamespace(AutoTokenizer=SimpleNamespace(from_pretrained=initialize))
+        with patch.dict('sys.modules',{'transformers':fake}),ThreadPoolExecutor(max_workers=4) as pool:
+            futures=[pool.submit(BatchClient,'http://127.0.0.1:'+str(18080+i)+'/v1','synthetic',self.raw,self.work/'cache') for i in range(4)]
+            clients=[f.result() for f in futures]
+        self.assertEqual(len({id(c.tokenizer) for c in clients}),4)
+
+    def test_padded_token_budget_splits_before_sending_without_changing_requests(self):
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        from bank_data.bulk_client import BatchClient
+        import io
+        tokenizer=SimpleNamespace(apply_chat_template=lambda *args,**kwargs:[0]*6000)
+        fake=SimpleNamespace(AutoTokenizer=SimpleNamespace(from_pretrained=lambda *args,**kwargs:tokenizer))
+        batches=[]
+        def send(request,**kwargs):
+            values=json.loads(request.data)['requests'];batches.append(values)
+            return io.BytesIO(json.dumps({'items':[{'ok':False,'error':'synthetic'} for _ in values]}).encode())
+        with patch.dict('sys.modules',{'transformers':fake}):
+            client=BatchClient('http://127.0.0.1:18080/v1','synthetic',self.raw,self.work/'cache')
+        client.opener=SimpleNamespace(open=send)
+        requests=[client.request('synthetic',{'case':i},{'type':'object'},512) for i in range(4)]
+        output=client.call(requests)
+        self.assertEqual(len(output),4)
+        self.assertEqual([len(b) for b in batches],[2,2])
+        self.assertEqual([r for batch in batches for r in batch],requests)
+
+    def test_archive_byte_names_preserve_original_encoding(self):
+        original='目录/企业名单.csv'.encode('gb18030')
+        name,metadata=member_name(original)
+        import base64
+        self.assertEqual(name,'目录/企业名单.csv')
+        self.assertEqual(base64.b64decode(metadata['pathname_bytes_base64']),original)
+
+    def test_configurable_transport_budget_keeps_individual_requests_identical(self):
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        from bank_data.bulk_client import BatchClient
+        import io
+        fake=SimpleNamespace(AutoTokenizer=SimpleNamespace(from_pretrained=lambda *a,**k:SimpleNamespace(apply_chat_template=lambda *a,**k:[0]*6000)))
+        batches=[]
+        def send(request,**kwargs):
+            values=json.loads(request.data)['requests'];batches.append(values)
+            return io.BytesIO(json.dumps({'items':[{'ok':False,'error':'synthetic'} for _ in values]}).encode())
+        with patch.dict('sys.modules',{'transformers':fake}),patch.dict('os.environ',{'BANK_PADDED_BATCH_TOKENS':'32768'}):
+            client=BatchClient('http://127.0.0.1:18080/v1','synthetic',self.raw,self.work/'cache')
+            explicit=BatchClient('http://127.0.0.1:18080/v1','synthetic',self.raw,self.work/'explicit',padded_batch_tokens=24576)
+        self.assertEqual((client.padded_batch_tokens,explicit.padded_batch_tokens),(32768,24576))
+        client.opener=SimpleNamespace(open=send);requests=[client.request('synthetic',{'case':i},{'type':'object'},512) for i in range(4)]
+        client.call(requests);self.assertEqual(batches,[requests])
+
+    def test_multiline_model_json_keeps_column_values_and_rejects_broken_syntax(self):
+        from bank_data.common import decode_model_json
+        raw='{"field":"多行'+chr(10)+'表头","value":"制表'+chr(9)+'原值"}'
+        data,repaired=decode_model_json(raw)
+        self.assertTrue(repaired)
+        self.assertEqual(data['field'],'多行\n表头')
+        self.assertEqual(json.loads(json.dumps(data,ensure_ascii=False)),data)
+        with self.assertRaises(json.JSONDecodeError):decode_model_json('{"field":}')
+
+    def test_document_table_and_paragraphs_keep_source_structure(self):
+        path=self.raw/'synthetic.docx'
+        xml='''<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>
+        <w:p><w:r><w:t>合成说明</w:t></w:r></w:p><w:tbl>
+        <w:tr><w:tc><w:p><w:r><w:t>企业名称</w:t></w:r></w:p></w:tc></w:tr>
+        <w:tr><w:tc><w:p><w:r><w:t>合成甲公司</w:t></w:r></w:p></w:tc></w:tr></w:tbl></w:body></w:document>'''
+        with zipfile.ZipFile(path,'w') as archive:archive.writestr('word/document.xml',xml)
+        rows=list(document_records(path,'docx'))
+        self.assertTrue(any(r[2].get('企业名称')=='合成甲公司' for r in rows))
+        self.assertTrue(any(r[2].get('__text__')=='合成说明' for r in rows))
+
+    @unittest.skipUnless(ctypes.util.find_library('archive') and importlib.util.find_spec('libarchive'),'native archive runtime not installed')
+    def test_archive_members_have_lineage_and_unsafe_paths_are_not_extracted(self):
+        path=self.raw/'synthetic.zip'
+        with zipfile.ZipFile(path,'w') as archive:
+            archive.writestr('folder/名单.csv','企业名称,地址\n合成甲公司,示例路1号\n')
+            archive.writestr('../escape.csv','企业名称\n不应写出\n')
+        before=file_hash(path);profiles,_=scan(self.raw,self.work/'initial')
+        expanded=prepare_inputs(profiles,self.work,workers=1)
+        self.assertEqual(file_hash(path),before)
+        self.assertEqual(len([p for p in expanded if p['status']=='PROFILED']),1)
+        child=next(p for p in expanded if p['status']=='PROFILED')
+        self.assertEqual(child['root_file_id'],profiles[0]['file_id'])
+        self.assertEqual(child['source']['archive_member'],'folder/名单.csv')
+        ledger=json.loads((self.work/'01_inputs/archive_members.json').read_text(encoding='utf-8'))
+        self.assertTrue(any(v['status']=='REVIEW' for v in ledger))
+        self.assertFalse((self.root/'escape.csv').exists())
+
+    def test_source_mapping_preserves_proposed_stage_and_rejects_authority_code(self):
+        card={'filename':'合成创新企业拟认定名单.csv','columns':['企业名称','地址','事件内容','日期','处罚机关代码']}
+        plan=mapping();validate_plan(plan,card)
+        row={'record_id':'synthetic','cells':{'企业名称':'合成甲公司','地址':'示例路1号','事件内容':'认定','日期':'2026年1月1日'}}
+        result,reason,_=apply_plan(row,card,plan)
+        self.assertEqual(result['events'][0]['status'],'proposed')
+        self.assertEqual(result['events'][0]['date']['value'],'2026年1月1日')
+        plan['entities'][0]['code_field']='处罚机关代码'
+        with self.assertRaises(ValueError):validate_plan(plan,card)
+
+    def test_contradictory_stage_mapping_is_rejected(self):
+        card={'filename':'合成行政处罚.csv','columns':['企业名称','地址','事件内容','日期','状态']}
+        plan=mapping();plan['events'][0]['status_rules']=[{'field':'状态','contains':'已处罚','status':'proposed'}]
+        with self.assertRaises(ValueError):validate_plan(plan,card)
+
+    def test_basic_personal_names_do_not_become_enterprise_profiles(self):
+        plan=mapping();plan['mode']='entity_only';plan['events']=[];plan['entities'][0]['kind']='person'
+        row={'record_id':'synthetic-person','cells':{'企业名称':'合成人员甲'}}
+        result,reason,kinds=apply_plan(row,{'filename':'合成先进个人.csv','columns':['企业名称']},plan)
+        self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[]);self.assertEqual(kinds,[])
+        self.assertEqual(reason,'personal_subject_not_enterprise_fact')
+
+    def test_a_business_mapping_cannot_turn_project_or_category_values_into_organizations(self):
+        for name in ['合成美术制作技艺','合成广场扩建项目','中小企业','合成高新技术企业认定']:
+            result,reason,_=apply_plan({'record_id':'synthetic-project','cells':{'企业名称':name}},
+                {'filename':'合成名单.csv','columns':['企业名称']},mapping())
+            self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[])
+            self.assertEqual(reason,'subject_name_not_recognizable_requires_review')
+
+    def test_basic_school_uses_the_same_name_guard_as_model_extraction(self):
+        plan=mapping();plan.update(mode='entity_only',events=[]);plan['entities'][0]['kind']='institution'
+        result,_,kinds=apply_plan({'record_id':'synthetic-school','cells':{'企业名称':'合成第二中学'}},
+            {'filename':'合成学校名单.csv','columns':['企业名称']},plan)
+        self.assertEqual(result['status'],'NO_EVENT');self.assertEqual(kinds,['institution'])
+        self.assertEqual(result['entities'][0]['name']['value'],'合成第二中学')
+
+    def test_project_column_cannot_be_copied_as_a_whole_organization_name(self):
+        plan=mapping();plan['entities'][0]['name_field']='项目名称'
+        result,reason,_=apply_plan({'record_id':'synthetic-project','cells':{'项目名称':'合成甲公司新建项目'}},
+            {'filename':'合成项目名录.csv','columns':['项目名称']},plan)
+        self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[])
+        self.assertEqual(reason,'project_field_cannot_directly_identify_organization')
+
+    def test_case_title_containing_a_company_is_not_itself_an_organization_name(self):
+        plan=mapping();plan['entities'][0]['name_field']='案件名称'
+        result,reason,_=apply_plan({'record_id':'synthetic-case','cells':{'案件名称':'合成甲公司未按规定办理手续案'}},
+            {'filename':'合成行政处罚.csv','columns':['案件名称']},plan)
+        self.assertEqual(result['status'],'REVIEW');self.assertEqual(result['entities'],[]);self.assertEqual(result['events'],[])
+        self.assertEqual(reason,'case_title_cannot_directly_identify_organization')
+
+    def test_effective_plan_omits_unused_mappings_without_changing_raw_reply(self):
+        card={'filename':'合成统计.csv','columns':['企业名称','地址','事件内容','日期']}
+        raw=mapping();raw['mode']='exclude'
+        effective=validate_plan(raw,card)
+        self.assertEqual(effective['entities'],[]);self.assertEqual(effective['events'],[])
+        self.assertEqual(len(raw['events']),1)
+
+    def test_native_xml_keeps_repeated_fields_and_attributes(self):
+        from bank_data.bulk_native import native_one
+        path=self.raw/'合成监测.xml';path.write_text('<stations><station id="A"><reading>1</reading><reading>2</reading></station></stations>',encoding='utf-8')
+        profile={'file_id':'synthetic-root','root_file_id':'synthetic-root','path':str(path),'sha256':file_hash(path),
+            'kind':'xml','filename':path.name,'relative_path':path.name,'source':{},'status':'REVIEW','cards':[],'records':0}
+        profiles=native_one((profile,str(self.work)))
+        self.assertEqual(profiles[0]['status'],'CONVERTED')
+        data=json.loads(Path(profiles[1]['path']).read_text(encoding='utf-8'))
+        self.assertEqual(data['station/@id'],'A')
+        self.assertEqual(data['station/reading[1]/text()'],'1')
+        self.assertEqual(data['station/reading[2]/text()'],'2')
+
+    @unittest.skipUnless(importlib.util.find_spec('pymupdf'),'native PDF runtime not installed')
+    def test_blank_pdf_page_does_not_quarantine_native_text_or_start_ocr(self):
+        from bank_data.bulk_native import ocr_file
+        from unittest.mock import patch
+        import pymupdf
+        path=self.raw/'synthetic.pdf'
+        with pymupdf.open() as doc:
+            doc.new_page();page=doc.new_page();page.insert_text((72,72),'SYNTHETIC BUSINESS RECORD');doc.save(path)
+        with patch('bank_data.bulk_native.ocr_engine',side_effect=AssertionError('OCR not needed')):
+            result=ocr_file({'kind':'pdf','path':str(path),'sha256':file_hash(path)},self.work)
+        self.assertEqual([p['source'] for p in result['pages']],['blank_page','pdf_native_text'])
+        self.assertIn('SYNTHETIC BUSINESS RECORD',result['pages'][1]['text'])
+        rows=list(document_records(path,'pdf'))
+        self.assertTrue(rows);self.assertEqual({row[3]['page'] for row in rows},{2})
+
+    def test_model_results_are_assigned_by_id_even_when_reordered(self):
+        from bank_data.bulk_semantics import infer
+        from unittest.mock import Mock,patch
+        from bank_data.extract import review_result
+        records=[{'record_id':'a','cells':{}},{'record_id':'b','cells':{}}]
+        client=Mock();client.call.return_value=[{}]
+        client.content.return_value={'results':[review_result('b'),review_result('a')]}
+        with patch('bank_data.bulk_semantics.extract_request',return_value={}):
+            results,_=infer(client,records,{})
+        self.assertEqual([r['record_id'] for r in results],['a','b'])
+
+    def test_passed_inspection_does_not_become_a_penalty(self):
+        card={'filename':'合成检查结果.csv','columns':['企业名称','地址','事件内容','日期','检查结果']}
+        plan=mapping();plan['events'][0]['event_type']='administrative_penalty'
+        row={'record_id':'synthetic','cells':{'企业名称':'合成甲公司','地址':'示例路1号','事件内容':'检查','日期':'2026-01-01','检查结果':'合格'}}
+        result,_,_=apply_plan(row,card,plan)
+        self.assertEqual(result['status'],'NO_EVENT');self.assertEqual(result['events'],[])
+
+    @unittest.skipUnless(importlib.util.find_spec('duckdb'),'bulk SQL runtime not installed')
+    def test_streamed_mapping_matching_exports_and_coverage(self):
+        path=self.raw/'合成高新认定.csv'
+        path.write_text('企业名称,地址,事件内容,日期,__text_source__,__ocr_min_confidence__\n合成甲公司,示例路1号,已认定,2026-01-01,rapidocr_cpu,0.42\n合成甲公司,示例路1号,已认定,2026-02-01,pdf_native_text,1.0\n',encoding='utf-8')
+        profiles,_=scan(self.raw,self.work/'02_profiles');card=profiles[0]['cards'][0]
+        dump(self.work/'04_plans/scopes'/(card['scope_id']+'.json'),{'signature':'synthetic','plan':mapping()})
+        materialize(profiles,self.work,workers=1)
+        summary=finalize_validation(profiles,self.work)
+        self.assertEqual(summary['records'],2)
+        result=aggregate(self.work,profiles)
+        self.assertEqual(result['counts']['entities'],1)
+        self.assertEqual(result['counts']['events'],2)
+        self.assertEqual(result['counts']['record_ledger'],2)
+        self.assertTrue((self.work/'08_results/profiles.parquet').exists())
+        import duckdb
+        db=duckdb.connect(str(self.work/'07_entities/results.duckdb'),read_only=True)
+        try:
+            self.assertEqual(db.execute("SELECT count(*) FROM event_sources WHERE source_quality='OCR_UNVERIFIED' AND ocr_min_confidence=0.42").fetchone()[0],1)
+            self.assertIn('OCR_UNVERIFIED',db.execute('SELECT observed_source_quality FROM profiles').fetchone()[0])
+        finally:db.close()
+
+    @unittest.skipUnless(importlib.util.find_spec('duckdb'),'bulk SQL runtime not installed')
+    def test_header_uncertainty_survives_fact_and_profile_exports(self):
+        from bank_data.common import stable_id
+        for folder in ['one','two']:
+            path=self.raw/folder/'合成许可名单.csv';path.parent.mkdir()
+            path.write_text('客户名称,经营地址,事项结果,发生日,文书编号\n合成甲公司,示例路1号,已批准,2026-01-01,SYNTHETIC-L-001\n',encoding='utf-8')
+        profiles,_=scan(self.raw,self.work/'02_profiles')
+        profiles.sort(key=lambda p:stable_id(p['cards'][0]['sample'][0]['record_id'],0))
+        profiles[-1]['cards'][0]['quality_flags'].append('width_mismatch')
+        plan=mapping();plan['entities'][0].update(name_field='客户名称',address_field='经营地址')
+        plan['events'][0].update(event_type='qualification',date_field='发生日',document_field='文书编号',evidence_fields=['事项结果','__filename__'])
+        for profile in profiles:
+            card=profile['cards'][0];self.assertIn('header_uncertain',card['quality_flags'])
+            dump(self.work/'04_plans/scopes'/(card['scope_id']+'.json'),{'signature':'synthetic','plan':plan})
+        materialize(profiles,self.work,workers=1);finalize_validation(profiles,self.work)
+        result=aggregate(self.work,profiles)
+        import duckdb
+        db=duckdb.connect(str(self.work/'07_entities/results.duckdb'),read_only=True)
+        try:
+            self.assertIn('header_uncertain',db.execute('SELECT quality_flags FROM event_sources').fetchone()[0])
+            self.assertIn('header_uncertain',db.execute('SELECT observed_quality_flags FROM profiles').fetchone()[0])
+            self.assertEqual(db.execute('SELECT quality_flags FROM events').fetchone()[0],['header_uncertain','width_mismatch'])
+            self.assertEqual(result['counts']['events'],1);self.assertEqual(result['counts']['event_sources'],2)
+            self.assertEqual(result['record_statuses'],{'EXTRACTED':2})
+            self.assertEqual(result['processed_scopes_requiring_structural_review'],2)
+        finally:db.close()
+
+
+if __name__=='__main__':unittest.main()

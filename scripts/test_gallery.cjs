@@ -5,10 +5,10 @@ const {eventGroups, eventView, autoplayStep, loopOrder} = require('../showcase/g
 const data = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../showcase/assets/gallery-data.json'), 'utf8'));
 const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
 
-test('gallery aggregates reconcile separately within the full corpus and selected subset', () => {
+test('gallery aggregates reconcile separately within the completed full corpus', () => {
   assert.equal(data.kind, 'aggregate_notebook_gallery');
-  assert.equal(data.final_pipeline_complete, false);
-  assert.equal(data.subset.partial_only, true);
+  assert.equal(data.final_pipeline_complete, true);
+  assert.equal(data.subset.partial_only, false);
   assert.equal(data.subset.semantic_accuracy_evaluated, false);
   assert.equal(sum(data.formats, 'files'), data.corpus.logical_files);
   assert.equal(sum(data.file_space.bins, 'files'), data.corpus.logical_files);
@@ -29,10 +29,10 @@ test('public gallery exports counts and observed times without private identifie
 });
 test('refinement conserves legacy observations without summing nonadditive profile counts',()=>{
   const selected=eventView(data);
-  assert.equal(sum(selected,'count'),5031890);
+  assert.equal(sum(selected,'count'),5032506);
   assert.equal(selected.length,10);
-  assert.equal(data.taxonomy.legacy_qualification_events,5031890);
-  assert.equal(data.taxonomy.downgraded_confirmed,540317);
+  assert.equal(data.taxonomy.legacy_qualification_events,5032506);
+  assert.equal(data.taxonomy.downgraded_confirmed,540486);
   assert.ok(!data.events.some(r=>r.type==='qualification'));
   assert.equal(data.taxonomy.unique_licences,null);
   assert.equal(data.taxonomy.unique_registered_enterprises,null);

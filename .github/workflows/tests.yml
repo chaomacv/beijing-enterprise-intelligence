@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: python -m pip install -e '.[test,taxonomy]'
+      - run: python -m pip install -e '.[test,bulk,taxonomy]'
       - run: python -m unittest discover -s tests -v
       - run: bank-data demo --work-dir /tmp/bank-data-demo
       - run: python scripts/verify_local_model.py --backend rules --work-dir /tmp/bank-rule-regression

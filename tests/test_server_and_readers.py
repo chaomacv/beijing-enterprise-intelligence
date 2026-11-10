@@ -56,6 +56,18 @@ class ReaderRegressionTests(unittest.TestCase):
             path.write_bytes(b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1')
             self.assertEqual(detect(path), 'legacy_word')
 
+    def test_extensionless_csv_supports_gb18030_and_partial_utf8_probe(self):
+        with tempfile.TemporaryDirectory() as name:
+            path = Path(name) / 'no_suffix'
+            value = '企业名称,状态\n合成甲公司,已认定\n'
+            path.write_bytes(value.encode('gb18030'))
+            self.assertEqual(detect(path), 'csv')
+            # 8,192 bytes lands inside a Chinese character in this complete file.
+            value = '企业名称,状态\n' + ('合成甲公司,已认定\n' * 1000)
+            path.write_bytes(value.encode('utf-8'))
+            with self.assertRaises(UnicodeDecodeError):path.read_bytes()[:8192].decode('utf-8')
+            self.assertEqual(detect(path), 'csv')
+
 
 class FakeBackend:
     model_id = 'synthetic-test-backend'

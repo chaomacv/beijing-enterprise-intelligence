@@ -57,7 +57,7 @@
     const response=await win.fetch('assets/gallery-data.json');
     if (!response.ok) throw new Error('AggregateFetchFailed');
     const data=await response.json();
-    if (data.kind!=='aggregate_notebook_gallery' || data.final_pipeline_complete!==false) throw new Error('AggregateScopeMismatch');
+    if (data.kind!=='aggregate_notebook_gallery' || data.final_pipeline_complete!==true || data.subset.partial_only!==false) throw new Error('AggregateScopeMismatch');
     doc.querySelectorAll('.gallery-code code').forEach(block=>{
       block.innerHTML=block.textContent.split('\n').map(line=>line.trimStart().startsWith('#')?`<span class="syntax-comment">${esc(line)}</span>`:esc(line).replace(/\b(SELECT|FROM|GROUP BY|AS|if|elif|else|for|in)\b/g,'<span class="syntax-keyword">$1</span>')).join('\n');
     });

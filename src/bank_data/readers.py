@@ -13,6 +13,7 @@ READER_VERSION = 'reader-v2'
 
 
 def reader_version(kind):
+    if kind in ('pdf','docx','legacy_word','txt','text','html','htm'):return 'reader-v1-native-documents'
     return 'reader-v3-xlsx-dimensions' if kind == 'xlsx' else READER_VERSION
 
 
@@ -59,15 +60,20 @@ def detect(path):
         if path.suffix.lower() == '.doc': return 'legacy_word'
         return 'xls'
     if prefix.startswith(b'%PDF-'): return 'pdf'
+    if prefix.lstrip().lower().startswith((b'<html',b'<!doctyp')):return 'html'
+    if prefix.startswith((b'\x1f\x8b',b'7z\xbc\xaf\x27\x1c')):return 'unsupported_archive'
     if not path.suffix:
         with path.open('rb') as stream: probe = stream.read(8192).lstrip(b'\xef\xbb\xbf \r\n\t')
         if probe.startswith((b'<?xml', b'<rdf:', b'<RDF')): return 'xml'
         if probe.startswith((b'{', b'[')): return 'json'
+        if probe.lower().startswith((b'<html',b'<!doctype html')):return 'html'
         try:
-            value = probe.decode('utf-8-sig')
+            encoding = encoding_for(path)
+            # The bounded probe may end inside a multibyte character.
+            value = codecs.getincrementaldecoder(encoding)().decode(probe,final=False)
             csv.Sniffer().sniff(value, delimiters=',\t;|')
             return 'csv'
-        except (UnicodeDecodeError, csv.Error): pass
+        except (ValueError, csv.Error): pass
     return path.suffix.lower().lstrip('.')
 
 
@@ -196,5 +202,8 @@ def read_records(path, kind):
             element.clear()
         if not ordinal and nonempty:
             raise ValueError('Nonempty XML has an unrecognized record structure; review required')
+    elif kind in ('pdf','docx','legacy_word','txt','text','html','htm'):
+        from .document_readers import document_records
+        yield from document_records(path,'html' if kind=='htm' else kind)
     else:
         raise ValueError('Unsupported format; OCR/archive handling is not enabled')

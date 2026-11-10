@@ -11,7 +11,7 @@ from .prepare import source_metadata
 from .readers import READER_VERSION, detect, discover, read_records, reader_version
 
 PROFILE_VERSION = 'profile-v1-head3-middle3-tail3-reservoir5'
-KINDS = {'csv', 'xlsx', 'xls', 'json', 'jsonl', 'ndjson', 'xml', 'rdf'}
+KINDS = {'csv', 'xlsx', 'xls', 'json', 'jsonl', 'ndjson', 'xml', 'rdf','pdf','docx','legacy_word','txt','text','html','htm'}
 
 
 def profile_file(path, relative, cache_dir, retry_review=False):

@@ -1,82 +1,108 @@
+/* Zoom interaction: Mike Bostock / D3 Zoomable Sunburst, ISC.
+ * https://observablehq.com/@d3/zoomable-sunburst — see vendor/D3-LICENSE.txt.
+ */
 (function(root,factory){
-  const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;
-  if(root.document)api.mount(root).catch(()=>{root.document.getElementById('event-sunburst-detail').textContent='层级汇总读取失败，请查看数据接口。';});
+ const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;
+ if(root.document)api.mount(root).catch(()=>{const e=root.document.getElementById('event-sunburst-detail');if(e)e.textContent='层级汇总暂时无法读取，请刷新后重试。';});
 })(typeof window==='object'?window:globalThis,function(){
-  'use strict';
-  const palette=['#a997cf','#84bfba','#e8b5c8','#91b4d7','#edc88d','#a6c999','#d5b092','#a8afce','#d8c78e','#b1cdd6'];
-  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function hierarchy(data){
-    const ids=new Set(),nodes=[];
-    function visit(d,parent=null){
-      if(!d||typeof d.id!=='string'||!d.id||ids.has(d.id)||typeof d.name!=='string')throw Error('Invalid hierarchy node');
-      ids.add(d.id);const n={id:d.id,name:d.name,parent,depth:parent?parent.depth+1:0,children:[]};n.path=parent?[...parent.path,n.name]:[n.name];nodes.push(n);
-      if(d.children!==undefined&&!Array.isArray(d.children))throw Error('Invalid children');
-      n.children=(d.children||[]).map(c=>visit(c,n));
-      n.value=n.children.length?n.children.reduce((s,c)=>s+c.value,0):d.value;
-      if(!Number.isSafeInteger(n.value)||n.value<0||(d.value!==undefined&&d.value!==n.value))throw Error('Counts do not reconcile');
-      n.path=parent?[...parent.path,n.name]:[n.name];
-      return n;
-    }
-    const tree=visit(data);if(tree.value<=0)throw Error('Empty hierarchy');
-    tree.children.forEach((n,i)=>{function color(c){c.color=palette[i%palette.length];c.children.forEach(color);}color(n);});
-    function angles(n,start,end){n.x0=start;n.x1=end;let a=start;for(const c of n.children){const b=a+(end-start)*c.value/n.value;angles(c,a,b);a=b;}}
-    angles(tree,0,Math.PI*2);return {tree,nodes};
+ 'use strict';
+ const TAU=Math.PI*2,INNER=90,OUTER=282,fmt=n=>n.toLocaleString('en-US');
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+ function hierarchy(data){
+  const ids=new Set(),nodes=[];
+  function visit(d,parent=null){
+   if(!d||typeof d.id!=='string'||!d.id||ids.has(d.id)||typeof d.name!=='string')throw Error('Invalid hierarchy node');
+   ids.add(d.id);const n={id:d.id,name:d.name,parent,depth:parent?parent.depth+1:0,children:[]};
+   n.path=parent?[...parent.path,n.name]:[n.name];nodes.push(n);
+   if(d.children!==undefined&&!Array.isArray(d.children))throw Error('Invalid children');
+   n.children=(d.children||[]).map(c=>visit(c,n));n.value=n.children.length?n.children.reduce((s,c)=>s+c.value,0):d.value;
+   if(!Number.isSafeInteger(n.value)||n.value<=0||(d.value!==undefined&&d.value!==n.value))throw Error('Counts do not reconcile');return n;
   }
-  function layout(nodes,focus){
-    const descendants=nodes.filter(n=>n.depth>focus.depth&&n.depth<=focus.depth+2&&n.x0>=focus.x0-1e-10&&n.x1<=focus.x1+1e-10&&n.value>0);
-    const levels=Math.max(1,...descendants.map(n=>n.depth-focus.depth));
-    return descendants.map(n=>{const level=n.depth-focus.depth;return {id:n.id,
-      a:(n.x0-focus.x0)/(focus.x1-focus.x0)*Math.PI*2,b:(n.x1-focus.x0)/(focus.x1-focus.x0)*Math.PI*2,
-      inner:Math.sqrt(80**2+(250**2-80**2)*(level-1)/levels),outer:Math.sqrt(80**2+(250**2-80**2)*level/levels),opacity:1};});
+  const tree=visit(data);
+  function angles(n,a,b){n.x0=a;n.x1=b;let at=a;for(const c of n.children){const end=at+(b-a)*c.value/n.value;angles(c,at,end);at=end;}}
+  angles(tree,0,TAU);return {tree,nodes};
+ }
+ function project(n,focus){const span=focus.x1-focus.x0;return {
+  x0:clamp((n.x0-focus.x0)/span,0,1)*TAU,x1:clamp((n.x1-focus.x0)/span,0,1)*TAU,
+  y0:Math.max(0,n.y0-focus.depth),y1:Math.max(0,n.y1-focus.depth)};}
+ function radius(y){return Math.sqrt(INNER**2+(OUTER**2-INNER**2)*(clamp(y,1,3)-1)/2);}
+ function visible(d){return d.y0>=1&&d.y1<=3&&d.x1-d.x0>1e-9;}
+ function layout(nodes,focus){return nodes.filter(n=>n!==focus).map(n=>({n,p:project({...n,y0:n.depth,y1:n.depth+1},focus)})).filter(({p})=>visible(p)).map(({n,p})=>({id:n.id,a:p.x0,b:p.x1,inner:radius(p.y0),outer:radius(p.y1)}));}
+ async function mount(win){
+  const doc=win.document,$=id=>doc.getElementById(id),host=$('event-sunburst-chart');if(!host)return;
+  const d3=win.d3;if(!d3)throw Error('D3 unavailable');
+  async function json(file){const r=await win.fetch('assets/'+file);if(!r.ok)throw Error('Hierarchy unavailable');return r.json();}
+  const manifest=await json('event-hierarchy.json');if(manifest.schema_version!==2||!Array.isArray(manifest.modes))throw Error('Invalid manifest');
+  const cache=new Map();let sequence=0,mode,root,nodes=[],focus,filter='',svg,lookup;
+  const modes=$('event-sunburst-modes');modes.innerHTML=manifest.modes.map(m=>`<button type="button" data-sun-mode="${esc(m.id)}" aria-pressed="false"><span>${esc(m.label)}</span><b>${fmt(m.total)}</b></button>`).join('');
+  const tooltip=doc.createElement('div');tooltip.className='sunburst-tooltip';tooltip.hidden=true;
+  const ancestors=n=>n.ancestors().reverse();
+  function details(n,event){
+   const share=n.parent?n.value/n.parent.value*100:100,path=ancestors(n).map(d=>d.data.name).join(' → ');
+   $('event-sunburst-detail').textContent=`${n.data.name} · ${fmt(n.value)} ${mode.unit} · 占父级 ${share.toFixed(2)}% · ${path}`;
+   if(event?.type==='pointerenter'&&event.pointerType!=='touch'){
+    tooltip.innerHTML=`<strong>${esc(n.data.name)}</strong><b>${fmt(n.value)} <small>${esc(mode.unit)}</small></b><span>占父级 ${share.toFixed(2)}%</span><p>${esc(path)}</p>`;tooltip.hidden=false;positionTooltip(event);
+   }
   }
-  function arc(s){
-    const pt=(r,a)=>[270+r*Math.sin(a),270-r*Math.cos(a)],a=s.a,b=Math.min(s.b,a+Math.PI*2-1e-7);
-    const p=pt(s.outer,a),q=pt(s.outer,b),r=pt(s.inner,b),t=pt(s.inner,a),large=+(b-a>Math.PI);
-    return `M${p}A${s.outer},${s.outer} 0 ${large} 1 ${q}L${r}A${s.inner},${s.inner} 0 ${large} 0 ${t}Z`;
+  function positionTooltip(event){const b=host.getBoundingClientRect();tooltip.style.left=clamp(event.clientX-b.left+12,4,Math.max(4,b.width-232))+'px';tooltip.style.top=clamp(event.clientY-b.top+15,4,Math.max(4,b.height-145))+'px';}
+  function major(n){while(n.parent&&n.parent!==root)n=n.parent;return n;}
+  function selected(n){return !filter||major(n).data.id===filter;}
+  function labelVisible(d){return visible(d)&&d.x1-d.x0>.095;}
+  function labelTransform(d){const a=(d.x0+d.x1)/2*180/Math.PI,r=(radius(d.y0)+radius(d.y1))/2;return `rotate(${a-90}) translate(${r},0) rotate(${a<180?0:180})`;}
+  function navigation(){
+   $('event-sunburst-breadcrumb').innerHTML=ancestors(focus).map(n=>`<button type="button" data-sun-crumb="${esc(n.data.id)}">${esc(n.data.name)}</button>`).join('<span aria-hidden="true">›</span>');
+   $('event-sunburst-table').innerHTML=(focus.children||[]).filter(selected).map(n=>`<tr><td><button type="button" data-sun-table="${esc(n.data.id)}">${esc(n.data.name)}${n.children?' ↗':''}</button></td><td>${fmt(n.value)}</td><td>${(n.value/focus.value*100).toFixed(2)}%</td></tr>`).join('');
+   const center=svg.select('[data-sun-up]');center.attr('aria-label',focus.parent?'返回上一级':'总览，点击扇区探索');
+   center.select('.sunburst-center-name').text(focus.data.name.length>9?focus.data.name.slice(0,8)+'…':focus.data.name);
+   center.select('.sunburst-center-count').text(fmt(focus.value));center.select('.sunburst-center-hint').text(focus.parent?'点击中心返回':mode.unit+' · 点击扇区探索');
+   center.select('title').text(focus.data.name+'：'+fmt(focus.value)+' '+mode.unit);host.dataset.focus=focus.data.id;host.dataset.focusCount=focus.value;details(focus);
   }
-  async function mount(win){
-    const doc=win.document,$=id=>doc.getElementById(id),host=$('event-sunburst-chart');if(!host)return;
-    const response=await win.fetch('assets/event-hierarchy.json');if(!response.ok)throw Error('Hierarchy unavailable');
-    const data=await response.json(),{tree,nodes}=hierarchy(data.tree),lookup=new Map(nodes.map(n=>[n.id,n]));
-    let focus=tree,filter='',frame=0,current=new Map();const fmt=n=>n.toLocaleString('en-US');
-    $('event-sunburst-filter').innerHTML='<option value="">全部十类</option>'+tree.children.map(n=>`<option value="${esc(n.id)}">${esc(n.name)}</option>`).join('');
-    function details(n){
-      const parent=n.parent||n;
-      $('event-sunburst-detail').textContent=`${n.name} · ${fmt(n.value)} 条 · 占父级 ${(n.value/parent.value*100).toFixed(2)}% · ${n.path.join(' → ')}${!n.children.length?' · 暂无已核实下级，未开放下钻':''}`;
-    }
-    function paint(shapes){
-      current=new Map(shapes.map(s=>[s.id,s]));let body='';
-      for(const s of shapes){
-        const n=lookup.get(s.id),major=n.path[1],selected=!filter||lookup.get(filter).name===major;
-        const tip=`${n.name}\n记录数量：${fmt(n.value)}\n占父级：${(n.value/n.parent.value*100).toFixed(2)}%\n${n.path.join(' → ')}`;
-        body+=`<path d="${arc(s)}" fill="${n.color}" fill-opacity="${s.opacity*(selected?Math.max(.55,1-(n.depth-1)*.12):.13)}" stroke="white" stroke-width=".6" data-sun-node="${esc(n.id)}" tabindex="0" role="${n.children.length?'button':'img'}" aria-label="${esc(tip)}${n.children.length?'，点击展开':'，下级尚未开放'}"><title>${esc(tip)}</title></path>`;
-        if(selected&&s.b-s.a>.13&&s.opacity>.6){const angle=(s.a+s.b)/2,r=(s.inner+s.outer)/2,x=270+r*Math.sin(angle),y=270-r*Math.cos(angle),rotation=angle*180/Math.PI-90+(angle>Math.PI?180:0);
-          body+=`<text x="${x}" y="${y}" transform="rotate(${rotation} ${x} ${y})" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#354052" pointer-events="none">${esc(n.name)}</text>`;}
-      }
-      body+=`<g data-sun-up="true" role="button" tabindex="0" aria-label="${focus.parent?'返回上一级':'当前为根级'}"><circle cx="270" cy="270" r="79" fill="#fafbfe"/><text x="270" y="263" text-anchor="middle" font-size="23" fill="#354052">${fmt(focus.value)}</text><text x="270" y="286" text-anchor="middle" font-size="12" fill="#718096">${focus.parent?'返回上一级':'当前范围事件观察'}</text></g>`;
-      host.innerHTML=`<svg viewBox="0 0 540 540" role="group" aria-label="按真实事件观察数分区的旭日图">${body}</svg>`;
-    }
-    function render(animate=true){
-      win.cancelAnimationFrame(frame);const target=layout(nodes,focus),previous=current;
-      $('event-sunburst-breadcrumb').innerHTML=focus.path.map((name,i)=>{let n=focus;while(n.depth>i)n=n.parent;return `<button type="button" data-sun-crumb="${esc(n.id)}">${esc(name)}</button>`;}).join('<span aria-hidden="true">›</span>');
-      $('event-sunburst-table').innerHTML=nodes.filter(n=>n.parent===focus&&(!filter||n.path[1]===lookup.get(filter).name)).map(n=>`<tr><td>${esc(n.name)}</td><td>${fmt(n.value)}</td><td>${(n.value/focus.value*100).toFixed(2)}%</td></tr>`).join('');
-      const start=win.performance.now(),duration=animate&&!win.matchMedia('(prefers-reduced-motion: reduce)').matches?550:0;
-      function tick(now){const t=duration?Math.min(1,(now-start)/duration):1,e=1-(1-t)**3;
-        paint(target.map(s=>{const old=previous.get(s.id)||{...s,b:s.a,opacity:0};return Object.fromEntries(Object.entries(s).map(([k,v])=>[k,typeof v==='number'?old[k]+(v-old[k])*e:v]));}));
-        if(t<1)frame=win.requestAnimationFrame(tick);
-      }tick(start);details(focus);
-    }
-    function activate(event){
-      const up=event.target.closest('[data-sun-up]'),crumb=event.target.closest('[data-sun-crumb]'),sector=event.target.closest('[data-sun-node]');
-      if(up){focus=focus.parent||tree;render();}
-      else if(crumb){focus=lookup.get(crumb.dataset.sunCrumb);render();}
-      else if(sector){const n=lookup.get(sector.dataset.sunNode);if(n.children.length){focus=n;render();}else details(n);}
-    }
-    host.addEventListener('click',activate);host.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate(e);}});
-    for(const type of ['pointerover','focusin'])host.addEventListener(type,e=>{const p=e.target.closest('[data-sun-node]');if(p)details(lookup.get(p.dataset.sunNode));});
-    $('event-sunburst-breadcrumb').addEventListener('click',activate);
-    $('event-sunburst-filter').addEventListener('change',e=>{filter=e.target.value;focus=tree;render(false);});
-    render(false);host.dataset.ready='true';
+  function zoom(n,animate=true){
+   if(!n.children){details(n);return;}
+   svg.interrupt('zoom');focus=n;tooltip.hidden=true;for(const d of nodes)d.target=project(d,focus);
+   const shown=nodes.filter(d=>d!==root&&(visible(d.current)||visible(d.target)));
+   const activate=(e,d)=>{if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;if(e.type==='keydown')e.preventDefault();zoom(d);};
+   const paths=svg.select('.sunburst-sectors').selectAll('path').data(shown,d=>d.data.id).join('path')
+    .attr('data-sun-node',d=>d.data.id).attr('role','button').attr('aria-label',d=>`${d.data.name}，${fmt(d.value)}${mode.unit}，${d.children?'点击展开下级':'末层分类'}`)
+    .attr('fill',d=>d.color).on('click',activate).on('keydown',activate).on('pointerenter',(e,d)=>details(d,e)).on('pointermove',positionTooltip).on('pointerleave',()=>{tooltip.hidden=true;}).on('focus',(e,d)=>details(d));
+   paths.selectAll('title').data(d=>[d]).join('title').text(d=>ancestors(d).map(n=>n.data.name).join(' → ')+'\n'+fmt(d.value)+' '+mode.unit+'\n占父级 '+(d.value/d.parent.value*100).toFixed(2)+'%');
+   const labels=svg.select('.sunburst-labels').selectAll('text').data(shown,d=>d.data.id).join('text').attr('dy','.35em').text(d=>d.data.name.length>11?d.data.name.slice(0,10)+'…':d.data.name);
+   const arc=d3.arc().startAngle(d=>d.x0).endAngle(d=>d.x1).padAngle(d=>Math.min((d.x1-d.x0)/2,.004)).padRadius(180).innerRadius(d=>radius(d.y0)).outerRadius(d=>radius(d.y1));
+   function paint(){paths.attr('d',d=>arc(d.current)).attr('fill-opacity',d=>visible(d.current)?(selected(d)?1:.14):0)
+    .attr('pointer-events',d=>visible(d.target)?'auto':'none').attr('tabindex',d=>visible(d.target)?0:-1).attr('aria-hidden',d=>visible(d.target)?null:'true').style('cursor',d=>d.children?'pointer':'default');
+    labels.attr('transform',d=>labelTransform(d.current)).attr('fill-opacity',d=>labelVisible(d.current)&&selected(d)?1:0);}
+   navigation();const duration=animate&&!win.matchMedia('(prefers-reduced-motion: reduce)').matches?750:0;
+   if(duration){const pairs=shown.map(d=>[d,d3.interpolate(d.current,d.target)]);svg.transition('zoom').duration(duration).tween('partition',()=>t=>{for(const [d,i] of pairs)d.current=i(t);paint();});}
+   else{for(const d of nodes)d.current={...d.target};paint();}
   }
-  return {hierarchy,layout,arc,mount};
+  async function setMode(id){
+   const next=manifest.modes.find(m=>m.id===id);if(!next)throw Error('Unknown mode');const token=++sequence;host.setAttribute('aria-busy','true');tooltip.hidden=true;
+   try{
+    if(!cache.has(id))cache.set(id,await json(next.file));if(token!==sequence)return;
+    const data=cache.get(id);hierarchy(data.tree);root=d3.hierarchy(data.tree).sum(d=>d.children?0:d.value).sort((a,b)=>b.value-a.value);
+    if(root.value!==next.total)throw Error('Mode count mismatch');d3.partition().size([TAU,root.height+1])(root);nodes=root.descendants();mode=next;focus=root;filter='';lookup=new Map(nodes.map(d=>[d.data.id,d]));
+    const colors=d3.quantize(t=>d3.interpolateRgb(d3.interpolateRainbow(t),'#fff')(.44),root.children.length+1);
+    root.children.forEach((n,i)=>{for(const d of n.descendants())d.color=d3.interpolateRgb(colors[i],'#fff')(Math.min(.28,(d.depth-1)*.1));});
+    for(const d of nodes)d.current={x0:d.x0,x1:d.x1,y0:d.y0,y1:d.y1};if(svg)svg.interrupt('zoom');host.replaceChildren();
+    svg=d3.select(host).append('svg').attr('viewBox',[-300,-300,600,600]).attr('role','group').attr('aria-label',mode.label+'多层级旭日图');
+    svg.append('g').attr('class','sunburst-sectors');svg.append('g').attr('class','sunburst-labels').attr('pointer-events','none').attr('text-anchor','middle');
+    const center=svg.append('g').attr('data-sun-up','true').attr('role','button').attr('tabindex',0).on('click',()=>zoom(focus.parent||root)).on('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();zoom(focus.parent||root);}});
+    center.append('circle').attr('r',INNER-1).attr('fill','#fff');center.append('title');
+    center.append('text').attr('class','sunburst-center-name').attr('text-anchor','middle').attr('y',-17);
+    center.append('text').attr('class','sunburst-center-count').attr('text-anchor','middle').attr('y',14);
+    center.append('text').attr('class','sunburst-center-hint').attr('text-anchor','middle').attr('y',37);host.appendChild(tooltip);
+    for(const b of modes.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.sunMode===id));
+    $('event-sunburst-filter').innerHTML='<option value="">全部'+esc(mode.levels[0])+'</option>'+root.children.map(n=>`<option value="${esc(n.data.id)}">${esc(n.data.name)}</option>`).join('');
+    $('event-sunburst-levels').textContent=mode.levels.join(' → ');$('event-sunburst-note').textContent=mode.note;$('event-sunburst-unit').textContent=mode.unit==='条'?'记录数':'文件数';
+    zoom(root,false);host.dataset.mode=id;host.dataset.ready='true';
+   }catch(e){if(token===sequence)$('event-sunburst-detail').textContent='该模式读取失败，请重新选择模式重试。';throw e;}
+   finally{if(token===sequence)host.setAttribute('aria-busy','false');}
+  }
+  modes.addEventListener('click',e=>{const b=e.target.closest('[data-sun-mode]');if(b)setMode(b.dataset.sunMode).catch(()=>{});});
+  $('event-sunburst-breadcrumb').addEventListener('click',e=>{const b=e.target.closest('[data-sun-crumb]');if(b)zoom(lookup.get(b.dataset.sunCrumb));});
+  $('event-sunburst-table').addEventListener('click',e=>{const b=e.target.closest('[data-sun-table]');if(b)zoom(lookup.get(b.dataset.sunTable));});
+  $('event-sunburst-filter').addEventListener('change',e=>{filter=e.target.value;zoom(root,false);});await setMode(manifest.default_mode);
+ }
+ return {hierarchy,layout,project,radius,visible,mount};
 });
