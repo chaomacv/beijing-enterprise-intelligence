@@ -10,7 +10,6 @@
 })(typeof window === 'object' ? window : globalThis, function () {
   'use strict';
   const colors = ['#4269d0', '#efb118', '#ff725c', '#6cc5b0', '#a463f2', '#ff8ab7', '#97bbf5', '#b59a6b', '#60a8a4', '#b5c456', '#9194a5'];
-  const statusLabels = {PROFILED: '已解析', CONVERTED: '已转换', REVIEW: '待复核', CONTAINER: '容器', EMPTY: '空文件', COMPONENT: '配套组件'};
   const eventStates = {confirmed: '来源标为 confirmed', proposed: '拟议', unknown: '阶段未明', removed: '已移出', revoked: '已撤销'};
   const number = n => n.toLocaleString('en-US');
   const percent = (part, total) => (part / total * 100).toFixed(1) + '%';
@@ -47,11 +46,6 @@
     const shift=position-Math.floor(order.length/2), pivot=(shift+order.length)%order.length;
     return {shift, order:order.slice(pivot).concat(order.slice(0,pivot))};
   }
-  function sector(cx,cy,inner,outer,start,end) {
-    const point=(r,a)=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
-    const a=point(outer,start), b=point(outer,end), c=point(inner,end), d=point(inner,start), large=end-start>Math.PI?1:0;
-    return `M${a}A${outer},${outer} 0 ${large} 1 ${b}L${c}A${inner},${inner} 0 ${large} 0 ${d}Z`;
-  }
   async function mount(win) {
     const doc=win.document, $=id=>doc.getElementById(id);
     const response=await win.fetch('assets/gallery-data.json');
@@ -61,30 +55,6 @@
     doc.querySelectorAll('.gallery-code code').forEach(block=>{
       block.innerHTML=block.textContent.split('\n').map(line=>line.trimStart().startsWith('#')?`<span class="syntax-comment">${esc(line)}</span>`:esc(line).replace(/\b(SELECT|FROM|GROUP BY|AS|if|elif|else|for|in)\b/g,'<span class="syntax-keyword">$1</span>')).join('\n');
     });
-
-    // Hierarchy: format totals and their parser-status children share one denominator.
-    const formats=new Map();
-    for(const row of data.formats) {
-      if(!formats.has(row.format)) formats.set(row.format,{name:row.format,count:0,children:[]});
-      const f=formats.get(row.format);f.count+=row.files;f.children.push(row);
-    }
-    const groups=[...formats.values()].sort((a,b)=>b.count-a.count), totalFiles=groups.reduce((n,g)=>n+g.count,0);
-    let angle=-Math.PI/2, rings='';
-    groups.forEach((group,index)=>{
-      const end=angle+group.count/totalFiles*Math.PI*2, color=colors[index%colors.length];
-      rings+=`<path d="${sector(240,205,59,130,angle,end)}" fill="${color}" stroke="white" stroke-width="1.2"><title>${esc(group.name)}：${number(group.count)} 个逻辑文件</title></path>`;
-      let childAngle=angle;
-      group.children.forEach((child,j)=>{
-        const childEnd=childAngle+child.files/totalFiles*Math.PI*2;
-        rings+=`<path d="${sector(240,205,132,190,childAngle,childEnd)}" fill="${color}" opacity="${.5+j*.08}" stroke="white" stroke-width="1"><title>${esc(group.name+' / '+statusLabels[child.status])}：${number(child.files)}</title></path>`;
-        childAngle=childEnd;
-      });angle=end;
-    });
-    rings+=text(240,202,number(totalFiles),'text-anchor="middle" class="svg-big"')+text(240,225,'逻辑文件','text-anchor="middle" class="svg-muted"');
-    $('gallery-sunburst').innerHTML=svg(rings,'全批逻辑文件按格式与解析状态分组的层级图',480,410);
-    $('gallery-file-total').textContent=number(totalFiles);
-    $('gallery-format-legend').innerHTML=groups.map((g,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(g.name)}<b>${number(g.count)}</b></span>`).join('');
-    $('gallery-format-detail').textContent=`${groups[0].name} 占逻辑文件的 ${percent(groups[0].count,totalFiles)}；JSONL 包含派生结果，各格式不等同于原附件数量。`;
 
     function renderEvents() {
       const state=$('gallery-event-stage').value, log=$('gallery-event-log').checked;

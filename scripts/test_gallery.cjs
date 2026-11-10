@@ -77,14 +77,14 @@ test('execution timeline uses ordered actual observations, not fabricated unifor
   }
   assert.ok(new Set(intervals).size>1);
 });
-test('gallery mount targets exist and all ten slides have accessible navigation controls', () => {
+test('gallery mount targets exist and all nine slides have accessible navigation controls', () => {
   const path=require('node:path');
   const html=fs.readFileSync(path.join(__dirname,'../showcase/index.html'),'utf8');
   const js=fs.readFileSync(path.join(__dirname,'../showcase/gallery.js'),'utf8');
   const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
   for(const match of js.matchAll(/\$\('([a-z0-9-]+)'\)/g)) assert.ok(ids.has(match[1]),match[1]);
-  assert.equal([...html.matchAll(/data-notebook="\d+"/g)].length,10);
-  assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,10);
+  assert.equal([...html.matchAll(/data-notebook="\d+"/g)].length,9);
+  assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,9);
   assert.ok(html.includes('src="gallery.js"'));
   assert.ok(html.includes('aria-roledescription="轮播"'));
 });
@@ -122,8 +122,8 @@ test('catalog totals, small categories and sampled links retain the true fixed i
 test('the first six notebooks follow the requested narrative and remaining ones retain order',()=>{
  const html=fs.readFileSync(require('node:path').join(__dirname,'../showcase/index.html'),'utf8');
  const keys=[...html.matchAll(/data-card-key="([^"]+)"/g)].map(m=>m[1]);
- assert.deepEqual(keys,['sources','acquisition','events','hierarchy','methods','dedup','formats','network','portrait','timeline']);
+ assert.deepEqual(keys,['sources','acquisition','events','hierarchy','methods','dedup','network','portrait','timeline']);
  const labels=[...html.matchAll(/class="cell-number">\[(\d+)\]/g)].map(m=>m[1]);
- assert.deepEqual(labels,Array.from({length:10},(_,i)=>String(i+1).padStart(2,'0')));
- assert.ok(html.includes('统计原始附件、压缩包展开成员及格式转换产物的文件类型与数量占比。'));
+ assert.deepEqual(labels,Array.from({length:9},(_,i)=>String(i+1).padStart(2,'0')));
+ assert.ok(!html.includes('id="gallery-sunburst"')); 
 });
