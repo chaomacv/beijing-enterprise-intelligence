@@ -31,13 +31,22 @@
 2. 识别 CSV、Excel、JSON/JSONL、RDF/XML。识别“扩展名是 CSV、实际是 Excel”的文件，读取全部工作表。
 3. 流式扫描全目录，生成首/中/尾与固定种子随机样本的文件卡片；筛选前不建立原始记录事实库。
 4. 生成按完整记录划分的准备块；使用本地模型时，再以实际 tokenizer 和聊天模板检查输入/输出预算。
-5. 用本地模型筛选文件；保留文件的完整记录进入 SQLite，再逐块抽取主体和事件。验证原文引用、主体索引与逐条 ID 覆盖；截断或验证失败时递归缩小批次，单条仍失败则进入复核。
+5. 用本地模型筛选并生成字段方案，结构化表由程序逐行执行，复杂内容分组后抽取。小样本入口使用 SQLite，全量入口使用流式 JSONL 和 DuckDB；原文引用、主体索引及记录覆盖分别验证，不可靠内容进入复核。
 6. 使用信用代码校验、名称和地址做保守实体关联；名称相似只生成复核候选，不直接合并。
 7. 导出事实事件、标签、画像、匹配依据、复核队列和来源索引。保留 proposed/confirmed/removed/revoked/unknown 状态，不生成授信评分。
 
 当前版本 **v0.3.0**。本批已用本地 Qwen3-8B 原始 BF16 完成全量流程，采用流式 JSONL、字段方案执行、精确内容复用及 DuckDB 聚合。[全量流程](docs/full_corpus.md) · [最终结果](docs/full_run_results.md) · [独立评测边界](docs/validation.md)
 
 许可相关宽类已在全量结果中细分为十类，修正后的画像标签以 `classified_profile_tags.parquet` 为准；原始分类保留作基线。
+
+全量处理入口如下，依赖、模型服务及系统读取工具见[部署与全量流程](docs/full_corpus.md)。同一工作目录支持兼容检查后的续跑；本批已完成目录无需再次运行。
+
+```bash
+python -m bank_data.bulk_run \
+  --input /private/raw --work-dir /private/full_run \
+  --model YOUR_LOCAL_MODEL_ID --tokenizer-dir /private/models/Qwen3-8B \
+  --endpoints http://127.0.0.1:18080/v1 --workers 6
+```
 
 ## 安装
 
@@ -50,7 +59,7 @@ python3.10 -m venv .venv
 
 文件准备和规则 Demo 不需要 GPU、浏览器、平台登录或云 API。
 
-## v0.2 完整流程入口
+## 小样本 workflow 入口
 
 先生成文件卡片，再由本地模型筛选；只有保留文件的记录进入事实库。阶段结果与缓存支持重复运行。
 
@@ -126,6 +135,8 @@ tokenizer 和权重只从本地读取，不下载远程代码。客户端只允�
 ```
 
 ## 最终输出与核验
+
+下面的 JSON／SQLite 文件说明对应小样本 workflow。全量入口的 JSONL、Parquet、DuckDB 和分类修正文件见[最终结果与文件索引](docs/full_run_results.md)。
 
 `record_results.json` 给每条已解析记录一个处理结果；`FILE_EXCLUDED`、`REVIEW` 和 `NO_EVENT` 含义不同。`run_summary.json` 的状态覆盖检查只说明台账完整，不代表语义召回率为 100%。
 
