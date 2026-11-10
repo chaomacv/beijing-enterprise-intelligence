@@ -19,14 +19,14 @@
  async function mount(win){
   const doc=win.document,$=id=>doc.getElementById(id),host=$('source-chart');if(!host)return;
   const response=await win.fetch('assets/source-overview.json');if(!response.ok)throw Error('Catalog unavailable');
-  const data=validate(await response.json()),top=26,bottom=263,left=43,width=662,step=width/data.themes.length,max=1400;
-  let body='<text x="3" y="12" class="source-axis-label">↑ 数据集数</text>';
-  for(let value=0;value<=max;value+=350){const y=bottom-value/max*(bottom-top);body+=`<path d="M${left} ${y}H710" stroke="#edf0f4"/><text x="${left-8}" y="${y+4}" text-anchor="end" class="source-tick">${fmt(value)}</text>`;}
+  const data=validate(await response.json()),top=26,bottom=335,left=43,width=662,step=width/data.themes.length,max=1250;
+  let body='<text x="3" y="12" class="source-axis-label">↑ 数据来源数</text>';
+  for(let value=0;value<=max;value+=250){const y=bottom-value/max*(bottom-top);body+=`<path d="M${left} ${y}H710" stroke="#edf0f4"/><text x="${left-8}" y="${y+4}" text-anchor="end" class="source-tick">${fmt(value)}</text>`;}
   data.themes.forEach((theme,index)=>{
    const x=left+index*step+3,h=theme.count/max*(bottom-top),y=bottom-h;
-   body+=`<g data-source-bar="${index}" role="button" tabindex="0" aria-label="${esc(theme.name)}，${fmt(theme.count)}个数据集，查看${theme.samples.length}个来源下载页"><rect class="source-column" x="${x}" y="${y}" width="${step-6}" height="${h}"/><rect x="${left+index*step}" y="${top}" width="${step}" height="${bottom-top}" fill="transparent"/><text x="${x+(step-6)/2}" y="${y-6}" text-anchor="middle" class="source-count">${theme.count}</text><text x="${x+8}" y="281" transform="rotate(55 ${x+8} 281)" class="source-category-label">${esc(theme.name)}</text><title>${esc(theme.name)}：${fmt(theme.count)}个数据集</title></g>`;
+   body+=`<g data-source-bar="${index}" role="button" tabindex="0" aria-label="${esc(theme.name)}，${fmt(theme.count)}个数据集，查看${theme.samples.length}个来源下载页"><rect class="source-column" x="${x}" y="${y}" width="${step-6}" height="${h}"/><rect x="${left+index*step}" y="${top}" width="${step}" height="${bottom-top}" fill="transparent"/><text x="${x+(step-6)/2}" y="${y-6}" text-anchor="middle" class="source-count">${theme.count}</text><text x="${x+8}" y="353" transform="rotate(55 ${x+8} 353)" class="source-category-label">${esc(theme.name)}</text><title>${esc(theme.name)}：${fmt(theme.count)}个数据集</title></g>`;
   });
-  host.innerHTML=`<svg viewBox="0 0 720 390" role="group" aria-label="20个官网主题的来源数据集数量；悬停、点击或键盘选择查看来源">${body}</svg>`;
+  host.innerHTML=`<svg viewBox="0 0 720 462" role="group" aria-label="20个官网主题的数据来源数，按数据集计；悬停、点击或键盘选择查看来源">${body}</svg>`;
   $('source-count').textContent=fmt(data.dataset_count);$('source-attachments').textContent=fmt(data.batch.attachments);$('source-records').textContent=(data.batch.known_logical_records/10000).toFixed(0)+'万';
   $('source-theme-select').innerHTML=data.themes.map((t,i)=>`<option value="${i}">${esc(t.name)} (${fmt(t.count)})</option>`).join('');
   let current=-1;
