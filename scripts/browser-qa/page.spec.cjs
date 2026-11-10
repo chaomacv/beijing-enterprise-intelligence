@@ -341,6 +341,7 @@ test('lineage routing returns to original sources while observed time remains a 
  await page.locator('[data-gallery-page="8"]').click();await page.locator('[data-notebook="8"] .notebook-reader-open').click();
  const chart=page.locator('#gallery-timeline-chart');await expect(chart).toHaveAttribute('data-ready','true');
  await expect(chart).toHaveAttribute('data-mode','flow');await expect(page.locator('[data-lineage-point]')).toHaveCount(7);
+ await page.locator('[data-lineage-point="3"]').focus();
  await expect(chart).toHaveAttribute('data-selected-count','388349');
  await expect(page.locator('#lineage-info')).toContainText('1,052,270');
  const representative=page.locator('[data-lineage-point="3"]');

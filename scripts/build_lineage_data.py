@@ -87,7 +87,8 @@ def build(assets):
     ]
     result = {'schema_version': 1, 'kind': 'completed_batch_lineage',
               'source_commit': final['source_commit'], 'completed_at': final['completed_at'],
-              'source_sha256': {name: hashlib.sha256((assets / name).read_bytes()).hexdigest()
+              'hash_basis': 'utf8_lf_newlines',
+              'source_sha256': {name: hashlib.sha256((assets / name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
                                 for name in ['final-results.json', 'run-summary.json', 'gallery-data.json']},
               'counts': c, 'outcomes': outcomes, 'equations': equations,
               'flow_axis': 'processing_stage_order_not_elapsed_time',

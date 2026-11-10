@@ -70,7 +70,7 @@ D3 7.9.0为ISC许可；d3-force-3d 3.0.6及其binarytree／octree依赖为MIT许
 
 ## 数量去向与九步流程
 
-09卡片、九步数量表和步骤详情共用`assets/data-lineage.json`。由`scripts/build_lineage_data.py`读取本批已完成的`final-results.json`、`run-summary.json`与原始进度观测生成，保留源文件SHA-256和三组数量守恒式。
+09卡片、九步数量表和步骤详情共用`assets/data-lineage.json`。由`scripts/build_lineage_data.py`读取本批已完成的`final-results.json`、`run-summary.json`与原始进度观测生成，保留源文件SHA-256（UTF-8/LF）和三组数量守恒式。
 
 数据去向图横轴是处理阶段顺序，节点数量依次为43,653,625→15,861,277→1,440,619→388,349→1,440,619→15,861,277→43,653,625；回填、合并与最终覆盖对账恢复来源范围。默认对数刻度，明确标注，可切换线性刻度。每点显示自身计量、分支数量、方法与去向，不伪装成同一总体持续删减。
 

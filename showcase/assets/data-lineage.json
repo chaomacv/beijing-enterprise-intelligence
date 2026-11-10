@@ -3,10 +3,11 @@
   "kind": "completed_batch_lineage",
   "source_commit": "57748c4c4086432c4b129a0fee059018a1d6a4c1",
   "completed_at": "2026-11-10T05:56:48.093902+08:00",
+  "hash_basis": "utf8_lf_newlines",
   "source_sha256": {
-    "final-results.json": "5d0b6253dc84d07f9ea67f86f015547b6695fe8d02d0adf86386123ed36334d0",
-    "run-summary.json": "e1f4c73a1f78994abd80bb1543f55fbbb2d863dd2082641c7ccb574a0e07e3bd",
-    "gallery-data.json": "925c96ebf66cc853bb5826c47a7fe68142cc0e737950ffe6476f9fac62469828"
+    "final-results.json": "1f3bfc38f7974f2974cf3b6c33674ed8dd8f120f92ad7c46a39b116db10acac4",
+    "run-summary.json": "720966b82215fbb6f27ad0e9c68c99c00cd878991f3bdc84ac3b35c5f5fd5580",
+    "gallery-data.json": "38250536f4cee5c76287c199fd04a8086493c22d8cf2d4fe6fcde21b21667314"
   },
   "counts": {
     "known": 43653625,

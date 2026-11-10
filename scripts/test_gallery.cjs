@@ -133,7 +133,8 @@ test('lineage conserves every routing branch and matches its exact source export
  const path=require('node:path'),crypto=require('node:crypto');
  const lineage=require('../showcase/assets/data-lineage.json'),model=require('../showcase/lineage.js');
  assert.equal(model.validate(lineage),lineage);
- for(const [name,digest] of Object.entries(lineage.source_sha256))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname,'../showcase/assets',name))).digest('hex'),digest);
+ assert.equal(lineage.hash_basis,'utf8_lf_newlines');
+ for(const [name,digest] of Object.entries(lineage.source_sha256))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname,'../showcase/assets',name),'utf8').replace(/\r\n/g,'\n')).digest('hex'),digest);
  const final=require('../showcase/assets/final-results.json');
  assert.equal(lineage.counts.known,final.input.known_logical_records);
  assert.equal(lineage.counts.retained,final.counts.record_ledger);

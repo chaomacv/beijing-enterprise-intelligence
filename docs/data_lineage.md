@@ -36,4 +36,4 @@
 - 时间进度视图只使用真实推理观测点，以388,349为内容代表分母。横轴按真实、非均匀的时间间隔绘制；末点为最终验收时已全部完成的快照，不冒充精确推理结束时刻。
 - 悬停圆点查看数量、方法和去向注释；触屏可点击，也可使用键盘方向键与滑块定位。没有核实的阶段完成时刻不补造。
 
-接口由`python scripts/build_lineage_data.py`从`final-results.json`、`run-summary.json`和`gallery-data.json`生成，包含源文件SHA-256、三组守恒关系、九步文件索引及原始进度观测。未增加模型推理或修改原始数据。
+接口由`python scripts/build_lineage_data.py`从`final-results.json`、`run-summary.json`和`gallery-data.json`生成，包含源文件SHA-256（UTF-8/LF）、三组守恒关系、九步文件索引及原始进度观测。未增加模型推理或修改原始数据。
