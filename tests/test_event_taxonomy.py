@@ -82,7 +82,8 @@ class RefinementTests(unittest.TestCase):
             summary=refine(source,base/'corrected')
             self.assertEqual(before,hashlib.sha256(source.read_bytes()).hexdigest())
             self.assertEqual(summary['total_events'],10)
-            self.assertEqual(summary['legacy_qualification_events'],9)
+            self.assertNotIn('legacy_qualification_events',summary)
+            self.assertEqual(summary['category_count'],len({x['event_type'] for x in summary['category_status']}))
             self.assertIsNone(summary['unique_licences'])
             db=duckdb.connect(str(base/'corrected/classification.duckdb'),read_only=True)
             corrected={r[0]:r[1:] for r in db.execute('SELECT event_id,event_type,status,current_validity FROM classified_events').fetchall()}

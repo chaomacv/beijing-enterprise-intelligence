@@ -25,9 +25,8 @@
     }
     return [...groups.values()].sort((a,b) => b.count - a.count || a.type.localeCompare(b.type));
   }
-  function eventView(data, state='all', scope='refined', metric='events') {
-    const categories=new Set(data.taxonomy.refined_types);
-    const groups=eventGroups(data.events,state).filter(r=>scope==='all' || categories.has(r.type));
+  function eventView(data, state='all', metric='events') {
+    const groups=eventGroups(data.events,state);
     if(metric==='profiles') {
       const counts=new Map(state==='all' ? data.taxonomy.category_profiles.map(r=>[r.type,r.count]) :
         data.events.filter(r=>r.status===state).map(r=>[r.type,r.associated_profiles]));
@@ -58,8 +57,8 @@
 
     function renderEvents() {
       const state=$('gallery-event-stage').value, log=$('gallery-event-log').checked;
-      const scope=$('gallery-event-scope').value, metric=$('gallery-event-metric').value;
-      const rows=eventView(data,state,scope,metric), total=rows.reduce((n,r)=>n+r.count,0), max=Math.max(1,...rows.map(r=>r.count));
+      const metric=$('gallery-event-metric').value;
+      const rows=eventView(data,state,metric), total=rows.reduce((n,r)=>n+r.count,0), max=Math.max(1,...rows.map(r=>r.count));
       const height=Math.max(340,rows.length*29+65), floor=height-48;
       const width=Math.max(420,Math.min(720,$('gallery-event-chart').clientWidth)), left=120, plot=width-left-94, ticks=width<500?2:4;
       let body='';const scale=n=>(log?Math.log10(1+n)/Math.log10(1+max):n/max)*plot;
@@ -72,15 +71,15 @@
         const y=27+i*29;
         body+=text(left-13,y+14,row.label,'text-anchor="end" class="svg-label"')+`<rect x="${left}" y="${y}" width="${scale(row.count)}" height="19" fill="${colors[i%colors.length]}"><title>${esc(row.label)}：${number(row.count)}</title></rect>`+text(left+plot+12,y+14,number(row.count),'class="svg-tick"');
       });
-      $('gallery-event-chart').innerHTML=svg(body,`${scope==='refined'?'原许可相关记录细分':'全部细分事件'}，${metric==='profiles'?'关联画像数':'事件观察数'}，${state==='all'?'全部阶段':eventStates[state]}，横轴${log?'为 log10(1+数量)':'为实际数量'}`,width,height);
+      $('gallery-event-chart').innerHTML=svg(body,`全部事件分类，${metric==='profiles'?'关联画像数':'事件观察数'}，${state==='all'?'全部阶段':eventStates[state]}，横轴${log?'为 log10(1+数量)':'为实际数量'}`,width,height);
       $('gallery-event-table').innerHTML=rows.map(r=>`<tr><td>${esc(r.label)}</td><td>${number(r.count)}</td><td>${esc(state==='all'?'全部':eventStates[state])}</td></tr>`).join('');
       $('gallery-event-count-label').textContent=metric==='profiles'?'关联画像数':'事件观察数';
       $('gallery-event-insight').textContent=metric==='profiles'?'各类别、阶段的关联画像可能重叠，不能相加为企业总数；画像仍包含临时身份。':
         total?`${rows[0].label}占当前选择的 ${percent(rows[0].count,total)} · 共 ${number(total)} 条事件观察。记录数不能解释为独立证照数。`:'这一阶段没有观察条目。';
     }
-    for(const id of ['gallery-event-stage','gallery-event-log','gallery-event-scope','gallery-event-metric'])$(id).addEventListener('change',renderEvents);
-    $('gallery-taxonomy-total').textContent=number(data.taxonomy.legacy_qualification_events);
-    $('gallery-taxonomy-downgraded').textContent=number(data.taxonomy.downgraded_confirmed);
+    for(const id of ['gallery-event-stage','gallery-event-log','gallery-event-metric'])$(id).addEventListener('change',renderEvents);
+    $('gallery-taxonomy-total').textContent=number(data.subset.events);
+    $('gallery-taxonomy-categories').textContent=eventGroups(data.events).length;
     renderEvents();
 
     const dedup=data.dedup, ratio=dedup.representative_records/dedup.source_records;

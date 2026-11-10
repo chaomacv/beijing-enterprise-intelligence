@@ -31,11 +31,13 @@ def sync(final_path, classification_path, assets):
     gallery['events'] = [{'type': r['event_type'], 'label': labels[r['event_type']], 'status': r['status'],
                           'count': r['observed_events'], 'associated_profiles': r['associated_profiles']}
                          for r in classified['category_status']]
-    gallery['taxonomy'].update(updated_at=classified['created_at'],
-        legacy_qualification_events=classified['legacy_qualification_events'],
-        category_profiles=[{'type': r['event_type'], 'count': r['associated_profiles']} for r in classified['category_profiles']],
-        downgraded_confirmed=sum(r['observed_events'] for r in classified['stage_changes']
-                                if r['original_status'] == 'confirmed' and r['status'] == 'unknown'))
+    gallery['taxonomy'].pop('legacy_qualification_events', None)
+    gallery['taxonomy'].pop('refined_types', None)
+    gallery['taxonomy'].pop('downgraded_confirmed', None)
+    gallery['taxonomy'].update(updated_at=classified['created_at'], total_events=classified['total_events'],
+        event_types=sorted({r['event_type'] for r in classified['category_status']}),
+        category_count=len({r['event_type'] for r in classified['category_status']}),
+        category_profiles=[{'type': r['event_type'], 'count': r['associated_profiles']} for r in classified['category_profiles']])
     gallery['record_statuses'] = [{'status': r['status'], 'count': r['records']} for r in final['record_statuses']]
     gallery['identities'] = [{'status': r['identity_status'], 'count': r['profiles']} for r in final['identity_statuses']]
     gallery['matching'] = [{'reason': r['match_reason'], 'mentions': r['mentions']} for r in final['identity_match_reasons']]
@@ -52,7 +54,12 @@ def sync(final_path, classification_path, assets):
               'boundaries': {'unreadable_logical_files': final['audit']['unsupported_or_unreadable_files'],
                              'upstream_failed_downloads': final['upstream_failed_download_tasks_not_present'],
                              'profiles_include_provisional_identities': True, 'current_licence_validity_verified': False}}
-    for name, value in [('run-summary.json', run), ('gallery-data.json', gallery), ('final-results.json', public)]:
+    classification_public = {key: classified[key] for key in ['version', 'created_at', 'basis',
+        'semantic_accuracy_evaluated', 'total_events', 'unique_licences', 'unique_registered_enterprises',
+        'category_status', 'category_profiles']}
+    classification_public['category_count'] = gallery['taxonomy']['category_count']
+    for name, value in [('run-summary.json', run), ('gallery-data.json', gallery), ('final-results.json', public),
+                        ('event-classification.json', classification_public)]:
         write(assets / name, value)
     print('Public final aggregates synchronized:', final['counts'])
 

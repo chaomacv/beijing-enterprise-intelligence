@@ -61,10 +61,9 @@ def build(profile_index, stage_summary, run_summary, progress, classification_su
     assert {x['status'] for x in observed_events} <= {'confirmed', 'proposed', 'unknown', 'removed', 'revoked'}
     assert classified['version'] == VERSION
     assert classified['total_events'] == stage['counts']['events']
-    assert classified['legacy_qualification_events'] == sum(x['observed_events'] for x in observed_events if x['event_type']=='qualification')
     refined = classified['category_status']
     assert sum(x['observed_events'] for x in refined) == classified['total_events']
-    assert sum(x['observed_events'] for x in refined if x['event_type'] in LABELS) == classified['legacy_qualification_events']
+    assert sum(x['observed_events'] for x in refined if x['event_type'] in LABELS) == sum(x['observed_events'] for x in observed_events if x['event_type']=='qualification')
     assert not any(x['event_type']=='qualification' for x in refined)
     for kind in EVENTS.keys() - {'qualification'}:
         assert {(x['status'],x['observed_events']) for x in observed_events if x['event_type']==kind} == {(x['status'],x['observed_events']) for x in refined if x['event_type']==kind}
@@ -87,10 +86,11 @@ def build(profile_index, stage_summary, run_summary, progress, classification_su
                     'status': x['status'], 'count': x['observed_events'],
                     'associated_profiles': x['associated_profiles']} for x in refined],
         'taxonomy': {'version': classified['version'], 'updated_at': classified['created_at'],
-                     'basis': classified['basis'], 'legacy_qualification_events': classified['legacy_qualification_events'],
-                     'refined_types': list(LABELS), 'unique_licences': None, 'unique_registered_enterprises': None,
-                     'category_profiles': [{'type':x['event_type'],'count':x['associated_profiles']} for x in classified['category_profiles']],
-                     'downgraded_confirmed': sum(x['observed_events'] for x in classified['stage_changes'] if x['original_status']=='confirmed' and x['status']=='unknown')},
+                     'basis': classified['basis'], 'total_events': classified['total_events'],
+                     'event_types': sorted({x['event_type'] for x in refined}),
+                     'category_count': len({x['event_type'] for x in refined}),
+                     'unique_licences': None, 'unique_registered_enterprises': None,
+                     'category_profiles': [{'type':x['event_type'],'count':x['associated_profiles']} for x in classified['category_profiles']]},
         'record_statuses': [{'status': s, 'count': n} for s,n in sorted(stage['record_statuses'].items())],
         'identities': [{'status': x['identity_status'], 'count': x['profiles']}
                        for x in stage['aggregates']['主体身份状态']],

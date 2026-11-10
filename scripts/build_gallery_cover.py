@@ -22,13 +22,13 @@ for i,(name,n) in enumerate(counts.most_common()):
  path=f'M{pt(102,a)}A102 102 0 {int(b-a>math.pi)} 1 {pt(102,b)}L{pt(52,b)}A52 52 0 {int(b-a>math.pi)} 0 {pt(52,a)}Z'
  s.append(f'<path d="{path}" fill="{colors[i%len(colors)]}" stroke="white"/>');a=b
 s.append('<text x="147" y="163" text-anchor="middle" fill="#263247" font-size="19">11,701</text><text x="147" y="181" text-anchor="middle" fill="#7b8799" font-size="9">逻辑文件</text><text x="16" y="290" fill="#7b8799" font-size="9">格式 × 解析状态 / 全批元数据</text></g></g>')
-s.append(card(454,'许可相关记录，分成十类。','事件分类'))
+s.append(card(454,'全部事件分类 · 18 类','事件分类'))
 events=Counter()
 for v in d['events']:
- if v['type'] in d['taxonomy']['refined_types']:events[v['label']]+=v['count']
+ events[v['label']]+=v['count']
 for i,(name,n) in enumerate(events.most_common()):
- y=54+i*17
- s.append(f'<text x="64" y="{y+10}" text-anchor="end" fill="#657187" font-size="8">{name}</text><rect x="72" y="{y}" width="{n/max(events.values())*177:.1f}" height="12" fill="{colors[i%len(colors)]}"/>')
+ y=54+i*10
+ s.append(f'<text x="64" y="{y+7}" text-anchor="end" fill="#657187" font-size="7">{name}</text><rect x="72" y="{y}" width="{n/max(events.values())*177:.1f}" height="7" fill="{colors[i%len(colors)]}"/>')
 s.append('<rect x="13" y="249" width="268" height="40" fill="#f6f8fb"/><text x="22" y="265" fill="#b65b2a" font-size="8" font-family="Consolas,monospace">SELECT event_type, status, count(*)</text><text x="22" y="279" fill="#4d6788" font-size="8" font-family="Consolas,monospace">FROM classified_events GROUP BY event_type;</text></g></g>')
 s.append(card(758,'相同内容，只理解一次。','内容去重'))
 s.append('<text x="17" y="78" fill="#6b7789" font-size="11">1,440,619 条来源记录</text><path d="M25 105C110 105 150 93 251 93L251 127C150 127 110 138 25 138Z" fill="#4269d0"/><path d="M25 140C110 140 150 147 251 147L251 221C150 221 110 216 25 216Z" fill="#bdd0f5"/><text x="147" y="259" text-anchor="middle" fill="#4269d0" font-size="25">1 − U/N = 73.0%</text><text x="18" y="290" fill="#7b8799" font-size="9">比例表示重复来源，原始位置全部保留</text></g></g>')
