@@ -73,9 +73,9 @@ representatives[key].append(record_id)
 <div class="story-equation">可追溯画像 = 来源证据 + 保守关联 + 标签结构</div>
 <pre class="gallery-code"><code id="story-code"></code></pre>
 <footer class="notebook-scope">方法说明 · 来源校验与独立语义准确率分别验证 · 不自动形成授信结论</footer></div></article><article class="data-notebook" data-notebook="4" aria-roledescription="幻灯片" aria-label="5 / 8：共享的标签，构成相似的画像。"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[05]</span><div><h3>共享的标签，构成相似的画像。</h3><p>选取100家真实企业，一点一家。共同标签和事件越多，目标距离越短。</p></div></div>
-<div class="network-simple-toolbar"><span id="network-total">正在读取真实企业样本…</span><label class="sr-only" for="network-dimension">网络空间</label><select id="network-dimension" aria-label="网络空间"><option value="2">二维</option><option value="3">三维</option></select></div>
+<div class="network-simple-toolbar"><span id="network-total">正在读取真实企业样本…</span><label class="sr-only" for="network-mode">网络视图</label><select id="network-mode" aria-label="网络视图"><option value="similarity">企业相似网络</option><option value="bipartite">企业—标签网络</option></select><label class="sr-only" for="network-dimension">网络空间</label><select id="network-dimension" aria-label="网络空间"><option value="2">二维</option><option value="3">三维</option></select></div>
 <details id="network-options" class="network-options"><summary>更多选项</summary><div class="network-option-body">
-<div class="network-toolbar"><label>视图 <select id="network-mode"><option value="similarity">画像相似网络</option><option value="bipartite">画像—标签网络</option></select></label><label>范围 <select id="network-scope"><option value="all">全部18类事件</option><option value="refined">许可相关十类</option></select></label></div>
+<div class="network-toolbar"><label>范围 <select id="network-scope"><option value="all">全部18类事件</option><option value="refined">许可相关十类</option></select></label></div>
 <div class="network-toolbar"><label>类别 <select id="network-category"></select></label><label class="network-label-toggle"><input id="network-labels" type="checkbox"> 显示标签</label></div>
 <label class="network-threshold">相似度阈值 <input id="network-threshold" type="range" min="0" max="1" step="0.05" value="0.1"><output id="network-threshold-value">0.10</output></label>
 <div id="network-legend" class="network-legend" aria-label="D3 Category10 标签配色"></div></div></details>

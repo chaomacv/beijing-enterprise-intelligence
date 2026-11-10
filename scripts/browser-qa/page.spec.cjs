@@ -194,6 +194,7 @@ test('100 real companies support similarity distances, peripheral tag anchors, d
  await expect(page.locator('[data-node-kind="tag"]')).toHaveCount(0);
  await expect(page.locator('#network-options')).not.toHaveAttribute('open','');
  await expect(page.locator('#network-category')).not.toBeVisible();
+ await expect(page.locator('#network-mode')).toBeVisible();
  await expect(page.locator('.network-nodes text:visible')).toHaveCount(0);
  expect(await page.locator('.network-edges line').count()).toBeLessThanOrEqual(300);
  await expect(host).toHaveAttribute('data-company-count','100');
