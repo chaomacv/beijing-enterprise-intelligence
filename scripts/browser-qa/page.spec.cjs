@@ -335,3 +335,46 @@ test('sunburst pointer focus has no rectangular outline and keyboard focus remai
  await center.press('Enter');await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(1);
  await page.screenshot({path:info.outputPath('sunburst-without-black-outline.png')});
 });
+
+
+test('lineage routing returns to original sources while observed time remains a separate view',async({page},info)=>{
+ await page.locator('[data-gallery-page="8"]').click();await page.locator('[data-notebook="8"] .notebook-reader-open').click();
+ const chart=page.locator('#gallery-timeline-chart');await expect(chart).toHaveAttribute('data-ready','true');
+ await expect(chart).toHaveAttribute('data-mode','flow');await expect(page.locator('[data-lineage-point]')).toHaveCount(7);
+ await expect(chart).toHaveAttribute('data-selected-count','388349');
+ await expect(page.locator('#lineage-info')).toContainText('1,052,270');
+ const representative=page.locator('[data-lineage-point="3"]');
+ if(page.viewportSize().width>1100){await representative.hover();await expect(page.locator('.lineage-tooltip')).toBeVisible();await expect(page.locator('.lineage-tooltip')).toContainText('388,349');}
+ await page.locator('[data-lineage-point="4"]').click();await expect(chart).toHaveAttribute('data-selected-count','1440619');
+ await expect(page.locator('#lineage-info')).toContainText('回填');
+ await page.locator('[data-lineage-point="4"]').focus();await page.locator('[data-lineage-point="4"]').press('ArrowRight');
+ await expect(chart).toHaveAttribute('data-selected-count','15861277');
+ await page.locator('#lineage-scale').selectOption('linear');await expect(chart).toHaveAttribute('data-selected-count','15861277');
+ await page.locator('#lineage-scale').selectOption('log');await representative.click();
+ await page.screenshot({path:info.outputPath('lineage-stage-flow.png')});
+ await page.locator('[data-lineage-mode="time"]').click();await expect(chart).toHaveAttribute('data-mode','time');
+ await expect(page.locator('[data-lineage-point]')).toHaveCount(9);await expect(page.locator('#lineage-count')).toHaveText('388,349');
+ await expect(page.locator('#lineage-at')).toContainText('实际观测');await expect(page.locator('#lineage-info')).toContainText('最终验收');
+ await expect(page.locator('#lineage-scale')).not.toBeVisible();
+ await page.locator('#lineage-scrub').focus();await page.locator('#lineage-scrub').press('Home');
+ await expect(chart).toHaveAttribute('data-selected-count','42540');
+ await page.locator('#lineage-scrub').press('End');
+ await page.screenshot({path:info.outputPath('lineage-observed-progress.png')});
+ await page.locator('[data-lineage-mode="flow"]').click();await expect(chart).toHaveAttribute('data-selected-count','388349');
+});
+
+test('nine-step lineage table and selected details expose the same conserved record quantities',async({page},info)=>{
+ await page.locator('#pipeline').scrollIntoViewIfNeeded();await expect(page.locator('#run-lineage-table')).toHaveAttribute('data-ready','true');
+ await expect(page.locator('#run-lineage-table tr')).toHaveCount(9);
+ await expect(page.locator('#run-lineage-table tr').nth(4)).toContainText('27,792,348');
+ await expect(page.locator('#run-lineage-table tr').nth(4)).toContainText('14,420,658');
+ await expect(page.locator('#run-lineage-table tr').nth(5)).toContainText('388,349');
+ await expect(page.locator('#run-lineage-table tr').nth(5)).toContainText('1,440,619');
+ await page.locator('.run-lineage-overview').scrollIntoViewIfNeeded();
+ await page.screenshot({path:info.outputPath('pipeline-lineage-table.png')});
+ await page.locator('[data-flow-step="5"]').click();await expect(page.locator('#run-detail-flow')).toContainText('1,052,270');
+ await expect(page.locator('#run-detail-output')).toContainText('15,861,277');
+ await page.screenshot({path:info.outputPath('pipeline-lineage-detail.png')});
+ await page.locator('[data-run-step="8"]').click();await expect(page.locator('#run-detail-output')).toContainText('43,653,625');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+});

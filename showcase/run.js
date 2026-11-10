@@ -15,7 +15,7 @@
     {title:'结果导出', input:'主体归属、事件与全部来源提及', method:'将画像、事件与来源导出为 JSONL 和 Parquet；逐条台账使用 Parquet。保留事件阶段、原始金额日期与质量标记。', output:'画像、事件观察、来源与记录台账', files:['08_results/profiles.parquet','08_results/events.parquet','08_results/event_sources.parquet','08_results/record_ledger.parquet'], code:'bulk_aggregate.py', metric:d=>[d.final_counts?.events,'条事件观察（保守归并）']},
     {title:'复核与验收', input:'全部原附件、已知逻辑记录与最终导出', method:'核对每份原附件及每条已知记录的去向，分别列出排除、文件失败、结构问题和语义复核。覆盖对账与独立语义准确率分别评估。', output:'总对账、待复核明细及结构复核清单', files:['audit.json','09_review/file_review.json','09_review/record_review.parquet','09_review/表头及结构复核清单.csv'], code:'bulk_run.py', metric:d=>[d.input.known_logical_records,'条已知逻辑记录的去向需对账']}
   ];
-  let snapshot, active = 5;
+  let snapshot, lineage, active = 5;
   const buttons = [...document.querySelectorAll('[data-run-step]')];
   function stageState(index) {
     if (snapshot.pipeline_status.startsWith('completed')) return 'complete';
@@ -35,8 +35,9 @@
     $('run-detail-title').textContent=String(index+1).padStart(2,'0')+' / '+step.title;
     $('run-detail-number').textContent=format(value);
     $('run-detail-label').textContent=snapshot.pipeline_status.startsWith('completed')&&index===8?'条已知逻辑记录已完成去向对账':label;
-    $('run-detail-input').textContent=step.input;$('run-detail-method').textContent=step.method;$('run-detail-output').textContent=step.output;
-    $('run-detail-files').innerHTML=step.files.map(path=>'<code>'+escape(path)+'</code>').join('');
+    $('run-detail-input').textContent=lineage.stages[index].input;$('run-detail-method').textContent=step.method;$('run-detail-output').textContent=lineage.stages[index].output;
+    $('run-detail-flow').innerHTML=lineage.stages[index].flow.map(value=>'<p>'+escape(value)+'</p>').join('');
+    $('run-detail-files').innerHTML=lineage.stages[index].files.map(path=>'<code>'+escape(path)+'</code>').join('');
     const commit=/^[a-f0-9]{40}$/.test(snapshot.source_commit)?snapshot.source_commit:'main';
     $('run-detail-source').href='https://github.com/chaomacv/beijing-enterprise-intelligence/blob/'+commit+'/src/bank_data/'+step.code;
   }
@@ -54,9 +55,11 @@
     $('html-story-example').textContent=text?'合成HTML有限公司已处罚，罚款100元。':'<p class="notice">合成<span>HTML</span>有限公司已处罚，罚款100元。</p>';
     document.querySelectorAll('[data-html-view]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
   }));
-  fetch('assets/run-summary.json').then(response=>{
+  Promise.all(['run-summary.json','data-lineage.json'].map(name=>fetch('assets/'+name).then(response=>{
     if(!response.ok)throw new Error('Aggregate snapshot unavailable');return response.json();
-  }).then(data=>{
+  }))).then(([data,flow])=>{
+    lineage=window.BEILineage.validate(flow);
+    if(lineage.counts.known!==data.input.known_logical_records||lineage.counts.retained!==data.preparation.retained_records)throw Error('Lineage snapshot mismatch');
     if(data.kind!=='aggregate_run_snapshot'||data.semantic_accuracy_evaluated!==false||!['running','completed','completed_with_review'].includes(data.pipeline_status))throw new Error('Unexpected snapshot provenance');
     if(data.pipeline_status.startsWith('completed')&&(!data.validation?.final_audit_passed||!data.final_counts))throw new Error('Final counts require completed audit');
     snapshot=data;const done=data.pipeline_status.startsWith('completed');
@@ -74,6 +77,9 @@
     $('batch-after-value').textContent=data.benchmarks.batching.packed_seconds.toFixed(1)+' s';
     $('batch-after-bar').style.width=(data.benchmarks.batching.packed_seconds/data.benchmarks.batching.serial_seconds*100)+'%';
     if(done){$('release-run-title').textContent='本批全量验收';$('release-run-copy').textContent='流程与覆盖对账已完成，待复核项继续留存。独立语义准确率仍需标注评估。';}
+    $('run-lineage-table').innerHTML=lineage.stages.map((row,i)=>'<tr><td><button type="button" data-flow-step="'+i+'">'+String(i+1).padStart(2,'0')+' '+escape(row.title)+'</button></td><td>'+escape(row.input)+'</td><td>'+escape(row.output)+'<small><code>'+escape(row.files[0])+'</code></small></td></tr>').join('');
+    $('run-lineage-table').dataset.ready='true';
+    $('run-lineage-table').addEventListener('click',event=>{const button=event.target.closest('[data-flow-step]');if(button){selectStep(Number(button.dataset.flowStep));$('run-step-panel').scrollIntoView({block:'nearest',behavior:'auto'});}});
     selectStep(active);
   }).catch(()=>{$('run-overall-state').textContent='汇总暂不可用 · 可查看下方说明与源码';});
 })();

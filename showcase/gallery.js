@@ -94,22 +94,6 @@
       text(350,284,number(dedup.exact_duplicate_source_records),'class="svg-stat"')+text(350,329,'重复来源 · 保留全部原始位置','class="svg-muted"'),
       '来源记录精确分组：不同内容代表与重复来源，端点高度按记录比例绘制');
 
-    const points=data.progress.points, start=Date.parse(points[0].at), span=Date.parse(points.at(-1).at)-start;
-    const timeFormatter=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
-    const x=p=>55+(Date.parse(p.at)-start)/span*620, y=p=>267-p.completed/data.progress.total*235;
-    function renderTimeline() {
-      const index=Number($('gallery-time-scrub').value), point=points[index];let body='';
-      for(let i=0;i<=4;i++) {const value=data.progress.total*i/4, yy=267-i/4*235;body+=`<path d="M55 ${yy}H680" stroke="#e9edf3"/>`+text(43,yy+4,Math.round(value/1000)+'k','text-anchor="end" class="svg-tick"');}
-      body+=`<path d="${points.map((p,i)=>(i?'L':'M')+x(p)+' '+y(p)).join(' ')}" stroke="#d9e0ec" stroke-width="2" fill="none"/>`;
-      body+=`<path d="${points.slice(0,index+1).map((p,i)=>(i?'L':'M')+x(p)+' '+y(p)).join(' ')}" stroke="#4269d0" stroke-width="3" fill="none"/>`;
-      points.forEach((p,i)=>{body+=`<circle cx="${x(p)}" cy="${y(p)}" r="${i===index?6:3.5}" fill="${i<=index?'#4269d0':'#d9e0ec'}"><title>${esc(timeFormatter.format(new Date(p.at)))}：${number(p.completed)}</title></circle>`;});
-      for(const i of [0,Math.floor((points.length-1)/2),points.length-1])body+=text(x(points[i]),300,timeFormatter.format(new Date(points[i].at)),`text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick"`);
-      $('gallery-timeline-chart').innerHTML=svg(body,'实际模型内容代表处理进度，横轴为北京时间，按真实时间间隔绘制',720,325);
-      $('gallery-time-count').textContent=number(point.completed);$('gallery-time-percent').textContent=percent(point.completed,data.progress.total)+' 个内容代表已处理';
-      $('gallery-time-at').textContent=timeFormatter.format(new Date(point.at))+'（北京时间）';$('gallery-time-at').dateTime=point.at;$('gallery-time-index').value=`${index+1} / ${points.length}`;
-    }
-    $('gallery-time-scrub').max=points.length-1;$('gallery-time-scrub').value=points.length-1;$('gallery-time-scrub').addEventListener('input',renderTimeline);renderTimeline();
-
     // A real clock drives the pager. Reading, hidden tabs and reduced motion pause it.
     const viewport=$('gallery-viewport'), track=viewport.querySelector('.carousel-track');
     const cards=[...doc.querySelectorAll('[data-notebook]')], pages=[...doc.querySelectorAll('[data-gallery-page]')];

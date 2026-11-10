@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="model.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="lineage.js" defer></script>
   <script src="run.js" defer></script>
   <script src="gallery.js" defer></script>
   <script src="source-overview.js" defer></script>
@@ -132,16 +133,17 @@ link_distance = 220 - 160 * similarity</code></pre>
 <div class="portrait-business"><span class="portrait-provisional">PROVISIONAL · 暂定身份</span><div class="portrait-heading"><h4 id="portrait-name"></h4><span class="portrait-avatar" aria-hidden="true">企</span></div><p id="portrait-address"></p><div id="portrait-tags" class="portrait-tags"></div></div>
 <div id="portrait-timeline" class="portrait-timeline"></div>
 <p class="portrait-boundary">每条事实保留来源和阶段。未观察到某类事件，不代表该类事件不存在；拟认定也不等于已认定。</p>
-<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-card-key="timeline" data-notebook="8" aria-roledescription="幻灯片" aria-label="9 / 9：全量处理时间线">
-      <span class="notebook-category">执行进度</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[09]</span><div><h3>全量处理时间线</h3><p>横轴为实际观测时间，纵轴为已处理内容代表；拖动滑块回放进度。</p></div></div>
-      
- <div class="timeline-reading"><strong id="gallery-time-count">280,360</strong><span id="gallery-time-percent">72.2% 个内容代表已处理</span><time id="gallery-time-at">2026-11-09 16:11（北京时间）</time></div>
- <div id="gallery-timeline-chart" class="gallery-figure"></div>
- <label class="space-control" for="gallery-time-scrub">回放观测点 <input id="gallery-time-scrub" type="range" min="0" max="7" value="7"><output id="gallery-time-index" for="gallery-time-scrub">8 / 8</output></label>
- <pre class="gallery-code"><code>progress = completed_representatives / 388_349
-# 横轴按真实时间间隔绘制；连接观测点，不补造中间测量</code></pre>
- <div class="notebook-callout">这是数据工程执行时间线。最后一个点来自全批完成汇总，推理、关联、分类修正及验收均已结束；待复核项继续保留。</div><footer class="notebook-scope">实际进度观测 · 时间统一为北京时间 · 不代表企业事件时间分布</footer></div></article></div></div>
-  <div class="carousel-controls shell"><button class="gallery-nav" id="gallery-prev" type="button" aria-label="上一个笔记本">←</button><div class="gallery-pagination" role="group" aria-label="选择数据笔记本"><button type="button" data-gallery-page="0" aria-label="第 1 个：来源分布与数据异构性" aria-pressed="true"><span></span></button><button type="button" data-gallery-page="1" aria-label="第 2 个：数据采集与安全控制" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="2" aria-label="第 3 个：企业事件分类统计" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="3" aria-label="第 4 个：数据层级与数量构成" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="4" aria-label="第 5 个：公开数据处理方法" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="5" aria-label="第 6 个：内容去重与推理复用" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="6" aria-label="第 7 个：企业画像相似网络" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="7" aria-label="第 8 个：企业画像与证据追溯" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="8" aria-label="第 9 个：全量处理时间线" aria-pressed="false"><span></span></button></div><button class="gallery-nav" id="gallery-next" type="button" aria-label="下一个笔记本">→</button><span class="carousel-divider" aria-hidden="true"></span><button id="gallery-play" class="gallery-play" type="button" aria-pressed="true"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2"/></svg></button><span id="gallery-clock" class="gallery-clock">8s / 每张</span><span class="sr-only" id="gallery-announcement" role="status"></span></div>
+<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-card-key="timeline" data-notebook="8" aria-roledescription="幻灯片" aria-label="9 / 9：处理进度与数据去向"><span class="notebook-category">数据去向</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[09]</span><div><h3>处理进度与数据去向</h3><p>按阶段看记录分流，按时间看推理进度；悬停圆点，查看数量、处理方法与后续去向。</p></div></div>
+<div class="lineage-toolbar"><div class="lineage-mode" role="group" aria-label="数据去向探索视图"><button type="button" data-lineage-mode="flow" aria-pressed="true">数据去向</button><button type="button" data-lineage-mode="time" aria-pressed="false">时间进度</button></div><label id="lineage-scale-label">纵轴 <select id="lineage-scale" aria-label="数据去向纵轴刻度"><option value="log">对数</option><option value="linear">线性</option></select></label></div>
+<div class="lineage-reading"><strong id="lineage-count">388,349</strong><span id="lineage-unit">内容代表 · 个内容代表</span><span id="lineage-at">处理阶段 4 / 7</span></div>
+<div id="gallery-timeline-chart" class="gallery-figure lineage-chart"></div>
+<p id="lineage-axis-note" class="lineage-axis-note"></p>
+<label class="space-control" for="lineage-scrub">选择节点 <input id="lineage-scrub" type="range" min="0" max="6" value="3"><output id="lineage-index" for="lineage-scrub">4 / 7</output></label>
+<div id="lineage-info" class="lineage-info" role="status" aria-live="polite"></div>
+<div id="lineage-equations" class="lineage-equations"></div>
+<div class="notebook-callout">388,349 是复杂语义通道的内容代表数。推理后回填到 1,440,619 条来源，再与 14,420,658 条字段方案记录合并为 15,861,277 条处理台账。</div>
+<footer class="notebook-scope">数据去向：按阶段顺序 · 时间进度：实际观测 · 回填保留原始记录与来源 · <a href="assets/data-lineage.json">完整数量与去向 JSON ↗</a> · <a href="#pipeline">逐步输入输出 ↗</a></footer></div></article></div></div>
+  <div class="carousel-controls shell"><button class="gallery-nav" id="gallery-prev" type="button" aria-label="上一个笔记本">←</button><div class="gallery-pagination" role="group" aria-label="选择数据笔记本"><button type="button" data-gallery-page="0" aria-label="第 1 个：来源分布与数据异构性" aria-pressed="true"><span></span></button><button type="button" data-gallery-page="1" aria-label="第 2 个：数据采集与安全控制" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="2" aria-label="第 3 个：企业事件分类统计" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="3" aria-label="第 4 个：数据层级与数量构成" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="4" aria-label="第 5 个：公开数据处理方法" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="5" aria-label="第 6 个：内容去重与推理复用" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="6" aria-label="第 7 个：企业画像相似网络" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="7" aria-label="第 8 个：企业画像与证据追溯" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="8" aria-label="第 9 个：处理进度与数据去向" aria-pressed="false"><span></span></button></div><button class="gallery-nav" id="gallery-next" type="button" aria-label="下一个笔记本">→</button><span class="carousel-divider" aria-hidden="true"></span><button id="gallery-play" class="gallery-play" type="button" aria-pressed="true"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2"/></svg></button><span id="gallery-clock" class="gallery-clock">8s / 每张</span><span class="sr-only" id="gallery-announcement" role="status"></span></div>
 
   <noscript><p class="shell fallback">开启 JavaScript 可查看图表并操作轮播。各卡片的代码、口径和说明仍可阅读；精确数值可下载上方汇总 JSON。</p></noscript>
  </section>
@@ -208,9 +210,10 @@ else:
     </section>
 
     <section class="section shell architecture" id="pipeline" aria-labelledby="pipeline-title">
-      <div class="section-intro"><div><p class="eyebrow">NINE STAGES / ONE SOURCE MAP</p><h2 id="pipeline-title">从原始附件，<br>一路走到可核对的结果。</h2></div><p>选择一个步骤，查看输入、方法和中间产物。每一步有独立去向；业务明细与模型原回复保留在私有环境。</p></div>
+      <div class="section-intro"><div><p class="eyebrow">NINE STAGES / ONE SOURCE MAP</p><h2 id="pipeline-title">从原始附件，<br>一路走到可核对的结果。</h2></div><p>先看每一步的数据量与去向，再选择步骤查看方法及中间文件。筛选、分流、复用、回填和最终对账各自保留计量口径。</p></div>
       <div class="run-notebook">
         <div class="run-topline"><span id="run-snapshot-date">固定输入 / 2026-11-07 · 汇总更新 / 2026-11-08</span><span class="run-state" id="run-overall-state" data-state="complete" role="status">本批流程已完成，含待复核结果</span></div>
+        <section class="run-lineage-overview" aria-labelledby="run-lineage-title"><h3 id="run-lineage-title">每一步的数据量与去向</h3><p>43,653,625 条已知记录，经过筛选、通道分流、推理复用与逐来源回填；最终处理台账和显式排除共同完成覆盖对账。</p><div class="run-lineage-scroll"><table class="run-lineage-table"><caption class="sr-only">九步流程的输入数量、输出去向与中间文件</caption><thead><tr><th>步骤</th><th>输入与计量</th><th>输出数量与去向</th></tr></thead><tbody id="run-lineage-table"></tbody></table></div><p class="run-lineage-note">排除记录在03–05合并对账；方案、记录、提及、画像和事件分别计量。点击步骤查看方法与完整中间文件。</p></section>
         <div class="run-explorer">
           <div class="run-step-tabs" role="tablist" aria-label="九步处理流程">
             <button id="run-tab-01" type="button" role="tab" aria-selected="false" aria-controls="run-step-panel" tabindex="-1" data-run-step="0" data-state="complete"><span>01</span><strong>固定输入</strong><small class="run-step-status">已完成</small></button>
@@ -226,12 +229,12 @@ else:
           <article id="run-step-panel" class="run-detail" role="tabpanel" aria-labelledby="run-tab-06" tabindex="0">
             <div class="run-detail-heading"><h3 id="run-detail-title">06 / 抽取与核验</h3><span class="run-state" id="run-detail-state" data-state="complete">已完成</span></div>
             <div class="run-detail-metric"><strong id="run-detail-number">388,349</strong><span id="run-detail-label">个不同内容代表需语义处置</span></div>
-            <dl><dt>输入</dt><dd id="run-detail-input">复杂内容代表及各自表头、语境与来源 ID</dd><dt>方法</dt><dd id="run-detail-method">完整内容精确分组后推理；按实际 tokenizer 预算拆组，再批量提交。核对主体、原文引用与记录归属，逐条回填重复来源；不确定项进入复核。</dd><dt>产出</dt><dd id="run-detail-output">逐条状态、来源引用、模型请求与原回复</dd></dl>
+            <dl><dt>输入</dt><dd id="run-detail-input">复杂内容代表及各自表头、语境与来源 ID</dd><dt>方法</dt><dd id="run-detail-method">完整内容精确分组后推理；按实际 tokenizer 预算拆组，再批量提交。核对主体、原文引用与记录归属，逐条回填重复来源；不确定项进入复核。</dd><dt>产出</dt><dd id="run-detail-output">逐条状态、来源引用、模型请求与原回复</dd><dt>去向</dt><dd id="run-detail-flow">1,440,619 条复杂来源 → 388,349 个代表 → 回填到原始来源。</dd></dl>
             <div class="run-detail-files" id="run-detail-files"><code>06_validation/内容去重总表.csv</code><code>06_validation/content_indices/</code><code>06_validation/&lt;file_id&gt;/record_results.jsonl</code></div>
             <a class="text-link" id="run-detail-source" href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/57748c4c4086432c4b129a0fee059018a1d6a4c1/src/bank_data/bulk_semantics.py" target="_blank" rel="noopener">查看本步骤源码 <span aria-hidden="true">↗</span></a>
           </article>
         </div>
-        <p class="run-footnote">本页展示固定快照的汇总与处理计划。最终画像、事件及总对账在全量验收后更新；下方交互案例继续使用合成数据。<a href="assets/run-summary.json">查看汇总 JSON ↗</a></p>
+        <p class="run-footnote">本页为已完成批次的数量与去向。排除、复核及来源回填均保留台账；下方交互案例明确使用合成数据。<a href="assets/run-summary.json">查看汇总 JSON ↗</a></p>
       </div>
       <div class="architecture-bottom"><div><span class="bracket">[ LOCAL ]</span><p>本地 Qwen3-8B · 原始 BF16 权重。模型理解文件、生成字段方案并处理复杂内容，程序逐行复制和校验原值。</p></div><div><span class="bracket">[ TRACEABLE ]</span><p>大表采用流式 JSONL 与 DuckDB 聚合，Parquet 保存明细。CSV 用于导航，事件可追溯到记录、单元格与原附件。</p></div><div><span class="bracket">[ RESUMABLE ]</span><p>内容与配置签名控制续跑。有效检查点保留，失败、排除与复核分别记账；新方案留下独立版本与核验回执。</p></div></div>
     </section>
