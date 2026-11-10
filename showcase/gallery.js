@@ -145,7 +145,8 @@
     const cards=[...doc.querySelectorAll('[data-notebook]')], pages=[...doc.querySelectorAll('[data-gallery-page]')];
     const reduced=win.matchMedia('(prefers-reduced-motion: reduce)');
     const reader=$('notebook-reader');
-    let index=0, playing=!reduced.matches, hover=false, focused=false, dragging=false, visible=true, elapsed=0, last=0, settle, reading=null;
+    const initialIndex=win.matchMedia('(min-width: 1101px)').matches?1:0;
+    let index=initialIndex, playing=!reduced.matches, hover=false, focused=false, dragging=false, visible=true, elapsed=0, last=0, settle, reading=null;
     function updateControls(manual=false) {
       pages.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));
       cards.forEach((c,i)=>c.dataset.active=String(i===index));
@@ -224,7 +225,7 @@
       doc.querySelector('.gallery-pagination').style.setProperty('--play-progress',elapsed/8000);
       win.requestAnimationFrame(tick);
     }
-    select(0,false,false);viewport.dataset.ready='true';win.requestAnimationFrame(tick);
+    select(initialIndex,false,false);viewport.dataset.ready='true';win.requestAnimationFrame(tick);
   }
   return {eventGroups,eventView,autoplayStep,loopOrder,mount};
 });

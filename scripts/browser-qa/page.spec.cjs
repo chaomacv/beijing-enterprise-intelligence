@@ -19,6 +19,10 @@ test('bounded viewport shows three full desktop cards with clipped neighbors',as
   await page.locator('#explorations').scrollIntoViewIfNeeded();
   await expect.poll(async()=>(await measure(page)).full).toBe(page.viewportSize().width>1100?3:1);
   const m=await measure(page);expect(m.left).toBeGreaterThan(5);expect(m.right).toBeLessThan(m.window-5);
+  const visibleStory=await page.locator('#gallery-viewport').evaluate(el=>{
+    const b=el.getBoundingClientRect();return [...el.querySelectorAll('[data-card-key]')].filter(c=>{const r=c.getBoundingClientRect();return r.left>=b.left-2&&r.right<=b.right+2;}).map(c=>c.dataset.cardKey);
+  });
+  expect(visibleStory).toEqual(page.viewportSize().width>1100?['sources','acquisition','events']:['sources']);
   expect(m.pageWidth).toBeLessThanOrEqual(m.window+1);
   if(m.window>1100){expect(m.partial).toBe(2);expect(m.cardWidth).toBeLessThanOrEqual(558);}
   await page.screenshot({path:info.outputPath('bounded-gallery.png')});
