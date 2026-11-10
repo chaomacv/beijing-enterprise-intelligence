@@ -127,3 +127,41 @@ test('the first six notebooks follow the requested narrative and remaining ones 
  assert.deepEqual(labels,Array.from({length:9},(_,i)=>String(i+1).padStart(2,'0')));
  assert.ok(!html.includes('id="gallery-sunburst"')); 
 });
+
+
+test('lineage conserves every routing branch and matches its exact source exports',()=>{
+ const path=require('node:path'),crypto=require('node:crypto');
+ const lineage=require('../showcase/assets/data-lineage.json'),model=require('../showcase/lineage.js');
+ assert.equal(model.validate(lineage),lineage);
+ assert.equal(lineage.hash_basis,'utf8_lf_newlines');
+ for(const [name,digest] of Object.entries(lineage.source_sha256))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname,'../showcase/assets',name),'utf8').replace(/\r\n/g,'\n')).digest('hex'),digest);
+ const final=require('../showcase/assets/final-results.json');
+ assert.equal(lineage.counts.known,final.input.known_logical_records);
+ assert.equal(lineage.counts.retained,final.counts.record_ledger);
+ assert.equal(lineage.counts.mapped,final.preparation.field_mapped_records);
+ assert.equal(lineage.stages.length,9);
+ assert.deepEqual(lineage.flow_points.map(p=>p.count),[43653625,15861277,1440619,388349,1440619,15861277,43653625]);
+ assert.equal(lineage.outcomes.REVIEW,6179034);
+ assert.ok(!/password|10\.126\.|\/opt\/|"cells"|"record_id"/.test(JSON.stringify(lineage)));
+});
+
+test('stage order and actual inference time remain distinct while both chart scales preserve quantities',()=>{
+ const d=require('../showcase/assets/data-lineage.json'),m=require('../showcase/lineage.js');
+ assert.ok(m.series(d,'flow').every(p=>p.at===undefined));
+ assert.deepEqual(m.series(d,'time').map(p=>p.count),d.progress.points.map(p=>p.completed));
+ for(const log of [true,false]){
+  const p=m.positions(d,'flow',log).points;assert.equal(p[3].count,388349);assert.equal(p[4].count,1440619);
+  assert.ok(p[3].y>p[4].y);assert.ok(p[0].y<p[1].y);assert.ok(p.every(n=>Number.isFinite(n.x)&&Number.isFinite(n.y)));
+ }
+ const p=m.positions(d,'time',false).points;
+ assert.ok(p[1].x-p[0].x < p[6].x-p[5].x);
+ assert.equal(p.at(-1).count,388349);
+});
+
+test('inconsistent lineage counts or fabricated stage timestamps cannot be presented as the batch',()=>{
+ const d=require('../showcase/assets/data-lineage.json'),m=require('../showcase/lineage.js');
+ for(const change of [c=>c.counts.retained++,c=>c.outcomes.REVIEW++,c=>c.flow_points[0].at='2026-11-07T00:00:00Z',c=>c.progress.points[1].at=c.progress.points[0].at]){
+  const copy=structuredClone(d);change(copy);assert.throws(()=>m.validate(copy));
+ }
+ assert.throws(()=>m.series(d,'unknown'));
+});
