@@ -45,7 +45,7 @@
    $('lineage-scrub').value=index;$('lineage-index').value=`${index+1} / ${points.length}`;
    host.dataset.selectedCount=p.count;host.dataset.selectedId=p.id;
    host.querySelectorAll('[data-lineage-point]').forEach((g,i)=>{g.setAttribute('aria-pressed',String(i===index));g.querySelector('.lineage-dot').setAttribute('r',i===index?6:4);});
-   if(event?.type==='pointerenter'&&event.pointerType!=='touch'){
+   if(event?.type==='pointerenter'&&event.pointerType!=='touch'&&win.matchMedia('(hover: hover)').matches){
     tooltip.innerHTML=`<strong>${esc(p.name)}</strong><b>${fmt(p.count)} <small>${esc(p.unit)}</small></b>${p.at?'<time>'+esc(date.format(new Date(p.at)))+'（北京时间）</time>':''}<p>${esc(p.details.join(' '))}</p>`;tooltip.hidden=false;tooltipPosition(event);
    }
   }
@@ -57,9 +57,9 @@
    body+=`<path d="${points.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ')}" stroke="#4269d0" stroke-width="2.3" fill="none"/>`;
    points.forEach((p,i)=>{
     body+=`<g class="lineage-point" data-lineage-point="${i}" tabindex="0" role="button" aria-label="${esc(p.name+'，'+fmt(p.count)+p.unit)}"><circle cx="${p.x}" cy="${p.y}" r="13" fill="transparent"/><circle class="lineage-dot" cx="${p.x}" cy="${p.y}" r="4" fill="#4269d0" stroke="#fff" stroke-width="1.5"/><title>${esc(p.name+'：'+fmt(p.count)+p.unit+'。'+p.details.join(' '))}</title></g>`;
-    if(mode==='flow')body+=`<text x="${p.x}" y="${p.y-13}" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick">${compact(p.count)}</text><text x="${p.x}" y="276" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick">${i+1} ${esc(p.name)}</text>`;
+    if(mode==='flow')body+=`<text x="${p.x}" y="${p.y-13}" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick">${compact(p.count)}</text><text x="${p.x}" y="276" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick"><tspan>${String(i+1).padStart(2,'0')}</tspan><tspan class="lineage-phase-name"> ${esc(p.name)}</tspan></text>`;
    });
-   if(mode==='time')for(const i of [0,Math.floor(points.length/2),points.length-1])body+=`<text x="${points[i].x}" y="276" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick">${esc(date.format(new Date(points[i].at)))}</text>`;
+   if(mode==='time')for(const i of [0,Math.floor(points.length/2),points.length-1])body+=`<text x="${points[i].x}" y="276" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick${i>0&&i<points.length-1?' lineage-time-middle':''}">${esc(date.format(new Date(points[i].at)))}</text>`;
    host.innerHTML=`<svg viewBox="0 0 720 305" role="group" aria-label="${mode==='flow'?'按处理阶段展示记录分流、内容代表、回填和最终覆盖对账':'按实际时间展示内容代表处理进度'}">${body}</svg>`;host.append(tooltip);
    host.querySelectorAll('[data-lineage-point]').forEach((g,i)=>{
     g.addEventListener('pointerenter',e=>inspect(i,e));g.addEventListener('pointermove',e=>{if(!tooltip.hidden)tooltipPosition(e);});g.addEventListener('pointerleave',()=>{tooltip.hidden=true;});
