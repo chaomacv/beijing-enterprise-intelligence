@@ -30,8 +30,11 @@
   $('network-zoom-value').textContent=Math.round(camera.k*100)+'%';host.dataset.camera=[camera.yaw,camera.pitch,camera.x,camera.y].join(',');
  }
  function rebuild(){
-  if(!data)return;const category=$('network-category').value,scope=$('network-scope').value,groups=model.groups(data,scope,category),token=++serial;
-  const visibleCategories=data.categories.filter((c,i)=>scope==='all'||i<10),mode=$('network-mode').value;
+  if(!data)return;const scope=$('network-scope').value,visibleCategories=data.categories.filter((c,i)=>scope==='all'||i<10);
+  let category=$('network-category').value;if(!visibleCategories.some(c=>c.id===category))category='';
+  $('network-category').innerHTML='<option value="">全部类别</option>'+visibleCategories.map(c=>`<option value="${esc(c.id)}">${esc(c.label)}</option>`).join('');$('network-category').value=category;
+  $('network-legend').innerHTML=visibleCategories.map(c=>`<span><i style="background:${c.color}"></i>${esc(c.label)}</span>`).join('');
+  const groups=model.groups(data,scope,category),token=++serial,mode=$('network-mode').value;
   dimension=Number($('network-dimension').value);$('network-threshold').disabled=mode!=='similarity';
   $('network-threshold-value').value=Number($('network-threshold').value).toFixed(2);
   const profiles=groups.reduce((s,n)=>s+n.profiles,0);

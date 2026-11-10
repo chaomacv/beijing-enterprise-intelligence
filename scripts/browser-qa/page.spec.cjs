@@ -140,6 +140,9 @@ test('three real sunburst modes retain full totals and support true two-level zo
  await page.locator('[data-gallery-page="7"]').click();
  await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-ready','true');
  await page.locator('[data-notebook="7"] .notebook-reader-open').click();
+ const chartBox=await page.locator('#event-sunburst-chart').boundingBox();
+ expect(chartBox.width).toBeGreaterThan(page.viewportSize().width>1100?600:200);
+ expect(chartBox.height/chartBox.width).toBeCloseTo(1,1);
  for(const [mode,total] of [['attachments','5200'],['logical','11701'],['records','43653625']]){
   await page.locator(`[data-sun-mode="${mode}"]`).click();
   const chart=page.locator('#event-sunburst-chart');await expect(chart).toHaveAttribute('data-mode',mode);

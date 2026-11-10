@@ -550,14 +550,14 @@ dialog { width: min(680px,calc(100% - 32px)); max-height: 88vh; color: var(--ink
 .sunburst-modes button[aria-pressed="true"] { border-color:#b6acd4; background:#f7f4fc; color:#6e5a9c; }.sunburst-modes button[aria-pressed="true"] b { color:#6e5a9c; }
 .sunburst-explore-bar { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }.sunburst-explore-bar>span { font-size:10px; color:#969eac; }
 .sunburst-explore-bar select { max-width:160px; font-size:10px; }
-.event-sunburst-chart { position:relative; margin:0 -7px; }.event-sunburst-chart svg { overflow:visible; }
+.event-sunburst-chart { position:relative; margin:0 -7px; width:100%; flex-shrink:0; aspect-ratio:1; }.event-sunburst-chart svg { overflow:visible; aspect-ratio:1; }
 .sunburst-labels { font:11px var(--sans); fill:#354052; user-select:none; }
 .sunburst-center-name { font-size:12px; fill:#7c8797; }.sunburst-center-count { font:24px var(--mono); fill:#344056; letter-spacing:-1px; }.sunburst-center-hint { font-size:9px; fill:#9aa4b2; }
 .sunburst-tooltip { position:absolute; z-index:5; width:220px; padding:13px; border:1px solid #e3e6ed; background:rgba(255,255,255,.97); box-shadow:0 6px 24px #18253d1a; pointer-events:none; border-radius:4px; color:#64748b; font-size:10px; }
 .sunburst-tooltip[hidden] { display:none; }.sunburst-tooltip strong,.sunburst-tooltip b,.sunburst-tooltip span { display:block; }.sunburst-tooltip b { font:21px var(--mono); color:#3d4b63; margin:7px 0; }.sunburst-tooltip small { font-size:10px; }.sunburst-tooltip p { margin:7px 0 0; overflow-wrap:anywhere; line-height:1.6; }
 #event-sunburst-table button { padding:3px 0; color:#687b99; background:none; font-size:inherit; text-align:left; }
 #notebook-reader .event-sunburst-chart { max-width:740px; margin-inline:auto; }
-.real-network-notice { color:#4f7686; background:#f2f7f8; border-color:#dfebed; }
+.network-notice.real-network-notice { color:#4f7686; background:#f2f7f8; border-color:#dfebed; }.network-notice.real-network-notice i { background:#1f77b4; }
 .network-census,.network-interaction-hint { font-size:10px; line-height:1.8; color:#8793a5; margin:8px 0; }
 .network-legend { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px 10px; margin:16px 0; }
 .network-legend span { font-size:9px; color:#7d899a; display:flex; align-items:center; gap:5px; }.network-legend i { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
