@@ -41,6 +41,6 @@ test('3D projection responds to depth and rotation while 2D ignores depth',()=>{
 });
 test('UI declares the 100-company sample and no longer treats grouped profiles as companies',()=>{
  const html=fs.readFileSync(path.join(__dirname,'../showcase/index.html'),'utf8'),module=fs.readFileSync(path.join(__dirname,'../showcase/enterprise-network.js'),'utf8');
- assert.ok(html.includes('一点一家'));assert.ok(html.includes('assets/company-network.json'));assert.ok(!html.includes('id="network-detail-level"'));
+ assert.ok(html.includes('100 个圆点对应 100 家真实企业'));assert.ok(html.includes('assets/company-network.json'));assert.ok(!html.includes('id="network-detail-level"'));
  assert.ok(module.includes("assets/company-network.json"));assert.ok(!module.includes('model.overview')&&!module.includes('model.groups'));
 });

@@ -77,14 +77,14 @@ test('execution timeline uses ordered actual observations, not fabricated unifor
   }
   assert.ok(new Set(intervals).size>1);
 });
-test('gallery mount targets exist and all eight slides have accessible navigation controls', () => {
+test('gallery mount targets exist and all ten slides have accessible navigation controls', () => {
   const path=require('node:path');
   const html=fs.readFileSync(path.join(__dirname,'../showcase/index.html'),'utf8');
   const js=fs.readFileSync(path.join(__dirname,'../showcase/gallery.js'),'utf8');
   const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
   for(const match of js.matchAll(/\$\('([a-z0-9-]+)'\)/g)) assert.ok(ids.has(match[1]),match[1]);
-  assert.equal([...html.matchAll(/data-notebook="\d+"/g)].length,8);
-  assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,8);
+  assert.equal([...html.matchAll(/data-notebook="\d+"/g)].length,10);
+  assert.equal([...html.matchAll(/data-gallery-page="\d+"/g)].length,10);
   assert.ok(html.includes('src="gallery.js"'));
   assert.ok(html.includes('aria-roledescription="轮播"'));
 });
@@ -101,4 +101,29 @@ test('circular recentering keeps both neighbors at every wrap without cloning ca
     }
   }
   assert.throws(()=>loopOrder([0,0,1],0),RangeError);
+});
+
+
+test('catalog totals, small categories and sampled links retain the true fixed input',()=>{
+ const overview=require('../showcase/assets/source-overview.json');
+ const {validate}=require('../showcase/source-overview.js');
+ assert.equal(validate(overview),overview);
+ assert.equal(overview.dataset_count,4710);
+ assert.equal(overview.themes.reduce((n,t)=>n+t.count,0),4710);
+ assert.equal(overview.themes.reduce((n,t)=>n+t.samples.length,0),192);
+ assert.equal(overview.themes.find(t=>t.name==='生活安全').count,58);
+ assert.equal(overview.themes.find(t=>t.name==='农业农村').count,103);
+ assert.equal(overview.themes.find(t=>t.name==='消费购物').samples.length,5);
+ assert.equal(overview.batch.known_logical_records,data.corpus.known_logical_records);
+ assert.ok(overview.examples.every(e=>e.illustrative===true));
+ const broken=structuredClone(overview);broken.themes[0].samples[0].url+='?token=example';assert.throws(()=>validate(broken));
+});
+
+test('the first six notebooks follow the requested narrative and remaining ones retain order',()=>{
+ const html=fs.readFileSync(require('node:path').join(__dirname,'../showcase/index.html'),'utf8');
+ const keys=[...html.matchAll(/data-card-key="([^"]+)"/g)].map(m=>m[1]);
+ assert.deepEqual(keys,['sources','acquisition','events','hierarchy','methods','dedup','formats','network','portrait','timeline']);
+ const labels=[...html.matchAll(/class="cell-number">\[(\d+)\]/g)].map(m=>m[1]);
+ assert.deepEqual(labels,Array.from({length:10},(_,i)=>String(i+1).padStart(2,'0')));
+ assert.ok(html.includes('统计原始附件、压缩包展开成员及格式转换产物的文件类型与数量占比。'));
 });
