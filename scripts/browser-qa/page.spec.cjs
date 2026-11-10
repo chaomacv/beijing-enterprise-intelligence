@@ -231,7 +231,10 @@ test('100 real companies support similarity distances, peripheral tag anchors, d
  expect(positions.every(p=>Math.abs(p.x-p.fx)<1e-6&&Math.abs(p.y-p.fy)<1e-6)).toBe(true);
  const companies=await page.locator('[data-node-kind="company"]').evaluateAll(els=>els.map(el=>({x:el.__data__.x,y:el.__data__.y})));
  expect(companies.every(p=>(p.x/200)**2+(p.y/120)**2<1.000001)).toBe(true);
+ await page.locator('#network-options summary').click();
+ await page.locator('#enterprise-network').scrollIntoViewIfNeeded();
  await page.screenshot({path:info.outputPath('company-tag-network.png')});
+ await page.locator('#network-options summary').click();
  await page.locator('#network-category').selectOption('product_registration');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  expect(await page.locator('[data-network-node]').count()).toBeLessThan(118);
  await page.locator('#network-category').selectOption('');await page.locator('#network-scope').selectOption('refined');
