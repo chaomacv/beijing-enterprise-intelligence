@@ -17,6 +17,7 @@
   <script src="app.js" defer></script>
   <script src="run.js" defer></script>
   <script src="gallery.js" defer></script>
+  <script src="source-overview.js" defer></script>
   <script src="vendor/d3.v7.min.js" defer></script>
   <script src="vendor/d3-binarytree.min.js" defer></script>
   <script src="vendor/d3-octree.min.js" defer></script>
@@ -41,13 +42,30 @@
   <div class="hero-copy"><p class="eyebrow">从数千万条异构记录中，提取可信、可追溯的企业事实</p><h1 id="hero-title">让公开数据，成为有据可查的企业情报。</h1><div class="hero-bottom"><p class="hero-lead">以公共数据为实践场景，结合数据工程与大模型技术，实现公开数据的解析、清洗、信息提取与实体关联，构建可靠、可追溯的企业画像，为金融业务提供数据支持。</p><div class="hero-cta"><div class="hero-actions"><a class="button primary" href="#explorations">开始探索 <span aria-hidden="true">↓</span></a><a class="button secondary" href="#pipeline">查看处理流程 <span aria-hidden="true">↗</span></a></div><p class="hero-footnote">开源实践<span>·</span>本地 Qwen<span>·</span>来源可追溯</p></div></div></div>
  </section>
  <section class="notebook-showcase" id="explorations" aria-label="数据笔记本" aria-roledescription="轮播">
-  <div class="carousel-viewport" id="gallery-viewport" tabindex="0" aria-label="数据笔记本，左右方向键切换"><div class="carousel-track"><article class="data-notebook" data-notebook="0" aria-roledescription="幻灯片" aria-label="1 / 8：5,200 份附件，展开后是什么样？">
-      <span class="notebook-category">文件概览</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[01]</span><div><h3>5,200 份附件，展开后是什么样？</h3><p>内圈是格式，外圈是解析状态。先看清数据的形状。</p></div></div>
-      
- <div class="sunburst-layout"><div id="gallery-sunburst" class="gallery-figure"></div><div><p class="notebook-kicker">LOGICAL FILES</p><strong class="notebook-big-number" id="gallery-file-total">11,701</strong><p class="notebook-small">包含展开成员和转换结果</p><div id="gallery-format-legend" class="format-legend"></div></div></div>
- <div class="cell-output" id="gallery-format-detail" role="status">悬停扇区可查看格式与解析状态。</div><pre class="gallery-code"><code>formats[kind, status] += 1
-# 按实际处理器格式分组，保留转换与复核状态</code></pre><footer class="notebook-scope">全批文件元数据 · 固定输入 2026-11-07 · 文件数不等于企业数</footer></div></article><article class="data-notebook" data-notebook="1" aria-roledescription="幻灯片" aria-label="2 / 8：把许可资质拆成十类。">
-      <span class="notebook-category">事件分类</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[02]</span><div><h3>把“许可资质”，拆开来看。</h3><p>分清企业、人员、设备与产品，再区分申请、检查和获批记录。</p></div></div>
+  <div class="carousel-viewport" id="gallery-viewport" tabindex="0" aria-label="数据笔记本，左右方向键切换"><div class="carousel-track"><article class="data-notebook" data-card-key="sources" data-notebook="0" aria-roledescription="幻灯片" aria-label="1 / 10：来源分布与数据异构性"><span class="notebook-category">数据背景</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[01]</span><div><h3>来源分布与数据异构性</h3><p>按官网主题统计来源数量；悬停柱形查看下载页，下方对照文件结构与业务相关性。</p></div></div>
+<div class="source-scale"><div><strong id="source-count">4,710</strong><span>来源数据集</span></div><i>→</i><div><strong id="source-attachments">5,200</strong><span>已接收附件</span></div><i>→</i><div><strong id="source-records">4,365万</strong><span>已知逻辑记录</span></div></div>
+<div class="source-chart-scroll"><div id="source-chart" class="source-chart"></div></div>
+<p class="source-chart-hint">横轴：官网主题 · 柱高：数据集数 · 悬停或点击查看来源下载页</p>
+<section class="source-inspector" aria-labelledby="source-status"><div class="source-inspector-head"><h4 id="source-status" role="status">正在读取官网目录…</h4><label class="sr-only" for="source-theme-select">选择来源主题</label><select id="source-theme-select" aria-label="选择来源主题"></select></div><ol id="source-links" class="source-links"></ol></section>
+<div class="source-example-title"><h4>数据文件样例</h4><span>同样是公开文件，结构与相关性各不相同</span></div>
+<div class="source-examples-scroll"><table class="gallery-table source-examples"><caption class="sr-only">文件名与字段为结构示意，点击名称进入真实来源下载页</caption><thead><tr><th>文件名称</th><th>原始字段示例</th><th>相关性</th></tr></thead><tbody id="source-examples"></tbody></table></div>
+<p class="notebook-small">文件名、扩展名、字段和相关性为结构示意，非本批附件原样摘录或模型判定；链接对应真实来源目录。源头多不等于信息都有用。</p>
+<pre class="gallery-code"><code>SELECT official_theme, COUNT(*) AS datasets
+FROM catalog GROUP BY official_theme;
+# 来源下载页每类最多展示 10 个，不公开带登录态的附件链接</code></pre>
+<footer class="notebook-scope">官网目录固定快照 · 2026-11-07 · 20 个主题／4,710 个数据集 · 记录数包含排除与复核去向 · <a href="assets/source-overview.json">来源统计 JSON ↗</a></footer></div></article><article class="data-notebook" data-card-key="acquisition" data-notebook="1" aria-roledescription="幻灯片" aria-label="2 / 10：数据采集与安全控制"><span class="notebook-category">采集与安全</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[02]</span><div><h3>数据采集与安全控制</h3><p>流程图展示链接解析、异步接收与验收路径；公式和代码说明调度约束及恢复机制。</p></div></div>
+<p class="acquisition-intro">海量入口、动态附件链接、网络波动，以及必须留在本地的业务数据——采集需要有节制，也需要能恢复、能核对。</p>
+<div class="acquisition-flow" role="img" aria-label="目录缓存进入链接解析，导航与点击限频后异步接收；完成验收，失败进入第二三轮补跑"><div><span>01 / DISCOVER</span><b>目录缓存</b><small>已有清单直接续跑</small></div><i>→</i><div><span>02 / RESOLVE</span><b>解析附件</b><small>页面链接与版本分组</small></div><i>→</i><div><span>03 / RECEIVE</span><b>受控接收</b><small>限频发起 · 并发接收</small></div><i>→</i><div><span>04 / VERIFY</span><b>文件验收</b><small>格式 · 大小 · SHA-256</small></div></div>
+<div class="acquisition-retry"><span>失败池</span><b>↶</b><p>每轮结束补失败项 · 最多 3 次总尝试 · 耗尽后记录原因</p><span class="acquisition-terminal">成功项跳过</span></div>
+<div class="acquisition-equations"><div><span>调度约束</span><p><var>Δt</var> ≥ 1 s <em>·</em> 0 ≤ <var>C</var><sub>接收</sub> ≤ 4</p><small>默认策略；并发接收与导航发起分别控制</small></div><div><span>恢复判据</span><p><var>SHA256</var>(<var>file</var>) = <var>hash</var><sub>台账</sub></p><small>复核本地文件完整性，不冒充服务器原件校验</small></div></div>
+<div class="acquisition-practices"><section><span>LINKS</span><h4>解析链接，控制重复</h4><p>从官网目录进入详情页，提取附件入口。同数据集、同版本与名称组优先 CSV，其次 XLSX；不同年份和分片分别保留。</p></section><section><span>RECOVERY</span><h4>下载与验收解耦</h4><p>浏览器接手后继续调度，后台限量接收。非空、错误网页和基本格式检查通过后落盘；中断保留状态，下次按文件续跑。</p></section><section><span>PRIVACY</span><h4>本地模型与私有明细</h4><p>登录会话保留在本地浏览器；业务原文与模型回复在私有环境处理。公开页面仅发布汇总、匿名样本和明确标注的结构示意。</p></section></div>
+<pre class="gallery-code"><code>if local_file_matches_ledger(task): skip(task)
+await rate_limit(min_interval=1)
+receive_in_background(task, max_inflight=4)
+# 一轮后验收；仅补失败项；累计最多尝试 3 次</code></pre>
+<div class="notebook-callout acquisition-boundary">限频不保证官网不会限制访问；遇登录、验证码或访问限制即暂停，保留进度。文件级续跑不等于 HTTP 字节断点续传。</div>
+<footer class="notebook-scope">已实现的下载策略与安全边界 · 默认参数，不是吞吐测量 · 本批 5,200 份附件已纳入输入核对，上游 22 个失败项另记 · <a href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/main/docs/acquisition.md">采集方法说明 ↗</a></footer></div></article><article class="data-notebook" data-card-key="events" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 10：企业事件分类统计">
+      <span class="notebook-category">事件分类</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[03]</span><div><h3>企业事件分类统计</h3><p>柱长表示事件数量；可切换类别范围、事件阶段、关联画像数和刻度。</p></div></div>
       
  <div class="taxonomy-reconciliation"><strong id="gallery-taxonomy-total">5,032,506</strong><span>条旧类记录 → 10 类<br>原始事件与来源全部保留</span></div>
  <div class="notebook-toolbar taxonomy-toolbar"><label>范围 <select id="gallery-event-scope"><option value="refined">原许可相关记录细分</option><option value="all">全部细分事件</option></select></label><label>数量 <select id="gallery-event-metric"><option value="events">事件观察数</option><option value="profiles">关联画像数</option></select></label><label>阶段 <select id="gallery-event-stage"><option value="all">全部阶段</option><option value="confirmed">有阶段依据 confirmed</option><option value="proposed">拟议 proposed</option><option value="unknown">阶段未明 unknown</option></select></label><label><input id="gallery-event-log" type="checkbox"> 对数刻度</label></div>
@@ -56,8 +74,29 @@
  <pre class="gallery-code"><code>SELECT event_type, status, count(*) AS observations
 FROM classified_events GROUP BY event_type, status;
 -- 原 event_id、原分类、原阶段与依据可追溯</code></pre>
- <div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">细分类别及选定阶段的数量</caption><thead><tr><th>细分类别</th><th id="gallery-event-count-label">事件观察数</th><th>选定阶段</th></tr></thead><tbody id="gallery-event-table"></tbody></table></div><footer class="notebook-scope">全批最终结果 · 2026-11-10 分类修正 · 依据来源主题与结构化证据，独立准确率尚未评测 · <a href="assets/event-classification.json">分类汇总 JSON ↗</a></footer></div></article><article class="data-notebook" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 8：相同内容理解一次，来源全部保留。">
-      <span class="notebook-category">内容去重</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[03]</span><div><h3>相同内容理解一次，来源全部保留。</h3><p>从 144 万条待语义记录中，找出真正不同的内容。</p></div></div>
+ <div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">细分类别及选定阶段的数量</caption><thead><tr><th>细分类别</th><th id="gallery-event-count-label">事件观察数</th><th>选定阶段</th></tr></thead><tbody id="gallery-event-table"></tbody></table></div><footer class="notebook-scope">全批最终结果 · 2026-11-10 分类修正 · 依据来源主题与结构化证据，独立准确率尚未评测 · <a href="assets/event-classification.json">分类汇总 JSON ↗</a></footer></div></article><article class="data-notebook" data-card-key="hierarchy" data-notebook="3" aria-roledescription="幻灯片" aria-label="4 / 10：数据层级与数量构成">
+<span class="notebook-category">事件层级</span><div class="notebook-page">
+<div class="notebook-heading"><span class="cell-number">[04]</span><div><h3>数据层级与数量构成</h3><p>切换附件、逻辑文件和业务记录；扇区面积表示数量，点击展开下级或返回上级。</p></div></div>
+<div id="event-sunburst-modes" class="sunburst-modes" role="group" aria-label="旭日图探索模式"></div>
+<div class="sunburst-explore-bar"><span id="event-sunburst-levels"></span><label class="sunburst-filter"><select id="event-sunburst-filter" aria-label="旭日图类别筛选"></select></label></div>
+<nav id="event-sunburst-breadcrumb" class="sunburst-breadcrumb" aria-label="事件分类面包屑"></nav>
+<div id="event-sunburst-chart" class="event-sunburst-chart"></div>
+<p id="event-sunburst-detail" class="sunburst-detail" role="status" aria-live="polite"></p>
+<p id="event-sunburst-note" class="notebook-callout"></p>
+<div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">分类数量与占父级比例</caption><thead><tr><th>分类</th><th id="event-sunburst-unit">文件数</th><th>占父级</th></tr></thead><tbody id="event-sunburst-table"></tbody></table></div>
+<pre class="gallery-code"><code>root = d3.hierarchy(data).sum(d =&gt; d.children ? 0 : d.value)
+partition.size([2 * Math.PI, root.height + 1])(root)
+// 每条记录只计一次；点击后重新映射角度和可见层级</code></pre>
+<footer class="notebook-scope">全批最终结果 · 同层面积按数量分配 · <a href="https://observablehq.com/@d3/zoomable-sunburst">D3 Zoomable Sunburst ↗</a> · <a href="assets/event-hierarchy.json">真实层级接口 ↗</a></footer>
+</div></article><article class="data-notebook" data-card-key="methods" data-notebook="4" aria-roledescription="幻灯片" aria-label="5 / 10：公开数据处理方法"><span class="notebook-category">方法说明</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[05]</span><div><h3>公开数据处理方法</h3><p>从读取、筛选、提取到核验和关联；点击五个问题，查看各环节的输入、方法与输出。</p></div></div>
+<div class="story-chain" aria-label="异构文件，经理解与核验，形成可追溯画像"><span>异构文件</span><b>→</b><span>事件事实</span><b>→</b><span>企业画像</span></div>
+<p class="story-intro">公开文件只是起点。读者需要看到：数据怎样进入系统，信息怎样被识别，结果又凭什么值得进一步使用。</p>
+<div id="story-questions" class="story-questions" role="group" aria-label="五个方法问题"></div>
+<div id="story-method" class="story-method" aria-live="polite"></div>
+<div class="story-equation">可追溯画像 = 来源证据 + 保守关联 + 标签结构</div>
+<pre class="gallery-code"><code id="story-code"></code></pre>
+<footer class="notebook-scope">方法说明 · 来源校验与独立语义准确率分别验证 · 不自动形成授信结论</footer></div></article><article class="data-notebook" data-card-key="dedup" data-notebook="5" aria-roledescription="幻灯片" aria-label="6 / 10：内容去重与推理复用">
+      <span class="notebook-category">内容去重</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[06]</span><div><h3>内容去重与推理复用</h3><p>流向图对比来源记录与不同内容代表；公式说明可复用比例，代码展示分组方法。</p></div></div>
       
  <div id="gallery-dedup-chart" class="gallery-figure"></div>
  <div class="notebook-formula" aria-label="可复用来源比例等于一减去不同内容代表数除以来源记录数"><span>r</span><span>=</span><span>1 −</span><span class="fraction"><span>388,349</span><span>1,440,619</span></span><span>=</span><strong>73.0%</strong></div>
@@ -65,14 +104,12 @@ FROM classified_events GROUP BY event_type, status;
  <pre class="gallery-code"><code>key = hash(file_id, scope_id, complete_cells, context)
 representatives[key].append(record_id)
 # 概念伪代码：模型处理代表，逐条核对后回填原始位置</code></pre>
- <div class="notebook-callout">完整单元格和语境相同才复用。“同上”等相对表述单独处理；没有删除原始记录。</div><footer class="notebook-scope">全批复杂内容执行计划 · 精确分组 · 同文件／同逻辑表范围</footer></div></article><article class="data-notebook" data-notebook="3" aria-roledescription="幻灯片" aria-label="4 / 8：五个问题，读懂这条数据链。"><span class="notebook-category">方法说明</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[04]</span><div><h3>五个问题，读懂这条数据链。</h3><p>用解释、图形和代码，连接技术选择与具体困难。</p></div></div>
-<div class="story-chain" aria-label="异构文件，经理解与核验，形成可追溯画像"><span>异构文件</span><b>→</b><span>事件事实</span><b>→</b><span>企业画像</span></div>
-<p class="story-intro">公开文件只是起点。读者需要看到：数据怎样进入系统，信息怎样被识别，结果又凭什么值得进一步使用。</p>
-<div id="story-questions" class="story-questions" role="group" aria-label="五个方法问题"></div>
-<div id="story-method" class="story-method" aria-live="polite"></div>
-<div class="story-equation">可追溯画像 = 来源证据 + 保守关联 + 标签结构</div>
-<pre class="gallery-code"><code id="story-code"></code></pre>
-<footer class="notebook-scope">方法说明 · 来源校验与独立语义准确率分别验证 · 不自动形成授信结论</footer></div></article><article class="data-notebook" data-notebook="4" aria-roledescription="幻灯片" aria-label="5 / 8：共享的标签，构成相似的画像。"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[05]</span><div><h3>共享的标签，构成相似的画像。</h3><p>选取100家真实企业，一点一家。共同标签和事件越多，目标距离越短。</p></div></div>
+ <div class="notebook-callout">完整单元格和语境相同才复用。“同上”等相对表述单独处理；没有删除原始记录。</div><footer class="notebook-scope">全批复杂内容执行计划 · 精确分组 · 同文件／同逻辑表范围</footer></div></article><article class="data-notebook" data-card-key="formats" data-notebook="6" aria-roledescription="幻灯片" aria-label="7 / 10：文件格式构成">
+      <span class="notebook-category">文件概览</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[07]</span><div><h3>文件格式构成</h3><p>统计原始附件、压缩包展开成员及格式转换产物的文件类型与数量占比。</p></div></div>
+      
+ <div class="sunburst-layout"><div id="gallery-sunburst" class="gallery-figure"></div><div><p class="notebook-kicker">LOGICAL FILES</p><strong class="notebook-big-number" id="gallery-file-total">11,701</strong><p class="notebook-small">包含展开成员和转换结果</p><div id="gallery-format-legend" class="format-legend"></div></div></div>
+ <div class="cell-output" id="gallery-format-detail" role="status">悬停扇区可查看格式与解析状态。</div><pre class="gallery-code"><code>formats[kind, status] += 1
+# 按实际处理器格式分组，保留转换与复核状态</code></pre><footer class="notebook-scope">全批文件元数据 · 固定输入 2026-11-07 · 文件数不等于企业数</footer></div></article><article class="data-notebook" data-card-key="network" data-notebook="7" aria-roledescription="幻灯片" aria-label="8 / 10：企业画像相似网络"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[08]</span><div><h3>企业画像相似网络</h3><p>100 个圆点对应 100 家真实企业；切换相似网络与标签网络，观察共同标签及事件数量的影响。</p></div></div>
 <div class="network-simple-toolbar"><span id="network-total">正在读取真实企业样本…</span><label class="sr-only" for="network-mode">网络视图</label><select id="network-mode" aria-label="网络视图"><option value="similarity">企业相似网络</option><option value="bipartite">企业—标签网络</option></select><label class="sr-only" for="network-dimension">网络空间</label><select id="network-dimension" aria-label="网络空间"><option value="2">二维</option><option value="3">三维</option></select></div>
 <details id="network-options" class="network-options"><summary>更多选项</summary><div class="network-option-body">
 <div class="network-toolbar"><label>范围 <select id="network-scope"><option value="all">全部18类事件</option><option value="refined">许可相关十类</option></select></label></div>
@@ -88,36 +125,22 @@ representatives[key].append(record_id)
 shared_events = Σ min(count_A[t], count_B[t])
 similarity = 0.65 * types_norm + 0.35 * log_events_norm
 link_distance = 220 - 160 * similarity</code></pre>
-<footer class="notebook-scope">100家真实企业的匿名样本 · 按类别与标签丰富度分层选取，非总体随机样本 · 事件为来源观察，含阶段未明记录 · <a href="assets/company-network.json">样本数据 ↗</a></footer></div></article><article class="data-notebook" data-notebook="5" aria-roledescription="幻灯片" aria-label="6 / 8：企业画像，保留每一条证据。"><span class="notebook-category">企业画像</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[06]</span><div><h3>企业画像，保留每一条证据。</h3><p>从真实处理规模，到一条可回查的企业记录。</p></div></div>
+<footer class="notebook-scope">100家真实企业的匿名样本 · 按类别与标签丰富度分层选取，非总体随机样本 · 事件为来源观察，含阶段未明记录 · <a href="assets/company-network.json">样本数据 ↗</a></footer></div></article><article class="data-notebook" data-card-key="portrait" data-notebook="8" aria-roledescription="幻灯片" aria-label="9 / 10：企业画像与证据追溯"><span class="notebook-category">企业画像</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[09]</span><div><h3>企业画像与证据追溯</h3><p>上方统计全批画像规模，下方用合成企业演示标签、事件阶段与来源证据。</p></div></div>
 <div id="portrait-summary" class="portrait-summary">正在读取真实阶段汇总…</div>
 <div class="portrait-example-heading"><span>以下为合成企业示例</span><select id="portrait-company" aria-label="选择合成企业画像"></select></div>
 <div class="portrait-business"><span class="portrait-provisional">PROVISIONAL · 暂定身份</span><div class="portrait-heading"><h4 id="portrait-name"></h4><span class="portrait-avatar" aria-hidden="true">企</span></div><p id="portrait-address"></p><div id="portrait-tags" class="portrait-tags"></div></div>
 <div id="portrait-timeline" class="portrait-timeline"></div>
 <p class="portrait-boundary">每条事实保留来源和阶段。未观察到某类事件，不代表该类事件不存在；拟认定也不等于已认定。</p>
-<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-notebook="6" aria-roledescription="幻灯片" aria-label="7 / 8：看见这次处理，是怎样向前推进的。">
-      <span class="notebook-category">执行进度</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[07]</span><div><h3>看见这次处理，是怎样向前推进的。</h3><p>沿时间轴回放已经核对的快照，观察复杂内容的推理进度。</p></div></div>
+<footer class="notebook-scope">数量：全批已完成结果 · 画像包含临时身份 · 个体示例：仓库合成规则Demo，不是Qwen实测准确率</footer></div></article><article class="data-notebook" data-card-key="timeline" data-notebook="9" aria-roledescription="幻灯片" aria-label="10 / 10：全量处理时间线">
+      <span class="notebook-category">执行进度</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[10]</span><div><h3>全量处理时间线</h3><p>横轴为实际观测时间，纵轴为已处理内容代表；拖动滑块回放进度。</p></div></div>
       
  <div class="timeline-reading"><strong id="gallery-time-count">280,360</strong><span id="gallery-time-percent">72.2% 个内容代表已处理</span><time id="gallery-time-at">2026-11-09 16:11（北京时间）</time></div>
  <div id="gallery-timeline-chart" class="gallery-figure"></div>
  <label class="space-control" for="gallery-time-scrub">回放观测点 <input id="gallery-time-scrub" type="range" min="0" max="7" value="7"><output id="gallery-time-index" for="gallery-time-scrub">8 / 8</output></label>
  <pre class="gallery-code"><code>progress = completed_representatives / 388_349
 # 横轴按真实时间间隔绘制；连接观测点，不补造中间测量</code></pre>
- <div class="notebook-callout">这是数据工程执行时间线。最后一个点来自全批完成汇总，推理、关联、分类修正及验收均已结束；待复核项继续保留。</div><footer class="notebook-scope">实际进度观测 · 时间统一为北京时间 · 不代表企业事件时间分布</footer></div></article><article class="data-notebook" data-notebook="7" aria-roledescription="幻灯片" aria-label="8 / 8：事件分类旭日图">
-<span class="notebook-category">事件层级</span><div class="notebook-page">
-<div class="notebook-heading"><span class="cell-number">[08]</span><div><h3>用面积，看清事件分类。</h3><p>三种真实口径，两层可见。点击扇区深入，点击中心返回。</p></div></div>
-<div id="event-sunburst-modes" class="sunburst-modes" role="group" aria-label="旭日图探索模式"></div>
-<div class="sunburst-explore-bar"><span id="event-sunburst-levels"></span><label class="sunburst-filter"><select id="event-sunburst-filter" aria-label="旭日图类别筛选"></select></label></div>
-<nav id="event-sunburst-breadcrumb" class="sunburst-breadcrumb" aria-label="事件分类面包屑"></nav>
-<div id="event-sunburst-chart" class="event-sunburst-chart"></div>
-<p id="event-sunburst-detail" class="sunburst-detail" role="status" aria-live="polite"></p>
-<p id="event-sunburst-note" class="notebook-callout"></p>
-<div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">分类数量与占父级比例</caption><thead><tr><th>分类</th><th id="event-sunburst-unit">文件数</th><th>占父级</th></tr></thead><tbody id="event-sunburst-table"></tbody></table></div>
-<pre class="gallery-code"><code>root = d3.hierarchy(data).sum(d =&gt; d.children ? 0 : d.value)
-partition.size([2 * Math.PI, root.height + 1])(root)
-// 每条记录只计一次；点击后重新映射角度和可见层级</code></pre>
-<footer class="notebook-scope">全批最终结果 · 同层面积按数量分配 · <a href="https://observablehq.com/@d3/zoomable-sunburst">D3 Zoomable Sunburst ↗</a> · <a href="assets/event-hierarchy.json">真实层级接口 ↗</a></footer>
-</div></article></div></div>
-  <div class="carousel-controls shell"><button class="gallery-nav" id="gallery-prev" type="button" aria-label="上一个笔记本">←</button><div class="gallery-pagination" role="group" aria-label="选择数据笔记本"><button type="button" data-gallery-page="0" aria-label="第 1 个：文件层级" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="1" aria-label="第 2 个：事件统计" aria-pressed="true"><span></span></button><button type="button" data-gallery-page="2" aria-label="第 3 个：精确去重" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="3" aria-label="第 4 个：方法说明" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="4" aria-label="第 5 个：画像网络" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="5" aria-label="第 6 个：企业画像" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="6" aria-label="第 7 个：执行时间线" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="7" aria-label="第8个：事件层级" aria-pressed="false"><span></span></button></div><button class="gallery-nav" id="gallery-next" type="button" aria-label="下一个笔记本">→</button><span class="carousel-divider" aria-hidden="true"></span><button id="gallery-play" class="gallery-play" type="button" aria-pressed="true"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2"/></svg></button><span id="gallery-clock" class="gallery-clock">8s / 每张</span><span class="sr-only" id="gallery-announcement" role="status"></span></div>
+ <div class="notebook-callout">这是数据工程执行时间线。最后一个点来自全批完成汇总，推理、关联、分类修正及验收均已结束；待复核项继续保留。</div><footer class="notebook-scope">实际进度观测 · 时间统一为北京时间 · 不代表企业事件时间分布</footer></div></article></div></div>
+  <div class="carousel-controls shell"><button class="gallery-nav" id="gallery-prev" type="button" aria-label="上一个笔记本">←</button><div class="gallery-pagination" role="group" aria-label="选择数据笔记本"><button type="button" data-gallery-page="0" aria-label="第 1 个：来源分布与数据异构性" aria-pressed="true"><span></span></button><button type="button" data-gallery-page="1" aria-label="第 2 个：数据采集与安全控制" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="2" aria-label="第 3 个：企业事件分类统计" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="3" aria-label="第 4 个：数据层级与数量构成" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="4" aria-label="第 5 个：公开数据处理方法" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="5" aria-label="第 6 个：内容去重与推理复用" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="6" aria-label="第 7 个：文件格式构成" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="7" aria-label="第 8 个：企业画像相似网络" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="8" aria-label="第 9 个：企业画像与证据追溯" aria-pressed="false"><span></span></button><button type="button" data-gallery-page="9" aria-label="第 10 个：全量处理时间线" aria-pressed="false"><span></span></button></div><button class="gallery-nav" id="gallery-next" type="button" aria-label="下一个笔记本">→</button><span class="carousel-divider" aria-hidden="true"></span><button id="gallery-play" class="gallery-play" type="button" aria-pressed="true"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7 5v10M13 5v10" stroke="currentColor" stroke-width="2"/></svg></button><span id="gallery-clock" class="gallery-clock">8s / 每张</span><span class="sr-only" id="gallery-announcement" role="status"></span></div>
 
   <noscript><p class="shell fallback">开启 JavaScript 可查看图表并操作轮播。各卡片的代码、口径和说明仍可阅读；精确数值可下载上方汇总 JSON。</p></noscript>
  </section>

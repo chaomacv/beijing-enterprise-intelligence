@@ -1,0 +1,1352 @@
+{
+  "schema_version": 1,
+  "kind": "public_catalog_overview",
+  "snapshot_date": "2026-11-07",
+  "catalog_sha256": "46168851817f93ca8e5fd578bc54728b4bc5a9a28329684e84fac1a9c2c79f2f",
+  "dataset_count": 4710,
+  "sample_limit": 10,
+  "sampling": "名称排序后等距取样；不超过10个全部保留，不代表相关性排名",
+  "link_kind": "official_dataset_download_page_not_authenticated_attachment_url",
+  "themes": [
+    {
+      "name": "经济建设",
+      "count": 222,
+      "samples": [
+        {
+          "name": "2018年资产评估机构备案信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/16027.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "中关村国家自主创新示范区企业经营活动情况",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/stjj/b93c7b740a4c40108f93df032d639d8f.htm",
+          "department": "市统计局",
+          "formats": "png,rdf,xls,csv"
+        },
+        {
+          "name": "北京市建筑起重机械登记编号信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/942069753e704136aa4be7c0c93fb489.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xls"
+        },
+        {
+          "name": "国有产权股权-挂牌披露",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/4bdf0e12e5ea4ff9a349543f57f0ffb2.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "密云区农村基本情况（按乡镇分）（2019年）",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/48444.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "密云区限额以上批发和零售业商品购进、销售和库存情况（2019年）",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/48432.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "开发区2020年房地产开发和销售主要指标",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/fece598b8b794d629764f46bee54565e.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xlsx"
+        },
+        {
+          "name": "支出法地区生产总值",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/stjj/82233525af02453a9cdb54679ee32c5f.htm",
+          "department": "市统计局",
+          "formats": "csv,xls,rdf,png"
+        },
+        {
+          "name": "规模以上工业企业主要效益指标",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/stjj/7bc75addd8e7412d8e9a4e2fdbf67b41.htm",
+          "department": "市统计局",
+          "formats": "png,csv,xls,rdf"
+        },
+        {
+          "name": "顺义区行政许可统计数据",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/43f17a1ad0e0487aafd7db286e19a938.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xls"
+        }
+      ]
+    },
+    {
+      "name": "信用服务",
+      "count": 43,
+      "samples": [
+        {
+          "name": "公证处行政处罚信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/ssfj/05f1cd2c5e6b43b386c22aff0b8bd4c6.htm",
+          "department": "市司法局",
+          "formats": "csv,xlsx,png,rdf"
+        },
+        {
+          "name": "区住建委行政许可公示",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/058db15fda7546d3bad8aca4f517bd38.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xls"
+        },
+        {
+          "name": "区应急局怀柔区行政处罚公示信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/460e9c985399431a9a228cde0f03adef.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xls"
+        },
+        {
+          "name": "密云区城市排水许可证核发",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/52748.htm",
+          "department": "往年开放数据",
+          "formats": "png,xls,csv"
+        },
+        {
+          "name": "怀柔区 2024 园林绿化局行政许可结果公示",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/1e5166620921484fb81a0651d981c03f.htm",
+          "department": "往年开放数据",
+          "formats": "png,xlsx,csv"
+        },
+        {
+          "name": "怀柔区2025卫生健康委员会行政许可统计情况",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/hrq/a7fc81f73d474f31bddb5ad26b8fa6f1.htm",
+          "department": "怀柔区",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "房地产经纪机构警示名录",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/578ff34bc559442e9abd67df6a4eb509.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "违反《互联网视听节目服务管理规定》处罚数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/swhzfzd/354911549bb84a6b948f71c6f63b8843.htm",
+          "department": "市文化执法总队",
+          "formats": "xlsx,rdf,csv,png"
+        },
+        {
+          "name": "违反《娱乐场所管理办法》处罚数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/swhzfzd/99303c3ae6dc4f1ca7a4ebb23f82e44f.htm",
+          "department": "市文化执法总队",
+          "formats": "csv,rdf,xlsx,png"
+        },
+        {
+          "name": "违反《营业性演出管理条例》处罚数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/swhzfzd/5f247fb594e849a4813ec3d85264d790.htm",
+          "department": "市文化执法总队",
+          "formats": "png,csv,rdf,xlsx"
+        }
+      ]
+    },
+    {
+      "name": "财税金融",
+      "count": 194,
+      "samples": [
+        {
+          "name": "2022年一般公共预算财政拨款项目支出表",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sgzw/189d891948ce49dcaa2fdfd2e77b1166.htm",
+          "department": "市国资委",
+          "formats": "png,csv,xlsx"
+        },
+        {
+          "name": "2025年怀柔区区本级政府性基金预算支出表",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/955d445ed310485fa25040858f48f341.htm",
+          "department": "往年开放数据",
+          "formats": "pdf,png"
+        },
+        {
+          "name": "丰台区2023年一般公共预算基本支出政府经济分类情况表",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/ftq/b197b919a0ce4d808a987885e5912a29.htm",
+          "department": "丰台区",
+          "formats": "png,xlsx,csv,rdf"
+        },
+        {
+          "name": "北京市一般公共预算支出决算情况表",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/c2193b72e8104f7895e4e236f49846a6.htm",
+          "department": "往年开放数据",
+          "formats": "png,csv,xls"
+        },
+        {
+          "name": "北京市市级国有资本经营预算收入决算情况表",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/d344aa8fc80b4ed8bc08692f4ce281e6.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xls,png"
+        },
+        {
+          "name": "北京市融资担保公司信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/17767.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "大兴区典当行名单",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/2d83b35f8d6842ac804f23297b8c071f.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "期货机构联系方式",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/b265ef658a604cb98598f4f21faa75ea.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "西城区2020年一般公共预算支出政府经济分类情况表",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/d98d21f9983a4019b5540197e1eb04bb.htm",
+          "department": "西城区",
+          "formats": "csv,xlsx"
+        },
+        {
+          "name": "顺义区驻区银行网点",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/52406.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx,png"
+        }
+      ]
+    },
+    {
+      "name": "旅游住宿",
+      "count": 89,
+      "samples": [
+        {
+          "name": "2021年度昌平星级饭店数据开放表",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/443711ebcae443bf986164295f8217e4.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx"
+        },
+        {
+          "name": "丰台区景区景点（特色业态）",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/ftq/6d2c8c6c075442b09da069e1a9d32a8e.htm",
+          "department": "丰台区",
+          "formats": "png,xlsx,rdf,csv"
+        },
+        {
+          "name": "区发改委-怀柔区政府定价景区门票价格",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/058e91cd6f8b4759b50cb52a765d609c.htm",
+          "department": "往年开放数据",
+          "formats": "png,xlsx,csv"
+        },
+        {
+          "name": "展览路街道宾馆酒点基础信息",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/56cc24b6e68e42ca9dd47bb8873f8754.htm",
+          "department": "西城区",
+          "formats": "csv,xlsx"
+        },
+        {
+          "name": "新街口街道宾馆酒点基础信息",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/4d59b2f1899f4796a242daffbfcc4870.htm",
+          "department": "西城区",
+          "formats": "csv,xlsx"
+        },
+        {
+          "name": "望京街道宾馆酒店",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/zyq/1789be033b7f40c8a415afa2d51dcdba.htm",
+          "department": "朝阳区",
+          "formats": "csv,png,xlsx"
+        },
+        {
+          "name": "王府",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/4915893e464c492caff4fd59c3dee020.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "西城区文物名单",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/f7e94e6963d34f9da7d250d56ec1de28.htm",
+          "department": "西城区",
+          "formats": "xlsx,csv"
+        },
+        {
+          "name": "通讯社",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/78893df8006a482593612c47292f50df.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xls"
+        },
+        {
+          "name": "饮食业",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/21861c1942e243a991beeddcf5067104.htm",
+          "department": "往年开放数据",
+          "formats": "png,xls,csv"
+        }
+      ]
+    },
+    {
+      "name": "交通服务",
+      "count": 89,
+      "samples": [
+        {
+          "name": "乘客引导基础信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjtw/96fb0e66adef41aab7a98797a2e0cd1c.htm",
+          "department": "市交通委",
+          "formats": "csv,xlsx,png,rdf"
+        },
+        {
+          "name": "公交线路信息（出行服务）",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjtw/8cb06ae0555b41ee87a20bdb5b08c90a.htm",
+          "department": "市交通委",
+          "formats": "png,rdf,csv,xlsx"
+        },
+        {
+          "name": "北京西站地区公共卫生间信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sxzdqglwyk/aaaec4ef1fc04b23acc5bc2231694f9c.htm",
+          "department": "重点站区管委会",
+          "formats": "png,csv,rdf,xlsx"
+        },
+        {
+          "name": "密云区普通货运企业基础信息",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/myq/9cbecc8d6d634d179437e877038c4b59.htm",
+          "department": "密云区",
+          "formats": "csv,rdf,xls,png"
+        },
+        {
+          "name": "教练车信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjtw/64bb8477758d474a9f450c472454d7cc.htm",
+          "department": "市交通委",
+          "formats": "rdf,xlsx,csv,png"
+        },
+        {
+          "name": "汽车租赁企业信用评价结果数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjtw/0361da969bb24b0f8f1825c27a06a5c5.htm",
+          "department": "市交通委",
+          "formats": "csv,xlsx,rdf,png"
+        },
+        {
+          "name": "石景山区道路停车电子收费道路信息",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/sjsq/8fda5b13fca74ff6aeab7e4a040f9681.htm",
+          "department": "石景山区",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "西城区路侧电子收费停车位信息表",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/aa5361e49e0841b6962fc0f3465c9820.htm",
+          "department": "西城区",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "轨道站点信息（出行）",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjtw/3246d313de5c4470826f7384a297688b.htm",
+          "department": "市交通委",
+          "formats": "xlsx,csv,rdf,png"
+        },
+        {
+          "name": "驾培机构质量信誉考核信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjtw/a582caefaf114a72a0efddf06998fa66.htm",
+          "department": "市交通委",
+          "formats": "rdf,xlsx,png,csv"
+        }
+      ]
+    },
+    {
+      "name": "餐饮美食",
+      "count": 7,
+      "samples": [
+        {
+          "name": "2022年朝阳区黑珍珠入榜餐厅",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/zyq/0147d20bad8f44068dd23438fbef1ef1.htm",
+          "department": "朝阳区",
+          "formats": "png,xlsx,csv"
+        },
+        {
+          "name": "昌平区老年餐桌名单（2022年8月）",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/db36c9f1851242528f31638c8cc3c775.htm",
+          "department": "往年开放数据",
+          "formats": "png,xls,csv"
+        },
+        {
+          "name": "海淀区星级饭店",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/2cef1c0c118143b69d7284d5295312be.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "石景山区规模以上餐饮企业",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/sjsq/10a602de805c400f8cdc0c2e3746ab8f.htm",
+          "department": "石景山区",
+          "formats": "png,xlsx,csv"
+        },
+        {
+          "name": "规范化清真特色餐厅",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/f16f3564b68d4bc39bd5fca444adabdf.htm",
+          "department": "往年开放数据",
+          "formats": "png,xls,csv"
+        },
+        {
+          "name": "规范化清真特色餐厅信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/13748.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "餐饮服务许可证情况信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/syjj/fbc380d5524e4aa78530f6307fcfabb1.htm",
+          "department": "市市场监管局",
+          "formats": "rdf,csv,xlsx,png"
+        }
+      ]
+    },
+    {
+      "name": "医疗健康",
+      "count": 317,
+      "samples": [
+        {
+          "name": "2021年密云区门诊部及诊所类",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/6b5cfcd9737d47d88c2e0c0bc9a772dc.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xls"
+        },
+        {
+          "name": "互联网药品信息服务许可结果信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sypjdglj/4c2e1e983adc4c4d8736cc02899f9141.htm",
+          "department": "市药监局",
+          "formats": "xlsx,png,rdf,csv"
+        },
+        {
+          "name": "北京市二三级综合医院医保住院病例病组绩效比较分析——IB29（颈椎融合术）",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/bjylbxxk/17870.htm",
+          "department": "北京医疗保险协会",
+          "formats": "xls,csv"
+        },
+        {
+          "name": "北京市顺义区集中式供水单位卫生许可信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/7dbe31ead2a648a2ab25a52684997888.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "医疗机构制剂调剂使用批件",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/61898595535c455c88d36fac01e96477.htm",
+          "department": "往年开放数据",
+          "formats": "png,csv,xlsx"
+        },
+        {
+          "name": "密云区医疗机构主要业务情况统计表",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/myq/6b024794c3f6485abf7a9e950755b566.htm",
+          "department": "密云区",
+          "formats": "xlsx,csv,png,rdf"
+        },
+        {
+          "name": "朝阳区三级医疗机构名单",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/zyq/00e95ac6cda54632af76a06633035488.htm",
+          "department": "朝阳区",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "第二类医疗器械产品注册证信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sypjdglj/5dbf673d77ac435e9a010201093ff774.htm",
+          "department": "市药监局",
+          "formats": "xls,png,csv"
+        },
+        {
+          "name": "西城区宠物医院名单",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/4489c4a13e1e4919ab57de6ee5a3f245.htm",
+          "department": "西城区",
+          "formats": "csv,xlsx"
+        },
+        {
+          "name": "麻醉药品、精神药品邮寄证明",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/327cfd6fa2844f9ba9bcfc4b654685f8.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx,png"
+        }
+      ]
+    },
+    {
+      "name": "文体娱乐",
+      "count": 253,
+      "samples": [
+        {
+          "name": "2022年一级社会体育指导员信息公开",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/96cd3fff41fa4cde9cdbf9b6f724a72e.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "丰台区文娱场所",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/ftq/7d94485e056b4938b61776fcc2336ba7.htm",
+          "department": "丰台区",
+          "formats": "csv,xlsx,rdf,png"
+        },
+        {
+          "name": "公众服务-虚拟展厅",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/swwj/7e50d0aee45d413d829e71569c2f981c.htm",
+          "department": "市文物局",
+          "formats": "rdf,png,csv,xlsx"
+        },
+        {
+          "name": "北京市市级以上文物保护单位保护范围及建设控制地带",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/swwj/5972.htm",
+          "department": "市文物局",
+          "formats": "rdf,csv,png,xls"
+        },
+        {
+          "name": "北京青年美术双年展入围作品名单",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/tsw/17822.htm",
+          "department": "团市委",
+          "formats": "csv,xls,png"
+        },
+        {
+          "name": "市体育局直属事业单位",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/styj/6037.htm",
+          "department": "市体育局",
+          "formats": "xls,csv,xlsx,zip,png"
+        },
+        {
+          "name": "旅行社经营境内旅游业务和入境旅游业务许可（告知承诺）-旅行社业务经营许可证",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/slyw/82e03795982e4f26a5455146b5ec9106.htm",
+          "department": "市文化和旅游局",
+          "formats": "csv,png,rdf,xlsx"
+        },
+        {
+          "name": "第二季度行政执法检查结果公示（娱乐分队）",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/6d99ce54839e49ab8e3e8fa0a52c242d.htm",
+          "department": "往年开放数据",
+          "formats": "png,csv,xlsx"
+        },
+        {
+          "name": "西城区非物质文化遗产名录（传统医药）",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/2bdedd1ef6a143aea7dd08f5a4c35f51.htm",
+          "department": "西城区",
+          "formats": "rdf,csv,xls,png"
+        },
+        {
+          "name": "高危险性体育项目经营许可证",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/styj/14293.htm",
+          "department": "市体育局",
+          "formats": "xls,csv,xlsx,png"
+        }
+      ]
+    },
+    {
+      "name": "消费购物",
+      "count": 5,
+      "samples": [
+        {
+          "name": "居民消费水平历史数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/stjj/f4ea35713ae840ef8062fa65988e4695.htm",
+          "department": "市统计局",
+          "formats": "csv,png,xls,rdf"
+        },
+        {
+          "name": "怀柔区统计局社会消费品零售总额",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/52307.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "社会消费品零售总额",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/stjj/2c25355f71024c3b945eff31271f9de8.htm",
+          "department": "市统计局",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "社会消费品零售总额信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/71012b6b1e354404a4c0fc19a6b0165c.htm",
+          "department": "往年开放数据",
+          "formats": "png,zip"
+        },
+        {
+          "name": "通州区社会消费品零售总额",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/52319.htm",
+          "department": "往年开放数据",
+          "formats": "zip,png"
+        }
+      ]
+    },
+    {
+      "name": "生活安全",
+      "count": 58,
+      "samples": [
+        {
+          "name": "丰台区2022年动物狂犬免疫点名录",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/ftq/72e4449867794eb3b2db004b77417f16.htm",
+          "department": "丰台区",
+          "formats": "rdf,xlsx,png,csv"
+        },
+        {
+          "name": "全国商用密码应用安全性评估试点机构名单",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/8d0821e388c04619b64b35b93802bca3.htm",
+          "department": "往年开放数据",
+          "formats": "png,docx"
+        },
+        {
+          "name": "北京市商用密码产品重点应用项目目录",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/17489.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "安全生产专家信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/14446.htm",
+          "department": "往年开放数据",
+          "formats": "png,xls,csv"
+        },
+        {
+          "name": "密云区安全生产行政许可信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/48719.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "平谷区城市排水许可证核发",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/52511.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv"
+        },
+        {
+          "name": "扑火队信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/85793f8b701b412ba032317e4120162e.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xls,png"
+        },
+        {
+          "name": "权力清单数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/ssfj/defcf65464fa4eabb743bfc801053e0b.htm",
+          "department": "市司法局",
+          "formats": "png,rdf,xlsx,csv"
+        },
+        {
+          "name": "生活垃圾处理设施建设和运行管理规范性文件",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sszsrw/52923.htm",
+          "department": "市城市管理委",
+          "formats": "zip"
+        },
+        {
+          "name": "食用林产品质量安全的监督检查情况",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/05f7354b273641d494c6f7c07bf21f6a.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xlsx"
+        }
+      ]
+    },
+    {
+      "name": "气象服务",
+      "count": 28,
+      "samples": [
+        {
+          "name": "12小时分区预报",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/200cdd361e094a0eb0994e548c16008d.htm",
+          "department": "市气象局",
+          "formats": "zip,png"
+        },
+        {
+          "name": "北京地区8月降水趋势预测",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/0d32d3f74b47405e84c47f482935651c.htm",
+          "department": "市气象局",
+          "formats": "pdf,png"
+        },
+        {
+          "name": "北京地区未来24小时火险等级预报及天气预报",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/9dfd862dfcfa41d4b159461ab0436c00.htm",
+          "department": "市气象局",
+          "formats": "png,zip"
+        },
+        {
+          "name": "北京气象灾害预警信号",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/2e8a43b698704d4481dfe4ec321615f3.htm",
+          "department": "往年开放数据",
+          "formats": "png,zip"
+        },
+        {
+          "name": "市级预警信号",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/8272d2ed3af7496196f20a04a7d76269.htm",
+          "department": "市气象局",
+          "formats": "zip,png"
+        },
+        {
+          "name": "怀柔地区地面气候标准值数据集",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/79544794e50c44fab7fc422497128d98.htm",
+          "department": "市气象局",
+          "formats": "rdf,xlsx,csv,png"
+        },
+        {
+          "name": "朝阳地区地面气候标准值数据集",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/7eb7221d279648b09b1af89aaafd4f33.htm",
+          "department": "市气象局",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "海淀地区地面气候标准值数据集",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/dbb46e96fe0d4a6b829746b4f6d8538f.htm",
+          "department": "市气象局",
+          "formats": "rdf,xlsx,csv,png"
+        },
+        {
+          "name": "通州地区地面气候标准值数据集",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/0d11da5f3f5d47bd9a9cdaa2032f702f.htm",
+          "department": "市气象局",
+          "formats": "xlsx,csv,png,rdf"
+        },
+        {
+          "name": "顺义地区地面气候标准值数据集",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sqxj/a4463aa2d580496d8d9a6d8bed819bb7.htm",
+          "department": "市气象局",
+          "formats": "csv,xlsx,rdf,png"
+        }
+      ]
+    },
+    {
+      "name": "教育科研",
+      "count": 350,
+      "samples": [
+        {
+          "name": "2020年学校幼儿园基本信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/2c56a9b8d74c48bfb4cdf5c794c76201.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "一般公共预算教育经费增长情况（公开）",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjw/959b67302e47459eb16dbbd176f278a8.htm",
+          "department": "市教委",
+          "formats": "xlsx,csv,rdf,png"
+        },
+        {
+          "name": "公共预算项目支出表",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjw/2cb93075b4914d1f849e7091f49593e8.htm",
+          "department": "市教委",
+          "formats": "xlsx,csv,rdf,png"
+        },
+        {
+          "name": "北京市新时代文明实践基层科普行动（社区科普益民计划）",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/48754.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "各级民办教育情况",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjw/6e143c4e61b94959a72e4ef5936d328c.htm",
+          "department": "市教委",
+          "formats": "xlsx,csv,png,rdf"
+        },
+        {
+          "name": "小学名录",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/11c54f255e8f45c99869c1b348e250dc.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "教委2022-2023学年度教育工作先进个人评选结果",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/deb56a767cab49b3b8af338e0e0703a1.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "民办幼儿园",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/80511bbbae384aec8301c8de9aae096f.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx"
+        },
+        {
+          "name": "西城区中学名单",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/90fa5e15daba4a958e651c52bb08cc46.htm",
+          "department": "西城区",
+          "formats": "xlsx,csv"
+        },
+        {
+          "name": "高职本科分形式、分学科学生数",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sjw/c8975bf50cce45b5adbae8d055811392.htm",
+          "department": "市教委",
+          "formats": "csv,png,rdf,xlsx"
+        }
+      ]
+    },
+    {
+      "name": "社会保障",
+      "count": 287,
+      "samples": [
+        {
+          "name": "12348北京法律服务网数据",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/19105.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "住房公积金缴存基数及比例年度调整信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/zfgjjglzx/01ccf743519444cd980fc308606d0ff6.htm",
+          "department": "住房公积金管理中心",
+          "formats": "doc,png"
+        },
+        {
+          "name": "北京市中级专业技术资格评审结果公示 （盲人医疗按摩）",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/039828ddd8f9494ba6dd153045e82896.htm",
+          "department": "往年开放数据",
+          "formats": "png,rdf,csv,xlsx"
+        },
+        {
+          "name": "北京经开区社会保险缴费单位",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/8cac0829c15b4226ba987e77f94be6e2.htm",
+          "department": "往年开放数据",
+          "formats": "png,csv,xlsx"
+        },
+        {
+          "name": "宝山镇农村低保家庭冬季煤改清洁能源救助资金发放表",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/hrq/bbec8ef86c3745f8b4d5ec8db8b02d95.htm",
+          "department": "怀柔区",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "市水务局局属单位",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sswj/e6127d8b5c1a4310874a10ebb77f0675.htm",
+          "department": "市水务局",
+          "formats": "csv,rdf,xlsx,png"
+        },
+        {
+          "name": "政务服务窗口",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/5071115178424befa4034bcb487a428e.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xlsx"
+        },
+        {
+          "name": "汤河口镇特困供养人员",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/hrq/95a377452a0e4d2e8350be93d8cac99a.htm",
+          "department": "怀柔区",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "行政处罚权力清单",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/32d09166ad6042bc9accfcf05ba27146.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xls,png"
+        },
+        {
+          "name": "高龄老年人统计信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/c895443681134fe29bd78b45c4d17542.htm",
+          "department": "往年开放数据",
+          "formats": "png,csv,xlsx"
+        }
+      ]
+    },
+    {
+      "name": "劳动就业",
+      "count": 44,
+      "samples": [
+        {
+          "name": "2023年顺义区见习单位",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/e3bfd88f47444b709666af2adbeecfee.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xlsx"
+        },
+        {
+          "name": "全市各区职业指导培训补贴申报花名册",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/14359.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "北京市区县职业技能鉴定管理中心信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/14353.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,xlsx,png"
+        },
+        {
+          "name": "北京市顺义区综合计算工时工作制和不定时工作制行政许可信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/f9b1d8e495f1470b8871122780ff1b28.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xls,png"
+        },
+        {
+          "name": "密云区招聘会信息",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/myq/44379949d4774be896aaaa946884996b.htm",
+          "department": "密云区",
+          "formats": "xlsx,rdf,png,csv"
+        },
+        {
+          "name": "密云区用人单位岗补社补信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/243fccbf1683445b91b25e57a074a514.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xls"
+        },
+        {
+          "name": "平谷区民办职业技能培训机构名录",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/9ca9ea176e84427e92153957b94cb7cd.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "招聘会统计",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/f51df36b1c214b47befab65bc6c9295d.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx,jpg"
+        },
+        {
+          "name": "社会保障卡服务网点",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/14362.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "顺义区经营劳务派遣业务行政许可信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/47926.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xls"
+        }
+      ]
+    },
+    {
+      "name": "生活服务",
+      "count": 605,
+      "samples": [
+        {
+          "name": "12348公共法律服务热线平台工单数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/ssfj/d8dc3e1356f64962be25d43eea04dc8b.htm",
+          "department": "市司法局",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "丰台区临时用水指标",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/ftq/af0ec82a5b2440dc850ebfae1e6c53f6.htm",
+          "department": "丰台区",
+          "formats": "xlsx,png,rdf,csv"
+        },
+        {
+          "name": "今日空气质量状况",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/4ee3e82aa9e04f92aa5066f19171ed78.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "北京市总部经济中介组织名单信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/18269.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "大豆油价格",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sfzggw/097dd48956564e4988b8b6fe15567edc.htm",
+          "department": "市发展改革委",
+          "formats": "png,xlsx,rdf,csv"
+        },
+        {
+          "name": "延庆区律师事务所执业信息",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/yqq/a862137647cd4101a09093a8b8d9a1ce.htm",
+          "department": "延庆区",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "本市花生油超市零售价格",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sfzggw/ae58c54ad8b04b8b868bc2787875cedc.htm",
+          "department": "市发展改革委",
+          "formats": "rdf,xlsx,png,csv"
+        },
+        {
+          "name": "粮油市场行情",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/slsj/13428.htm",
+          "department": "市粮食和储备局",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "西城区陶然亭街道公厕情况",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/1413b3c37a5e4a988a0005d95057e878.htm",
+          "department": "西城区",
+          "formats": "png,xlsx,csv"
+        },
+        {
+          "name": "黄豆芽批发交易量",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sfzggw/427914bc4fbd44ab86ee34ddfeffd204.htm",
+          "department": "市发展改革委",
+          "formats": "xlsx,rdf,csv,png"
+        }
+      ]
+    },
+    {
+      "name": "房屋住宅",
+      "count": 216,
+      "samples": [
+        {
+          "name": "2022年1-6月海淀区房地产开发投资",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/645cf767abe2454796117c4e90894136.htm",
+          "department": "往年开放数据",
+          "formats": "jpg,xlsx,csv"
+        },
+        {
+          "name": "北京市司法查封项目信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/f1ff55d5f799466fb5b579d00cf5834c.htm",
+          "department": "往年开放数据",
+          "formats": "png,xlsx,csv"
+        },
+        {
+          "name": "北京市建筑业从业人员_装饰质检员",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/54498282448e411d9a0354c6637e8981.htm",
+          "department": "往年开放数据",
+          "formats": "png,csv,xlsx"
+        },
+        {
+          "name": "北京市昌平区住房和城乡建设委员会“双随机、一公开”抽查事项清单",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/9611c0891b3a43cbab7ec6aa830af4f8.htm",
+          "department": "往年开放数据",
+          "formats": "png,csv,xls"
+        },
+        {
+          "name": "外省市驻京建管部门信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/e09e05c17fb04126963359574c07130e.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "工程监理企业专业乙级、丙级资质和事务所资质认定",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/c7acc788d63547c09bc9ce3f8b6e6bb5.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "建筑施工单位主要负责人、项目负责人、专职安全生产管理人员的考核合格信息及监管情况",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/50702e3720624e70b52cc79fa3fe9c18.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "房地产开发企业二级及以下资质核定",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/6581492470e04de0b98d66f8f4cdc4ce.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "朝阳区地产经纪机构信用不良记录",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/zyq/47750.htm",
+          "department": "朝阳区",
+          "formats": "xls,csv"
+        },
+        {
+          "name": "预售证变更、注销信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/b4b3ae2f0cce407dbf9baaa1599ce420.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx,png"
+        }
+      ]
+    },
+    {
+      "name": "政府机构与社会团体",
+      "count": 1207,
+      "samples": [
+        {
+          "name": "12315绿色通道",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/9ec25acf7f7d4f67b42685c8028a41c8.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "信箱-邮件回复",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/f08b0c2baeaf46f2a484b129960b40d2.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "北京市延庆区司法局律师、公证行业行政执法检查结果公示",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/b61642e46de94d13b5d05b36e2c7abe2.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,jpg,csv"
+        },
+        {
+          "name": "区人防办4月人防工程抽查检查结果（含双随机）",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/8527c07861a64360b5e723a2414b2b23.htm",
+          "department": "往年开放数据",
+          "formats": "csv,jpg,xlsx"
+        },
+        {
+          "name": "培树“全国巾帼建功先进集体”",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sfl/1c46edc6201849e19e48f7124681ef5a.htm",
+          "department": "市妇联",
+          "formats": "xlsx,csv,rdf,png"
+        },
+        {
+          "name": "平谷城管执法局检查单公示（2021年第一季度）信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/7b63bf69e0944d78b97519d28a66ee50.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv"
+        },
+        {
+          "name": "昌平区养老机构信息（2021年12月）",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/49d4cafe996a42aea3f02e89a57d58fc.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,rdf,csv,png"
+        },
+        {
+          "name": "生态环境局行政处罚",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/zyq/3d49e0c4e71a49d0bc706fa79e28e8cb.htm",
+          "department": "朝阳区",
+          "formats": "csv,png,xlsx"
+        },
+        {
+          "name": "行政许可结果公示",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/5b861c92a9b74cd4a208f574f496b4e9.htm",
+          "department": "往年开放数据",
+          "formats": "png,csv,xlsx"
+        },
+        {
+          "name": "（20211201报局办）顺义区民办职业技能培训学校基础台账",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/1e5d5809e8d440018edc81f9b3dec19c.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xlsx"
+        }
+      ]
+    },
+    {
+      "name": "环境与资源保护",
+      "count": 318,
+      "samples": [
+        {
+          "name": "2021年11月重点排污单位监督性监测结果信息公开数据表(废气、废水)",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/8643faaa3a224a839e41d3bd9b48d948.htm",
+          "department": "往年开放数据",
+          "formats": "png,xls,csv"
+        },
+        {
+          "name": "公共空间艺术品数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sgtj/679498c545b843b0984b4273c7f71a54.htm",
+          "department": "市规划自然资源委",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "北京市第一批可移动革命文物名录",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/swwj/def6aacf343c43beb2ccd53188ab711b.htm",
+          "department": "市文物局",
+          "formats": "csv,xls"
+        },
+        {
+          "name": "城市河湖水情",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sswj/10787.htm",
+          "department": "市水务局",
+          "formats": "rdf,xlsx,csv,png"
+        },
+        {
+          "name": "对古树名木生长和管护情况的检查标准",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/syllhj/b00f204257d246a6b3b184d5698a8c85.htm",
+          "department": "市园林绿化局",
+          "formats": "png,rdf,xlsx,csv"
+        },
+        {
+          "name": "开发区行政处罚信息-环境保护领域-固定源一般程序行政处罚情况",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/3a6e14fc83cc4cd9a86a363f982878e3.htm",
+          "department": "往年开放数据",
+          "formats": "csv,png,xlsx"
+        },
+        {
+          "name": "水闸工程信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/sswj/17cd239b1b3a4f17bfe74fa818c68ad5.htm",
+          "department": "市水务局",
+          "formats": "csv,png,xlsx"
+        },
+        {
+          "name": "瞭望塔",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/13684.htm",
+          "department": "往年开放数据",
+          "formats": "xls,csv,png"
+        },
+        {
+          "name": "辐射安全许可证",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/53172.htm",
+          "department": "往年开放数据",
+          "formats": "png,xls,csv"
+        },
+        {
+          "name": "鸟类观测点位置数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/syllhj/1d61946fa729429bb8a972be67e864ba.htm",
+          "department": "市园林绿化局",
+          "formats": "xlsx,csv,rdf,png"
+        }
+      ]
+    },
+    {
+      "name": "企业服务",
+      "count": 275,
+      "samples": [
+        {
+          "name": "2019年平谷区高新技术企业名单信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/744bfd1b312b43f4b40b65e4dba9ce93.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx"
+        },
+        {
+          "name": "丰台区2024年企业-行业门类统计",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/ftq/1a71c87078434991b1ca353d3120625b.htm",
+          "department": "丰台区",
+          "formats": "png,rdf,xlsx,csv"
+        },
+        {
+          "name": "内资企业设立登记公告数据",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/978fe036d8e84efb8296180e3666c446.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,csv,png"
+        },
+        {
+          "name": "危险化学品获证登记企业信息",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/be0818eb35964ef39fd278dc2a425ca5.htm",
+          "department": "往年开放数据",
+          "formats": "xls,png,csv"
+        },
+        {
+          "name": "密云区内资企业注销公告数据",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/myq/a4cb4551641b41038778adaf16ea0c01.htm",
+          "department": "密云区",
+          "formats": "rdf,png,xlsx,csv"
+        },
+        {
+          "name": "市场监督管理企业登记注册基本信息（内资企业登记）",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/syjj/803466602a854d25a9c23d1ec44e5b8b.htm",
+          "department": "市市场监管局",
+          "formats": "png,xlsx,csv"
+        },
+        {
+          "name": "数据清洗-食品生产许可证",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/syjj/193a58272d89484a8055442d9b193e7b.htm",
+          "department": "市市场监管局",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "省际双随机抽查结果公示",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/53180.htm",
+          "department": "往年开放数据",
+          "formats": "csv,xlsx,png"
+        },
+        {
+          "name": "西城区市级文化产业园区汇总",
+          "url": "https://data.beijing.gov.cn/zyml/qjsw/xcq/242e065768a3485099c30cd459308c15.htm",
+          "department": "西城区",
+          "formats": "png,xlsx,csv,rdf"
+        },
+        {
+          "name": "高危险性体育项目许可信息",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/styj/652d4183162146c99ad302e099c6a2d9.htm",
+          "department": "市体育局",
+          "formats": "rdf,png,xlsx,csv"
+        }
+      ]
+    },
+    {
+      "name": "农业农村",
+      "count": 103,
+      "samples": [
+        {
+          "name": "42 个本市重点发展的小城镇",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/e1bb1ae9e22945c3a5b603402f00ee77.htm",
+          "department": "往年开放数据",
+          "formats": "xls,png,csv"
+        },
+        {
+          "name": "兽药经营许可证",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/snw/e1daa73715f248da86cdc7a25e3afc99.htm",
+          "department": "市农业农村局",
+          "formats": "xls,png,rdf,csv"
+        },
+        {
+          "name": "农林牧渔业总产值（现价）",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/snw/4cd2b2fa689b4b3eb88f34c002e9024c.htm",
+          "department": "市农业农村局",
+          "formats": "rdf,csv,xls,png"
+        },
+        {
+          "name": "北京市农业产业化重点龙头企业名单",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/5457.htm",
+          "department": "往年开放数据",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "北京市市级发证农作物种子生产经营企业名录",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/snw/277a76ebf0c74445b4389113f40accba.htm",
+          "department": "市农业农村局",
+          "formats": "csv,png,rdf,xlsx"
+        },
+        {
+          "name": "北京市级生态农场授予名单",
+          "url": "https://data.beijing.gov.cn/zyml/wnkfsj/366dbcc07e314778913d656ae0aaae30.htm",
+          "department": "往年开放数据",
+          "formats": "xls,png,csv"
+        },
+        {
+          "name": "执业兽医资格授予审核通过人员名单",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/snw/535452ea728342d2a04fe0389b30ce29.htm",
+          "department": "市农业农村局",
+          "formats": "xlsx,png,csv"
+        },
+        {
+          "name": "环京周边蔬菜生产基地名单",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/snw/1f0a6b4d54374411b6f3b6f90bcc3fe4.htm",
+          "department": "市农业农村局",
+          "formats": "png,xls,csv,rdf"
+        },
+        {
+          "name": "能源消费总量及万元地区生产总值能耗历史数据",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/stjj/513a1ff3c8b341389ab6f16a19556259.htm",
+          "department": "市统计局",
+          "formats": "csv,png,rdf,xls"
+        },
+        {
+          "name": "饲料生产许可证",
+          "url": "https://data.beijing.gov.cn/zyml/ajg/snw/83155385310d4fe8af6c20f766ca39de.htm",
+          "department": "市农业农村局",
+          "formats": "xlsx,rdf,png,csv"
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "filename": "鲜羊肉价格.csv",
+      "fields": "商品、市场、价格",
+      "relevance": "低相关",
+      "illustrative": true,
+      "source": {
+        "name": "鲜羊肉价格",
+        "url": "https://data.beijing.gov.cn/zyml/ajg/sfzggw/7f9e6b64b5c04891921190d5b7e66463.htm",
+        "department": "市发展改革委",
+        "formats": "csv,rdf,png,xlsx"
+      }
+    },
+    {
+      "filename": "婚姻登记机关.csv",
+      "fields": "机关、地址、电话",
+      "relevance": "低相关",
+      "illustrative": true,
+      "source": {
+        "name": "婚姻登记机关",
+        "url": "https://data.beijing.gov.cn/zyml/ajg/smzj/de2fb40e6f264454a54d57fd082d7b06.htm",
+        "department": "市民政局",
+        "formats": "rdf,csv,xlsx,png"
+      }
+    },
+    {
+      "filename": "企业处罚公示.pdf",
+      "fields": "企业名称、处罚文号",
+      "relevance": "高相关",
+      "illustrative": true,
+      "source": {
+        "name": "行政处罚信用公示信息",
+        "url": "https://data.beijing.gov.cn/zyml/ajg/sjtw/2a4d2512ff2e43279ee04daa9ce2daf1.htm",
+        "department": "市交通委",
+        "formats": "xlsx,rdf,png,csv"
+      }
+    },
+    {
+      "filename": "中标企业名单.zip",
+      "fields": "中标单位、项目、金额",
+      "relevance": "高相关",
+      "illustrative": true,
+      "source": {
+        "name": "中标公告",
+        "url": "https://data.beijing.gov.cn/zyml/ajg/sczj/19201.htm",
+        "department": "市财政局",
+        "formats": "rdf,csv,xlsx,png"
+      }
+    },
+    {
+      "filename": "科技独角兽企业名单.docx",
+      "fields": "企业名称、行业、认定年份",
+      "relevance": "高相关",
+      "illustrative": true,
+      "source": {
+        "name": "入围《中国潜在独角兽企业研究报告2023》企业名单",
+        "url": "https://data.beijing.gov.cn/zyml/wnkfsj/ccdf7fdc463b46d59df9f2ecdbc445fc.htm",
+        "department": "往年开放数据",
+        "formats": "xls,png,csv"
+      }
+    }
+  ],
+  "batch": {
+    "attachments": 5200,
+    "logical_files": 11701,
+    "known_logical_records": 43653625,
+    "upstream_failed_downloads": 22
+  }
+}

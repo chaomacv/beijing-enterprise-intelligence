@@ -43,7 +43,8 @@ test('hero actions move right on desktop and stack naturally on mobile',async({p
   await page.screenshot({path:info.outputPath('hero-actions.png')});
 });
 test('square notebooks have protruding topic tabs and a separate corner expansion icon',async({page},info)=>{
-  const card=page.locator('[data-notebook="1"]');
+  const card=page.locator('[data-notebook="2"]');
+  await page.locator('[data-gallery-page="2"]').click();
   await page.locator('#explorations').scrollIntoViewIfNeeded();
   await expect(card.locator('.notebook-category')).toHaveText('事件分类');
   await expect(card.locator('.notebook-reader-open svg')).toHaveCount(1);
@@ -62,31 +63,34 @@ test('square notebooks have protruding topic tabs and a separate corner expansio
   await expect(page.locator('#notebook-reader')).toBeVisible();
   await expect(page.locator('#notebook-reader .notebook-reader-open')).not.toBeVisible();
 });
-test('crossing either end keeps circular neighbors and unique interactive cards',async({page})=>{
-  for(const n of [7,0,7,0,1]){
-    if(n===7){await page.locator('[data-gallery-page="0"]').click();await page.locator('#gallery-prev').click();}
-    else if(n===0){await page.locator('[data-gallery-page="7"]').click();await page.locator('#gallery-next').click();}
+test('crossing either end keeps circular neighbors and ten unique interactive cards',async({page})=>{
+  for(const n of [9,0,9,0,1]){
+    if(n===9){await page.locator('[data-gallery-page="0"]').click();await page.locator('#gallery-prev').click();}
+    else if(n===0){await page.locator('[data-gallery-page="9"]').click();await page.locator('#gallery-next').click();}
     else await page.locator('#gallery-next').click();
     await expect(page.locator(`[data-gallery-page="${n}"]`)).toHaveAttribute('aria-pressed','true');
-    await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[4].dataset.notebook))).toBe(n);
+    await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[5].dataset.notebook))).toBe(n);
     const order=await page.locator('.carousel-track').evaluate(el=>[...el.children].map(c=>Number(c.dataset.notebook)));
-    expect(new Set(order).size).toBe(8);expect(order[3]).toBe((n+7)%8);expect(order[5]).toBe((n+1)%8);
+    expect(new Set(order).size).toBe(10);expect(order[4]).toBe((n+9)%10);expect(order[6]).toBe((n+1)%10);
   }
   const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));expect(ids.length).toBe(new Set(ids).size);
 });
+
 test('expanded notebook retains chart controls when restored',async({page})=>{
-  await page.locator('[data-notebook="1"] .notebook-reader-open').click();
+  await page.locator('[data-gallery-page="2"]').click();
+  await page.locator('[data-notebook="2"] .notebook-reader-open').click();
   await expect(page.locator('#notebook-reader')).toBeVisible();
   await page.locator('#gallery-event-stage').selectOption('unknown');
   await expect(page.locator('#gallery-event-table')).toContainText('阶段未明');
   await page.locator('#notebook-reader-close').click();
   await expect(page.locator('#notebook-reader')).not.toBeVisible();
   await expect(page.locator('#gallery-event-stage')).toHaveValue('unknown');
-  await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(8);
+  await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(10);
 });
 
 test('classification chart separates ten source topics and keeps profile counts explicit',async({page},info)=>{
-  await page.locator('[data-notebook="1"] .notebook-reader-open').click();
+  await page.locator('[data-gallery-page="2"]').click();
+  await page.locator('[data-notebook="2"] .notebook-reader-open').click();
   await expect(page.locator('#gallery-event-table tr')).toHaveCount(10);
   await expect(page.locator('#gallery-event-table')).toContainText('人员执业资格');
   await expect(page.locator('#gallery-event-table')).toContainText('申请办理');
@@ -107,10 +111,10 @@ test('classification chart separates ten source topics and keeps profile counts 
 });
 test('timed playback advances from the last notebook to the first',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.locator('[data-gallery-page="7"]').click();
+  await page.locator('[data-gallery-page="3"]').click();
   await page.locator('#gallery-play').click();
   await page.mouse.move(5,5);
-  await expect(page.locator('[data-gallery-page="0"]')).toHaveAttribute('aria-pressed','true',{timeout:12000});
+  await expect(page.locator('[data-gallery-page="6"]')).toHaveAttribute('aria-pressed','true',{timeout:12000});
   await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[4].dataset.notebook))).toBe(0);
 });
 test('method pages replace in place with useful content and keyboard controls',async({page},info)=>{
@@ -137,9 +141,9 @@ test('method pages replace in place with useful content and keyboard controls',a
 });
 
 test('three real sunburst modes retain full totals and support true two-level zoom',async({page},info)=>{
- await page.locator('[data-gallery-page="7"]').click();
+ await page.locator('[data-gallery-page="3"]').click();
  await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-ready','true');
- await page.locator('[data-notebook="7"] .notebook-reader-open').click();
+ await page.locator('[data-notebook="3"] .notebook-reader-open').click();
  const chartBox=await page.locator('#event-sunburst-chart').boundingBox();
  expect(chartBox.width).toBeGreaterThan(page.viewportSize().width>1100?600:200);
  expect(chartBox.height/chartBox.width).toBeCloseTo(1,1);
@@ -165,7 +169,7 @@ test('three real sunburst modes retain full totals and support true two-level zo
 
 test('sunburst animation remains correct after interrupted zoom and mode switches',async({page})=>{
  await page.emulateMedia({reducedMotion:'no-preference'});
- await page.locator('[data-gallery-page="7"]').click();await page.locator('[data-notebook="7"] .notebook-reader-open').click();
+ await page.locator('[data-gallery-page="3"]').click();await page.locator('[data-notebook="3"] .notebook-reader-open').click();
  await page.locator('#event-sunburst-table button').first().click();
  await page.locator('[data-sun-up]').click();
  await page.locator('[data-sun-mode="logical"]').click();await page.locator('[data-sun-mode="records"]').click();
@@ -175,8 +179,8 @@ test('sunburst animation remains correct after interrupted zoom and mode switche
 });
 
 test('five-question notebook explains each method in place',async({page},info)=>{
- await page.locator('[data-gallery-page="3"]').click();
- await page.locator('[data-notebook="3"] .notebook-reader-open').click();
+ await page.locator('[data-gallery-page="4"]').click();
+ await page.locator('[data-notebook="4"] .notebook-reader-open').click();
  await expect(page.locator('#story-questions button')).toHaveCount(5);
  await page.locator('[data-story="3"]').click();
  await expect(page.locator('#story-method')).toContainText('独立标注评测');
@@ -187,7 +191,7 @@ test('five-question notebook explains each method in place',async({page},info)=>
 });
 
 test('100 real companies support similarity distances, peripheral tag anchors, dragging and 3D',async({page},info)=>{
- await page.locator('[data-gallery-page="4"]').click();await page.locator('[data-notebook="4"] .notebook-reader-open').click();
+ await page.locator('[data-gallery-page="7"]').click();await page.locator('[data-notebook="7"] .notebook-reader-open').click();
  const host=page.locator('#enterprise-network');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  await expect(page.locator('#network-total')).toContainText('100 家真实企业样本');
  await expect(page.locator('[data-node-kind="company"]')).toHaveCount(100);
@@ -246,8 +250,8 @@ test('100 real companies support similarity distances, peripheral tag anchors, d
 
 test('portrait separates real scale from synthetic company facts and can trace evidence',async({page},info)=>{
  await expect(page.locator('#portrait-summary')).toHaveAttribute('data-ready','true');
- await page.locator('[data-gallery-page="5"]').click();
- await page.locator('[data-notebook="5"] .notebook-reader-open').click();
+ await page.locator('[data-gallery-page="8"]').click();
+ await page.locator('[data-notebook="8"] .notebook-reader-open').click();
  await expect(page.locator('#portrait-summary')).toContainText('5,202,714');
  await expect(page.locator('#portrait-summary')).toContainText('837,993');
  await expect(page.locator('#portrait-name')).toContainText('合成示例');
@@ -257,4 +261,50 @@ test('portrait separates real scale from synthetic company facts and can trace e
  await page.locator('#portrait-company').selectOption('1');
  await expect(page.locator('#portrait-timeline')).toContainText('拟议');
  await page.screenshot({path:info.outputPath('enterprise-portrait.png')});
+});
+
+
+test('catalog background shows true counts and at most ten real source links per theme',async({page},info)=>{
+ await page.locator('[data-gallery-page="0"]').click();await page.locator('[data-notebook="0"] .notebook-reader-open').click();
+ await expect(page.locator('#source-chart')).toHaveAttribute('data-ready','true');
+ await expect(page.locator('#source-count')).toHaveText('4,710');
+ await expect(page.locator('[data-source-bar]')).toHaveCount(20);
+ await page.locator('#source-theme-select').selectOption('5');
+ await expect(page.locator('#source-links a')).toHaveCount(7);
+ await expect(page.locator('#source-status')).toContainText('全部显示');
+ await page.locator('#source-theme-select').selectOption('16');
+ await expect(page.locator('#source-links a')).toHaveCount(10);
+ await expect(page.locator('#source-status')).toContainText('1,207');
+ const links=await page.locator('#source-links a').evaluateAll(els=>els.map(el=>el.href));
+ expect(links.every(link=>link.startsWith('https://data.beijing.gov.cn/zyml/')&&!link.includes('?'))).toBe(true);
+ if(page.viewportSize().width>1100){await page.locator('[data-source-bar="0"]').hover();await expect(page.locator('#source-status')).toContainText('经济建设');}
+ await page.locator('[data-source-bar="0"]').focus();await page.locator('[data-source-bar="0"]').press('ArrowRight');
+ await expect(page.locator('#source-status')).toContainText('信用服务');
+ await expect(page.locator('#source-examples tr')).toHaveCount(5);
+ await expect(page.locator('[data-notebook="0"]')).toContainText('结构示意');
+ await page.locator('#source-theme-select').selectOption('0');
+ await page.screenshot({path:info.outputPath('source-catalog-notebook.png')});
+ await page.locator('#source-examples').scrollIntoViewIfNeeded();
+ await page.screenshot({path:info.outputPath('heterogeneous-file-examples.png')});
+});
+
+test('acquisition notebook explains actual scheduling, retries and privacy boundaries',async({page},info)=>{
+ await page.locator('[data-gallery-page="1"]').click();await page.locator('[data-notebook="1"] .notebook-reader-open').click();
+ await expect(page.locator('.acquisition-flow')).toContainText('解析附件');
+ await expect(page.locator('.acquisition-equations')).toContainText('SHA256');
+ await expect(page.locator('.acquisition-retry')).toContainText('最多 3 次总尝试');
+ await expect(page.locator('.acquisition-practices')).toContainText('私有环境');
+ await page.screenshot({path:info.outputPath('acquisition-safety-notebook.png')});
+});
+
+test('sunburst pointer focus has no rectangular outline and keyboard focus remains shaped',async({page},info)=>{
+ await page.locator('[data-gallery-page="3"]').click();await page.locator('[data-notebook="3"] .notebook-reader-open').click();
+ await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-ready','true');
+ const sector=page.locator('.sunburst-sectors path[tabindex="0"]').first();
+ await sector.dispatchEvent('click');await sector.focus();
+ expect(await sector.evaluate(el=>getComputedStyle(el).outlineStyle)).toBe('none');
+ const center=page.locator('[data-sun-up]');await center.focus();
+ expect(await center.evaluate(el=>getComputedStyle(el).outlineStyle)).toBe('none');
+ await center.press('Enter');await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(1);
+ await page.screenshot({path:info.outputPath('sunburst-without-black-outline.png')});
 });
