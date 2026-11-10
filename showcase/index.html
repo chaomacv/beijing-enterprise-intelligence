@@ -72,23 +72,23 @@ representatives[key].append(record_id)
 <div id="story-method" class="story-method" aria-live="polite"></div>
 <div class="story-equation">可追溯画像 = 来源证据 + 保守关联 + 标签结构</div>
 <pre class="gallery-code"><code id="story-code"></code></pre>
-<footer class="notebook-scope">方法说明 · 来源校验与独立语义准确率分别验证 · 不自动形成授信结论</footer></div></article><article class="data-notebook" data-notebook="4" aria-roledescription="幻灯片" aria-label="5 / 8：共享的标签，构成相似的画像。"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[05]</span><div><h3>共享的标签，构成相似的画像。</h3><p>真实标签构成画像结构。越相似，目标连线越短；可切换二维与三维。</p></div></div>
-<div class="network-simple-toolbar"><span id="network-total">正在读取真实全量数据…</span><label class="sr-only" for="network-dimension">网络空间</label><select id="network-dimension" aria-label="网络空间"><option value="2">二维</option><option value="3">三维</option></select></div>
+<footer class="notebook-scope">方法说明 · 来源校验与独立语义准确率分别验证 · 不自动形成授信结论</footer></div></article><article class="data-notebook" data-notebook="4" aria-roledescription="幻灯片" aria-label="5 / 8：共享的标签，构成相似的画像。"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[05]</span><div><h3>共享的标签，构成相似的画像。</h3><p>选取100家真实企业，一点一家。共同标签和事件越多，目标距离越短。</p></div></div>
+<div class="network-simple-toolbar"><span id="network-total">正在读取真实企业样本…</span><label class="sr-only" for="network-mode">网络视图</label><select id="network-mode" aria-label="网络视图"><option value="similarity">企业相似网络</option><option value="bipartite">企业—标签网络</option></select><label class="sr-only" for="network-dimension">网络空间</label><select id="network-dimension" aria-label="网络空间"><option value="2">二维</option><option value="3">三维</option></select></div>
 <details id="network-options" class="network-options"><summary>更多选项</summary><div class="network-option-body">
-<div class="network-toolbar"><label>层次 <select id="network-detail-level"><option value="overview">标签概览</option><option value="complete">完整组合</option></select></label><label>视图 <select id="network-mode"><option value="similarity">画像相似网络</option><option value="bipartite">画像—标签网络</option></select></label><label>范围 <select id="network-scope"><option value="all">全部18类事件</option><option value="refined">许可相关十类</option></select></label></div>
+<div class="network-toolbar"><label>范围 <select id="network-scope"><option value="all">全部18类事件</option><option value="refined">许可相关十类</option></select></label></div>
 <div class="network-toolbar"><label>类别 <select id="network-category"></select></label><label class="network-label-toggle"><input id="network-labels" type="checkbox"> 显示标签</label></div>
-<label class="network-threshold">相似度阈值 <input id="network-threshold" type="range" min="0.1" max="1" step="0.05" value="0.35"><output id="network-threshold-value">0.35</output></label>
+<label class="network-threshold">相似度阈值 <input id="network-threshold" type="range" min="0" max="1" step="0.05" value="0.1"><output id="network-threshold-value">0.10</output></label>
 <div id="network-legend" class="network-legend" aria-label="D3 Category10 标签配色"></div></div></details>
-<div id="enterprise-network" class="enterprise-network" tabindex="0" aria-label="全量真实画像标签组合网络，展开后可拖动、缩放和三维旋转"></div>
+<div id="enterprise-network" class="enterprise-network" tabindex="0" aria-label="100家真实企业的网络，每个圆点对应一家企业"></div>
 <div class="network-controls"><span id="network-edge-count"></span><div><button id="network-zoom-out" type="button" aria-label="缩小网络">−</button><output id="network-zoom-value">100%</output><button id="network-zoom-in" type="button" aria-label="放大网络">+</button><button id="network-reset" type="button">复位</button></div></div>
 <p id="network-size" class="network-census"></p><p id="network-hint" class="network-interaction-hint"></p>
 <p id="network-view-note" class="network-view-note"></p>
-<div id="network-detail" class="network-detail" role="status" hidden><strong>真实全量统计 · 标签组合聚合展示</strong><span>每个节点代表标签集合完全相同的一组主体画像。无标签画像也计入总数；包含临时身份，不能等同于独立企业数量。</span></div>
-<pre class="gallery-code"><code>color = d3.scaleOrdinal(d3.schemeCategory10)
-simulation = d3.forceSimulation(groups)
-links = nearestNeighbors(groups, 2)
-// 概览连线采用组内真实画像的加权平均 Jaccard</code></pre>
-<footer class="notebook-scope">全量真实统计 · 每组保留两个最近邻 · <a href="assets/real-network.json">完整统计 ↗</a> · <a href="https://observablehq.com/@d3/force-directed-graph/2">D3 参考 ↗</a></footer></div></article><article class="data-notebook" data-notebook="5" aria-roledescription="幻灯片" aria-label="6 / 8：企业画像，保留每一条证据。"><span class="notebook-category">企业画像</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[06]</span><div><h3>企业画像，保留每一条证据。</h3><p>从真实处理规模，到一条可回查的企业记录。</p></div></div>
+<div id="network-detail" class="network-detail" role="status" hidden></div>
+<pre class="gallery-code"><code>shared_types = |tags(A) ∩ tags(B)|
+shared_events = Σ min(count_A[t], count_B[t])
+similarity = 0.65 * types_norm + 0.35 * log_events_norm
+link_distance = 220 - 160 * similarity</code></pre>
+<footer class="notebook-scope">100家真实企业的匿名样本 · 按类别与标签丰富度分层选取，非总体随机样本 · 事件为来源观察，含阶段未明记录 · <a href="assets/company-network.json">样本数据 ↗</a></footer></div></article><article class="data-notebook" data-notebook="5" aria-roledescription="幻灯片" aria-label="6 / 8：企业画像，保留每一条证据。"><span class="notebook-category">企业画像</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[06]</span><div><h3>企业画像，保留每一条证据。</h3><p>从真实处理规模，到一条可回查的企业记录。</p></div></div>
 <div id="portrait-summary" class="portrait-summary">正在读取真实阶段汇总…</div>
 <div class="portrait-example-heading"><span>以下为合成企业示例</span><select id="portrait-company" aria-label="选择合成企业画像"></select></div>
 <div class="portrait-business"><span class="portrait-provisional">PROVISIONAL · 暂定身份</span><div class="portrait-heading"><h4 id="portrait-name"></h4><span class="portrait-avatar" aria-hidden="true">企</span></div><p id="portrait-address"></p><div id="portrait-tags" class="portrait-tags"></div></div>
