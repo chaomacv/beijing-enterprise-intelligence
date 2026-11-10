@@ -82,7 +82,7 @@ test('crossing either end keeps circular neighbors and nine unique interactive c
   const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));expect(ids.length).toBe(new Set(ids).size);
 });
 
-test('expanded notebook retains chart controls when restored',async({page})=>{
+test('expanded notebook retains chart controls when restored',async({page},info)=>{
   await page.locator('[data-gallery-page="2"]').click();
   await page.locator('[data-notebook="2"] .notebook-reader-open').click();
   await expect(page.locator('#notebook-reader')).toBeVisible();
@@ -92,6 +92,10 @@ test('expanded notebook retains chart controls when restored',async({page})=>{
   await expect(page.locator('#notebook-reader')).not.toBeVisible();
   await expect(page.locator('#gallery-event-stage')).toHaveValue('unknown');
   await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(9);
+  await page.locator('[data-gallery-page="5"]').click();
+  await page.locator('[data-notebook="5"] .notebook-reader-open').click();
+  await page.locator('.dedup-example').scrollIntoViewIfNeeded();
+  await page.screenshot({path:info.outputPath('dedup-reuse-example.png')});
 });
 
 test('classification chart separates ten source topics and keeps profile counts explicit',async({page},info)=>{
