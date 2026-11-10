@@ -156,6 +156,10 @@ test('stage order and actual inference time remain distinct while both chart sca
  const p=m.positions(d,'time',false).points;
  assert.ok(p[1].x-p[0].x < p[6].x-p[5].x);
  assert.equal(p.at(-1).count,388349);
+ const ticks=m.timeTickIndices(p);
+ assert.equal(ticks[0],0);assert.equal(ticks.at(-1),p.length-1);
+ const span=p.at(-1).x-p[0].x;
+ assert.ok(p[ticks[1]].x-p[0].x>span*.25&&p.at(-1).x-p[ticks[1]].x>span*.25);
 });
 
 test('inconsistent lineage counts or fabricated stage timestamps cannot be presented as the batch',()=>{

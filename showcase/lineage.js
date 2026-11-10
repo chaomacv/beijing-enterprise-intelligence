@@ -30,6 +30,11 @@
   const y=n=>log&&mode==='flow'?bottom-(Math.log10(n)-5)/3*(bottom-top):bottom-n/max*(bottom-top);
   return {points:points.map((p,i)=>({...p,x:left+((mode==='time'?Date.parse(p.at):i)-start)/(end-start)*(right-left),y:y(p.count)})),y};
  }
+ function timeTickIndices(points){
+  const center=(points[0].x+points.at(-1).x)/2;
+  const middle=points.reduce((best,p,i)=>Math.abs(p.x-center)<Math.abs(points[best].x-center)?i:best,0);
+  return [...new Set([0,middle,points.length-1])];
+ }
  async function mount(win){
   const doc=win.document,$=id=>doc.getElementById(id),host=$('gallery-timeline-chart');if(!host)return;
   const response=await win.fetch('assets/data-lineage.json');if(!response.ok)throw Error('Lineage unavailable');const data=validate(await response.json());
@@ -59,7 +64,7 @@
     body+=`<g class="lineage-point" data-lineage-point="${i}" tabindex="0" role="button" aria-label="${esc(p.name+'，'+fmt(p.count)+p.unit)}"><circle cx="${p.x}" cy="${p.y}" r="13" fill="transparent"/><circle class="lineage-dot" cx="${p.x}" cy="${p.y}" r="4" fill="#4269d0" stroke="#fff" stroke-width="1.5"/><title>${esc(p.name+'：'+fmt(p.count)+p.unit+'。'+p.details.join(' '))}</title></g>`;
     if(mode==='flow')body+=`<text x="${p.x}" y="${p.y-13}" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick">${compact(p.count)}</text><text x="${p.x}" y="276" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick"><tspan>${String(i+1).padStart(2,'0')}</tspan><tspan class="lineage-phase-name"> ${esc(p.name)}</tspan></text>`;
    });
-   if(mode==='time')for(const i of [0,Math.floor(points.length/2),points.length-1])body+=`<text x="${points[i].x}" y="276" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick${i>0&&i<points.length-1?' lineage-time-middle':''}">${esc(date.format(new Date(points[i].at)))}</text>`;
+   if(mode==='time')for(const i of timeTickIndices(points))body+=`<text x="${points[i].x}" y="276" text-anchor="${i===0?'start':i===points.length-1?'end':'middle'}" class="svg-tick${i>0&&i<points.length-1?' lineage-time-middle':''}">${esc(date.format(new Date(points[i].at)))}</text>`;
    host.innerHTML=`<svg viewBox="0 0 720 305" role="group" aria-label="${mode==='flow'?'按处理阶段展示记录分流、内容代表、回填和最终覆盖对账':'按实际时间展示内容代表处理进度'}">${body}</svg>`;host.append(tooltip);
    host.querySelectorAll('[data-lineage-point]').forEach((g,i)=>{
     g.addEventListener('pointerenter',e=>inspect(i,e));g.addEventListener('pointermove',e=>{if(!tooltip.hidden)tooltipPosition(e);});g.addEventListener('pointerleave',()=>{tooltip.hidden=true;});
@@ -76,5 +81,5 @@
   $('lineage-equations').innerHTML=data.equations.map(e=>`<div><b>${esc(e.total==='known'?'全批去向':e.total==='retained'?'处理分流':'精确复用')}</b><span>${fmt(data.counts[e.total])} = ${e.parts.map(k=>fmt(data.counts[k])).join(' + ')}</span></div>`).join('');
   render();
  }
- return {validate,series,positions,mount};
+ return {validate,series,positions,timeTickIndices,mount};
 });
