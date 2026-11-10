@@ -67,20 +67,22 @@ test('square notebooks have protruding topic tabs and a separate corner expansio
   await expect(page.locator('#notebook-reader')).toBeVisible();
   await expect(page.locator('#notebook-reader .notebook-reader-open')).not.toBeVisible();
 });
-test('crossing either end keeps circular neighbors and ten unique interactive cards',async({page})=>{
-  for(const n of [9,0,9,0,1]){
-    if(n===9){await page.locator('[data-gallery-page="0"]').click();await page.locator('#gallery-prev').click();}
-    else if(n===0){await page.locator('[data-gallery-page="9"]').click();await page.locator('#gallery-next').click();}
+test('crossing either end keeps circular neighbors and nine unique interactive cards',async({page})=>{
+  const count=await page.locator('[data-gallery-page]').count(),last=count-1,mid=Math.floor(count/2);
+  expect(count).toBe(9);
+  for(const n of [last,0,last,0,1]){
+    if(n===last){await page.locator('[data-gallery-page="0"]').click();await page.locator('#gallery-prev').click();}
+    else if(n===0){await page.locator(`[data-gallery-page="${last}"]`).click();await page.locator('#gallery-next').click();}
     else await page.locator('#gallery-next').click();
     await expect(page.locator(`[data-gallery-page="${n}"]`)).toHaveAttribute('aria-pressed','true');
-    await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[5].dataset.notebook))).toBe(n);
+    await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[Math.floor(el.children.length/2)].dataset.notebook))).toBe(n);
     const order=await page.locator('.carousel-track').evaluate(el=>[...el.children].map(c=>Number(c.dataset.notebook)));
-    expect(new Set(order).size).toBe(10);expect(order[4]).toBe((n+9)%10);expect(order[6]).toBe((n+1)%10);
+    expect(new Set(order).size).toBe(count);expect(order[mid-1]).toBe((n+count-1)%count);expect(order[mid+1]).toBe((n+1)%count);
   }
   const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));expect(ids.length).toBe(new Set(ids).size);
 });
 
-test('expanded notebook retains chart controls when restored',async({page})=>{
+test('expanded notebook retains chart controls when restored',async({page},info)=>{
   await page.locator('[data-gallery-page="2"]').click();
   await page.locator('[data-notebook="2"] .notebook-reader-open').click();
   await expect(page.locator('#notebook-reader')).toBeVisible();
@@ -89,7 +91,11 @@ test('expanded notebook retains chart controls when restored',async({page})=>{
   await page.locator('#notebook-reader-close').click();
   await expect(page.locator('#notebook-reader')).not.toBeVisible();
   await expect(page.locator('#gallery-event-stage')).toHaveValue('unknown');
-  await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(10);
+  await expect(page.locator('.carousel-track [data-notebook]')).toHaveCount(9);
+  await page.locator('[data-gallery-page="5"]').click();
+  await page.locator('[data-notebook="5"] .notebook-reader-open').click();
+  await page.locator('.dedup-example').scrollIntoViewIfNeeded();
+  await page.screenshot({path:info.outputPath('dedup-reuse-example.png')});
 });
 
 test('classification chart separates ten source topics and keeps profile counts explicit',async({page},info)=>{
@@ -115,11 +121,11 @@ test('classification chart separates ten source topics and keeps profile counts 
 });
 test('timed playback advances from the last notebook to the first',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.locator('[data-gallery-page="9"]').click();
+  await page.locator('[data-gallery-page="8"]').click();
   await page.locator('#gallery-play').click();
   await page.mouse.move(5,5);
   await expect(page.locator('[data-gallery-page="0"]')).toHaveAttribute('aria-pressed','true',{timeout:12000});
-  await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[5].dataset.notebook))).toBe(0);
+  await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[Math.floor(el.children.length/2)].dataset.notebook))).toBe(0);
 });
 test('method pages replace in place with useful content and keyboard controls',async({page},info)=>{
   await page.locator('#approach').scrollIntoViewIfNeeded();
@@ -195,7 +201,7 @@ test('five-question notebook explains each method in place',async({page},info)=>
 });
 
 test('100 real companies support similarity distances, peripheral tag anchors, dragging and 3D',async({page},info)=>{
- await page.locator('[data-gallery-page="7"]').click();await page.locator('[data-notebook="7"] .notebook-reader-open').click();
+ await page.locator('[data-gallery-page="6"]').click();await page.locator('[data-notebook="6"] .notebook-reader-open').click();
  const host=page.locator('#enterprise-network');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  await expect(page.locator('#network-total')).toContainText('100 家真实企业样本');
  await expect(page.locator('[data-node-kind="company"]')).toHaveCount(100);
@@ -254,8 +260,8 @@ test('100 real companies support similarity distances, peripheral tag anchors, d
 
 test('portrait separates real scale from synthetic company facts and can trace evidence',async({page},info)=>{
  await expect(page.locator('#portrait-summary')).toHaveAttribute('data-ready','true');
- await page.locator('[data-gallery-page="8"]').click();
- await page.locator('[data-notebook="8"] .notebook-reader-open').click();
+ await page.locator('[data-gallery-page="7"]').click();
+ await page.locator('[data-notebook="7"] .notebook-reader-open').click();
  await expect(page.locator('#portrait-summary')).toContainText('5,202,714');
  await expect(page.locator('#portrait-summary')).toContainText('837,993');
  await expect(page.locator('#portrait-name')).toContainText('合成示例');
