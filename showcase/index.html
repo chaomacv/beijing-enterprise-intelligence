@@ -76,11 +76,13 @@ FROM classified_events GROUP BY event_type, status;
 -- 原 event_id、原分类、原阶段与依据可追溯</code></pre>
  <div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">细分类别及选定阶段的数量</caption><thead><tr><th>细分类别</th><th id="gallery-event-count-label">事件观察数</th><th>选定阶段</th></tr></thead><tbody id="gallery-event-table"></tbody></table></div><footer class="notebook-scope">全批最终结果 · 2026-11-10 分类修正 · 依据来源主题与结构化证据，独立准确率尚未评测 · <a href="assets/event-classification.json">分类汇总 JSON ↗</a></footer></div></article><article class="data-notebook" data-card-key="hierarchy" data-notebook="3" aria-roledescription="幻灯片" aria-label="4 / 9：数据层级与数量构成">
 <span class="notebook-category">事件层级</span><div class="notebook-page">
+<div class="sunburst-stage">
 <div class="notebook-heading"><span class="cell-number">[04]</span><div><h3>数据层级与数量构成</h3><p>切换附件、逻辑文件和业务记录；扇区面积表示数量，点击展开下级或返回上级。</p></div></div>
 <div id="event-sunburst-modes" class="sunburst-modes" role="group" aria-label="旭日图探索模式"></div>
 <div class="sunburst-explore-bar"><span id="event-sunburst-levels"></span><label class="sunburst-filter"><select id="event-sunburst-filter" aria-label="旭日图类别筛选"></select></label></div>
 <nav id="event-sunburst-breadcrumb" class="sunburst-breadcrumb" aria-label="事件分类面包屑"></nav>
-<div id="event-sunburst-chart" class="event-sunburst-chart"></div>
+<div class="sunburst-fit"><div id="event-sunburst-chart" class="event-sunburst-chart"></div></div>
+</div>
 <p id="event-sunburst-detail" class="sunburst-detail" role="status" aria-live="polite"></p>
 <p id="event-sunburst-note" class="notebook-callout"></p>
 <div class="gallery-table-scroll"><table class="gallery-table"><caption class="sr-only">分类数量与占父级比例</caption><thead><tr><th>分类</th><th id="event-sunburst-unit">文件数</th><th>占父级</th></tr></thead><tbody id="event-sunburst-table"></tbody></table></div>

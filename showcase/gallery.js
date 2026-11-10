@@ -153,7 +153,9 @@
         const slot=doc.createElement('div');slot.className='notebook-slot';slot.setAttribute('aria-hidden','true');
         card.replaceWith(slot);reading={card,slot,button};$('notebook-reader-body').append(card);
         $('notebook-reader-title').textContent=card.querySelector('h3').textContent;
-        reader.showModal();renderEvents();$('notebook-reader-close').focus();
+        reader.showModal();
+        if(card.dataset.cardKey==='hierarchy')card.querySelector('.notebook-page').scrollTop=0;
+        renderEvents();$('notebook-reader-close').focus();
       });
     });
     $('notebook-reader-close').addEventListener('click',()=>reader.close());

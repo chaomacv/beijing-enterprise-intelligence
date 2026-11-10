@@ -153,10 +153,23 @@ test('method pages replace in place with useful content and keyboard controls',a
 test('three real sunburst modes retain full totals and support true two-level zoom',async({page},info)=>{
  await page.locator('[data-gallery-page="3"]').click();
  await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-ready','true');
+ async function wholeChartFits(){
+  const bounds=await page.locator('#event-sunburst-chart').evaluate(el=>{
+   const chart=el.getBoundingClientRect(),frame=el.closest('.notebook-page').getBoundingClientRect();
+   return {top:chart.top,bottom:chart.bottom,left:chart.left,right:chart.right,width:chart.width,height:chart.height,frameTop:frame.top,frameBottom:frame.bottom,frameLeft:frame.left,frameRight:frame.right,scroll:el.closest('.notebook-page').scrollTop,screen:innerHeight};
+  });
+  expect(bounds.width).toBeGreaterThan(page.viewportSize().width>1100?250:180);
+  expect(bounds.height/bounds.width).toBeCloseTo(1,1);
+  expect(bounds.top).toBeGreaterThanOrEqual(bounds.frameTop);
+  expect(bounds.bottom).toBeLessThanOrEqual(Math.min(bounds.frameBottom,bounds.screen)+1);
+  expect(bounds.left).toBeGreaterThanOrEqual(bounds.frameLeft);
+  expect(bounds.right).toBeLessThanOrEqual(bounds.frameRight+1);
+  expect(bounds.scroll).toBe(0);
+ }
+ await wholeChartFits();
+ await page.screenshot({path:info.outputPath('whole-sunburst-card.png')});
  await page.locator('[data-notebook="3"] .notebook-reader-open').click();
- const chartBox=await page.locator('#event-sunburst-chart').boundingBox();
- expect(chartBox.width).toBeGreaterThan(page.viewportSize().width>1100?600:200);
- expect(chartBox.height/chartBox.width).toBeCloseTo(1,1);
+ await wholeChartFits();
  for(const [mode,total] of [['attachments','5200'],['logical','11701'],['records','43653625']]){
   await page.locator(`[data-sun-mode="${mode}"]`).click();
   const chart=page.locator('#event-sunburst-chart');await expect(chart).toHaveAttribute('data-mode',mode);
@@ -167,10 +180,12 @@ test('three real sunburst modes retain full totals and support true two-level zo
   expect(Number(await chart.getAttribute('data-focus-count'))).toBeLessThan(Number(total));
   await page.locator('#event-sunburst-table button').first().click();
   await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(3);
+  await wholeChartFits();
   await expect(page.locator('#event-sunburst-detail')).toContainText('占父级');
   await page.locator('[data-sun-up]').click();await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(2);
   await page.locator('#event-sunburst-breadcrumb button').first().click();
   await expect(chart).toHaveAttribute('data-focus-count',total);
+  await wholeChartFits();
  }
  await page.screenshot({path:info.outputPath('three-mode-sunburst.png')});
  await page.locator('[data-sun-mode="attachments"]').click();await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-mode','attachments');

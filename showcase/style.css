@@ -624,3 +624,20 @@ dialog { width: min(680px,calc(100% - 32px)); max-height: 88vh; color: var(--ink
 @media(max-width:600px) { .source-chart { min-width:620px; }#notebook-reader .source-chart-scroll { overflow-x:auto; }#notebook-reader .source-chart { min-width:620px; } }
 
 .dedup-example { margin:18px 0; padding-top:16px; border-top:1px solid #e6ebf2; }.dedup-example h4 { font-size:13px; font-weight:500; color:#41536f; }.dedup-example-scope { font-size:9px; line-height:1.8; color:#8d98a9; margin:6px 0 10px; }.dedup-example .gallery-table :is(th,td):first-child { width:20%; white-space:nowrap; }.dedup-example .gallery-table :is(th,td):nth-child(2) { text-align:left; font-family:var(--sans); line-height:1.9; overflow-wrap:anywhere; color:#738299; }.dedup-reuse-path { display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin:13px 0 10px; font-size:10px; color:#5c7698; }.dedup-reuse-path span { padding:5px 8px; background:#f1f5fb; }.dedup-reuse-path i { color:#a5b3c7; font-style:normal; }.dedup-example-outcome { font-size:10px; line-height:1.9; color:#8795a7; }
+
+/* Reserve the first visible card area for controls and the complete circular chart. */
+.sunburst-stage { height:100%; min-height:0; flex:0 0 auto; display:flex; flex-direction:column; }
+[data-card-key="hierarchy"] .notebook-page> * { flex-shrink:0; }
+.sunburst-stage> :not(.sunburst-fit) { flex:none; }
+.sunburst-stage .notebook-heading { margin-bottom:10px; }
+.sunburst-stage .sunburst-modes { margin:6px 0 8px; }
+.sunburst-stage .sunburst-modes button { padding-block:6px; }
+.sunburst-stage .sunburst-modes button span { margin-bottom:3px; }
+.sunburst-stage .sunburst-breadcrumb { margin-block:6px; }
+.sunburst-fit { flex:1; min-height:0; min-width:0; display:grid; place-items:center; container-type:size; }
+.sunburst-fit .event-sunburst-chart { width:min(100cqw,100cqh,740px); aspect-ratio:1; margin:0; }
+#notebook-reader[open]:has([data-card-key="hierarchy"]) { height:92dvh; max-height:92dvh; display:flex; flex-direction:column; overflow:hidden; }
+#notebook-reader:has([data-card-key="hierarchy"]) .notebook-reader-heading { flex:none; }
+#notebook-reader:has([data-card-key="hierarchy"]) #notebook-reader-body { flex:1; min-height:0; overflow:hidden; }
+#notebook-reader [data-card-key="hierarchy"] { height:100%; }
+#notebook-reader [data-card-key="hierarchy"] .notebook-page { height:100%; min-height:0; overflow-y:auto; padding-top:12px; }

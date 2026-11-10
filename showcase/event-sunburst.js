@@ -60,6 +60,7 @@
   }
   function zoom(n,animate=true){
    if(!n.children){details(n);return;}
+   host.closest('.notebook-page').scrollTop=0;
    svg.interrupt('zoom');focus=n;tooltip.hidden=true;for(const d of nodes)d.target=project(d,focus);
    const shown=nodes.filter(d=>d!==root&&(visible(d.current)||visible(d.target)));
    const activate=(e,d)=>{if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;if(e.type==='keydown')e.preventDefault();zoom(d);};
