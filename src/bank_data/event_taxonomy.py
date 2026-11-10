@@ -179,11 +179,12 @@ def refine(database, output):
         public = {'version': VERSION, 'created_at': datetime.now(timezone.utc).isoformat(),
                   'basis': 'source_topic_rules_and_structured_stage_evidence_not_manual_row_validation',
                   'semantic_accuracy_evaluated': False, 'total_events': after,
-                  'legacy_qualification_events': legacy, 'unique_licences': None,
+                  'category_count': len(category_profiles), 'unique_licences': None,
                   'unique_registered_enterprises': None, 'category_status': categories,
-                  'category_profiles': category_profiles, 'stage_changes': changes}
+                  'category_profiles': category_profiles}
         (output/'public_summary.json').write_text(json.dumps(public,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-        private = {**public, 'source_database':str(database),'recipe_sha256':recipe,
+        private = {**public, 'legacy_qualification_events':legacy, 'stage_changes':changes,
+                   'source_database':str(database),'recipe_sha256':recipe,
                    'source_stat_before': {'bytes':source_stat.st_size,'mtime_ns':source_stat.st_mtime_ns},
                    'output_source_links':sources,'checks':{'event_ids_conserved':True,'source_links_conserved':True,
                    'parquet_counts_verified':True,'current_validity_inferred':False}}
@@ -203,7 +204,7 @@ def main():
     args=parser.parse_args()
     result=refine(args.database,args.output)
     print(json.dumps({'version':result['version'],'events':result['total_events'],
-                      'legacy_qualification_events':result['legacy_qualification_events']},ensure_ascii=False))
+                      'category_count':result['category_count']},ensure_ascii=False))
 
 
 if __name__=='__main__':

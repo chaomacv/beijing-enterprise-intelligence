@@ -27,24 +27,31 @@ test('public gallery exports counts and observed times without private identifie
     assert.ok(bin.bucket >= 0 && bin.bucket < data.file_space.buckets.length);
   }
 });
-test('refinement conserves legacy observations without summing nonadditive profile counts',()=>{
+test('all eighteen event categories reconcile without summing nonadditive profile counts',()=>{
   const selected=eventView(data);
-  assert.equal(sum(selected,'count'),5032506);
-  assert.equal(selected.length,10);
-  assert.equal(data.taxonomy.legacy_qualification_events,5032506);
-  assert.equal(data.taxonomy.downgraded_confirmed,540486);
+  assert.equal(sum(selected,'count'),5968620);
+  assert.equal(selected.length,18);
+  assert.equal(data.taxonomy.total_events,5968620);
+  assert.equal(data.taxonomy.category_count,18);
+  assert.ok(!('legacy_qualification_events' in data.taxonomy));
+  assert.ok(!('refined_types' in data.taxonomy));
+  const classified=require('../showcase/assets/event-classification.json');
+  assert.equal(classified.total_events,sum(selected,'count'));
+  assert.equal(classified.category_count,selected.length);
+  assert.equal(sum(classified.category_status,'observed_events'),classified.total_events);
+  assert.ok(!('legacy_qualification_events' in classified));
   assert.ok(!data.events.some(r=>r.type==='qualification'));
   assert.equal(data.taxonomy.unique_licences,null);
   assert.equal(data.taxonomy.unique_registered_enterprises,null);
-  const profiles=eventView(data,'all','refined','profiles');
+  const profiles=eventView(data,'all','profiles');
   for(const row of profiles)assert.equal(row.count,data.taxonomy.category_profiles.find(p=>p.type===row.type).count);
   const original=data.events.map(r=>({...r}));
   const multi={...data,events:[
     {type:'business_permit',label:'企业经营许可',status:'confirmed',count:7,associated_profiles:3},
     {type:'business_permit',label:'企业经营许可',status:'unknown',count:9,associated_profiles:4}],
     taxonomy:{...data.taxonomy,category_profiles:[{type:'business_permit',count:5}]}};
-  assert.equal(eventView(multi,'all','refined','profiles')[0].count,5);
-  assert.equal(eventView(multi,'unknown','refined','profiles')[0].count,4);
+  assert.equal(eventView(multi,'all','profiles')[0].count,5);
+  assert.equal(eventView(multi,'unknown','profiles')[0].count,4);
   assert.deepEqual(data.events,original);
 });
 test('event-stage filters preserve categories and never mix record counts into event totals', () => {

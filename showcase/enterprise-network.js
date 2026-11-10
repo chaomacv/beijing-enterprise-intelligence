@@ -39,11 +39,11 @@
   $('network-zoom-value').textContent=Math.round(camera.k*100)+'%';host.dataset.camera=[camera.yaw,camera.pitch,camera.x,camera.y].join(',');
  }
  function rebuild(){
-  if(!data)return;const scope=$('network-scope').value,visibleCategories=data.categories.filter((c,i)=>scope==='all'||i<10);
+  if(!data)return;const visibleCategories=data.categories;
   let category=$('network-category').value;if(!visibleCategories.some(c=>c.id===category))category='';
   $('network-category').innerHTML='<option value="">全部类别</option>'+visibleCategories.map(c=>`<option value="${esc(c.id)}">${esc(c.label)}</option>`).join('');$('network-category').value=category;
   $('network-legend').innerHTML=visibleCategories.map(c=>`<span><i style="background:${c.color}"></i>${esc(c.label)}</span>`).join('');
-  const companies=model.companies(data,scope,category),normalizers=model.normalizers(model.companies(data,scope)),token=++serial,mode=$('network-mode').value;
+  const companies=model.companies(data,category),normalizers=model.normalizers(model.companies(data)),token=++serial,mode=$('network-mode').value;
   dimension=Number($('network-dimension').value);$('network-threshold').disabled=mode!=='similarity';
   $('network-threshold-value').value=Number($('network-threshold').value).toFixed(2);
   $('network-size').textContent=`显示 ${companies.length} / ${data.sample_size} 家样本企业`;
@@ -92,7 +92,7 @@
  for(const event of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(event,()=>{drag=null;});
  host.addEventListener('contextmenu',e=>{if(expanded())e.preventDefault();});
  host.addEventListener('keydown',e=>{if(['+','=','-'].includes(e.key)){e.preventDefault();e.stopPropagation();zoom(e.key==='-'?.8:1.25);}if(dimension===3&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();e.stopPropagation();camera.yaw+=e.key==='ArrowLeft'?-.15:e.key==='ArrowRight'?.15:0;camera.pitch+=e.key==='ArrowUp'?-.15:e.key==='ArrowDown'?.15:0;draw();}});
- for(const id of ['network-category','network-mode','network-threshold','network-dimension','network-scope'])$(id).addEventListener('change',rebuild);
+ for(const id of ['network-category','network-mode','network-threshold','network-dimension'])$(id).addEventListener('change',rebuild);
  $('network-labels').addEventListener('change',draw);$('network-zoom-in').addEventListener('click',()=>zoom(1.25));$('network-zoom-out').addEventListener('click',()=>zoom(.8));
  $('network-reset').addEventListener('click',()=>{camera={k:1,x:0,y:0,yaw:0,pitch:0};rebuild();});
  root.fetch('assets/company-network.json').then(r=>{if(!r.ok)throw Error('Network unavailable');return r.json();}).then(value=>{

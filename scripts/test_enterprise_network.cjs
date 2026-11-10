@@ -13,7 +13,9 @@ test('sample contains exactly 100 real company aliases with reconciled event and
   assert.equal(c.tag_count,keys.length);assert.equal(c.event_count,keys.reduce((s,t)=>s+c.event_counts[t],0));
   for(const [tag,count] of Object.entries(c.event_counts)){assert.ok(Number.isSafeInteger(count)&&count>0);assert.equal(Object.values(c.stage_counts[tag]).reduce((a,b)=>a+b,0),count);}
  }
- assert.equal(companies(data).length,100);assert.equal(companies(data,'refined').length,100);
+ assert.equal(companies(data).length,100);
+ assert.ok(companies(data,'procurement').every(c=>c.event_counts.procurement>0));
+ assert.equal(new Set(companies(data).flatMap(c=>Object.keys(c.event_counts))).size,18);
 });
 test('more shared event kinds or more corresponding events shorten target distance',()=>{
  const scale={tag_count:7,event_count:100};

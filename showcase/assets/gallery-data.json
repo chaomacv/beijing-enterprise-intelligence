@@ -745,19 +745,6 @@
     "version": "qualification-refinement-v1",
     "updated_at": "2026-11-09T21:51:29.332276+00:00",
     "basis": "source_topic_rules_and_structured_stage_evidence_not_manual_row_validation",
-    "legacy_qualification_events": 5032506,
-    "refined_types": [
-      "business_permit",
-      "enterprise_qualification",
-      "personnel_qualification",
-      "product_registration",
-      "equipment_inspection",
-      "qualification_application",
-      "regulatory_inspection",
-      "industry_assessment",
-      "project_approval",
-      "qualification_review"
-    ],
     "unique_licences": null,
     "unique_registered_enterprises": null,
     "category_profiles": [
@@ -834,7 +821,28 @@
         "count": 11337
       }
     ],
-    "downgraded_confirmed": 540486
+    "total_events": 5968620,
+    "event_types": [
+      "administrative_penalty",
+      "business_abnormal",
+      "business_permit",
+      "enterprise_qualification",
+      "environment",
+      "equipment_inspection",
+      "industry_assessment",
+      "innovation",
+      "operating_status",
+      "personnel_qualification",
+      "procurement",
+      "product_registration",
+      "project_approval",
+      "qualification_application",
+      "qualification_review",
+      "regulatory_inspection",
+      "subsidy",
+      "tax_credit"
+    ],
+    "category_count": 18
   },
   "record_statuses": [
     {

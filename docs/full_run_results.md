@@ -45,7 +45,7 @@
 | 07 主体关联 | 信用代码校验、名称与非空地址保守关联；近名仅产生候选 | `07_entities/results.duckdb`、`entity_mentions.parquet`、`name_ambiguities.parquet`、`name_neighbors.parquet` |
 | 08 导出 | 主体画像、事件观察、来源链接及逐条记录台账 | `08_results/profiles.*`、`events.*`、`event_sources.*`、`record_ledger.parquet`、`file_index.json` |
 | 09 复核验收 | 原附件及已知逻辑记录对账、导出回读、结构／OCR／语义分流 | `audit.json`、`09_review/file_review.json`、`record_review.parquet`、`表头及结构复核清单.csv` |
-| 10 分类修正 | 5,032,506 条原许可宽类事件细分为十类，保留原事件与来源；阶段证据不足则回退 | `10_classification_v1/classification.duckdb`、`classified_events.parquet`、`classified_profile_tags.parquet`、`audit.json` |
+| 10 分类修正 | 5,968,620 条事件统一归入 18 类并汇总画像标签，保留事件与来源；阶段证据不足则回退 | `10_classification_v1/classification.duckdb`、`classified_events.parquet`、`classified_profile_tags.parquet`、`audit.json` |
 | 最终报告 | 汇总所有验收与修正结果 | `交付汇总/完整处理结果.md`、`全量汇总.json`、`事件类别与阶段.csv`、`交付文件清单.json` |
 
 画像／事件 → `event_sources` → `record_ledger` → `06_validation` 逐条结果与模型来源 → `05_records` 完整原值与语境 → 原始附件及网站来源。

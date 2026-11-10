@@ -98,22 +98,23 @@ test('expanded notebook retains chart controls when restored',async({page},info)
   await page.screenshot({path:info.outputPath('dedup-reuse-example.png')});
 });
 
-test('classification chart separates ten source topics and keeps profile counts explicit',async({page},info)=>{
+test('classification chart shows all eighteen categories and keeps profile counts explicit',async({page},info)=>{
   await page.locator('[data-gallery-page="2"]').click();
   await page.locator('[data-notebook="2"] .notebook-reader-open').click();
-  await expect(page.locator('#gallery-event-table tr')).toHaveCount(10);
+  await expect(page.locator('#gallery-event-table tr')).toHaveCount(18);
   await expect(page.locator('#gallery-event-table')).toContainText('人员执业资格');
   await expect(page.locator('#gallery-event-table')).toContainText('申请办理');
-  await expect(page.locator('#gallery-taxonomy-total')).toHaveText('5,032,506');
-  await expect(page.locator('#gallery-taxonomy-downgraded')).toHaveText('540,486');
-  await page.locator('#gallery-event-scope').selectOption('all');
+  await expect(page.locator('#gallery-taxonomy-total')).toHaveText('5,968,620');
+  await expect(page.locator('#gallery-taxonomy-categories')).toHaveText('18');
+  await expect(page.locator('#gallery-event-scope')).toHaveCount(0);
+  await expect(page.locator('#gallery-event-table')).toContainText('采购中标');
+  await expect(page.locator('#gallery-event-table')).toContainText('行政处罚');
   await expect(page.locator('#gallery-event-table tr')).toHaveCount(18);
   await page.locator('#gallery-event-metric').selectOption('profiles');
   await expect(page.locator('#gallery-event-count-label')).toHaveText('关联画像数');
   await expect(page.locator('#gallery-event-insight')).toContainText('不能相加为企业总数');
   await page.locator('#gallery-event-stage').selectOption('unknown');
   await expect(page.locator('#gallery-event-table')).toContainText('阶段未明');
-  await page.locator('#gallery-event-scope').selectOption('refined');
   await page.locator('#gallery-event-metric').selectOption('events');
   await page.locator('#gallery-event-stage').selectOption('all');
   await page.screenshot({path:info.outputPath('event-classification.png')});
@@ -266,9 +267,11 @@ test('100 real companies support similarity distances, peripheral tag anchors, d
  await page.locator('#network-options summary').click();
  await page.locator('#network-category').selectOption('product_registration');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  expect(await page.locator('[data-network-node]').count()).toBeLessThan(118);
- await page.locator('#network-category').selectOption('');await page.locator('#network-scope').selectOption('refined');
+ await page.locator('#network-category').selectOption('');
+ await expect(page.locator('#network-category option')).toHaveCount(19);
+ await expect(page.locator('#network-scope')).toHaveCount(0);
  await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});await expect(host).toHaveAttribute('data-company-count','100');
- await page.locator('#network-scope').selectOption('all');await page.locator('#network-mode').selectOption('similarity');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
+ await page.locator('#network-mode').selectOption('similarity');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  await expect(page.locator('[data-node-kind="company"]')).toHaveCount(100);
  await expect(host).toHaveAttribute('data-company-count','100');
 });

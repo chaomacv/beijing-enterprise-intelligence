@@ -4,7 +4,6 @@
   "basis": "source_topic_rules_and_structured_stage_evidence_not_manual_row_validation",
   "semantic_accuracy_evaluated": false,
   "total_events": 5968620,
-  "legacy_qualification_events": 5032506,
   "unique_licences": null,
   "unique_registered_enterprises": null,
   "category_status": [
@@ -335,66 +334,5 @@
       "associated_profiles": 11337
     }
   ],
-  "stage_changes": [
-    {
-      "original_status": "confirmed",
-      "status": "confirmed",
-      "stage_reason": "original_stage_retained_no_promotion",
-      "observed_events": 2609315
-    },
-    {
-      "original_status": "confirmed",
-      "status": "unknown",
-      "stage_reason": "application_is_not_award",
-      "observed_events": 186
-    },
-    {
-      "original_status": "confirmed",
-      "status": "unknown",
-      "stage_reason": "classification_unresolved",
-      "observed_events": 184981
-    },
-    {
-      "original_status": "confirmed",
-      "status": "unknown",
-      "stage_reason": "insufficient_structured_stage_evidence",
-      "observed_events": 355319
-    },
-    {
-      "original_status": "proposed",
-      "status": "proposed",
-      "stage_reason": "original_stage_retained_no_promotion",
-      "observed_events": 541
-    },
-    {
-      "original_status": "proposed",
-      "status": "unknown",
-      "stage_reason": "application_is_not_award",
-      "observed_events": 12490
-    },
-    {
-      "original_status": "proposed",
-      "status": "unknown",
-      "stage_reason": "classification_unresolved",
-      "observed_events": 1453
-    },
-    {
-      "original_status": "unknown",
-      "status": "unknown",
-      "stage_reason": "application_is_not_award",
-      "observed_events": 234170
-    },
-    {
-      "original_status": "unknown",
-      "status": "unknown",
-      "stage_reason": "classification_unresolved",
-      "observed_events": 222822
-    },
-    {
-      "original_status": "unknown",
-      "status": "unknown",
-      "stage_reason": "original_stage_retained_no_promotion",
-      "observed_events": 1411229
-    }
-  ]
+  "category_count": 18
 }

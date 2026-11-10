@@ -66,12 +66,12 @@ receive_in_background(task, max_inflight=4)
 # 一轮后验收；仅补失败项；累计最多尝试 3 次</code></pre>
 <div class="notebook-callout acquisition-boundary">限频不保证官网不会限制访问；遇登录、验证码或访问限制即暂停，保留进度。文件级续跑不等于 HTTP 字节断点续传。</div>
 <footer class="notebook-scope">已实现的下载策略与安全边界 · 默认参数，不是吞吐测量 · 本批 5,200 份附件已纳入输入核对，上游 22 个失败项另记 · <a href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/main/docs/acquisition.md">采集方法说明 ↗</a></footer></div></article><article class="data-notebook" data-card-key="events" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 9：企业事件分类统计">
-      <span class="notebook-category">事件分类</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[03]</span><div><h3>企业事件分类统计</h3><p>柱长表示事件数量；可切换类别范围、事件阶段、关联画像数和刻度。</p></div></div>
+      <span class="notebook-category">事件分类</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[03]</span><div><h3>企业事件分类统计</h3><p>统计全部 18 类事件；柱长表示数量，可切换事件阶段、关联画像数和刻度。</p></div></div>
       
- <div class="taxonomy-reconciliation"><strong id="gallery-taxonomy-total">5,032,506</strong><span>条旧类记录 → 10 类<br>原始事件与来源全部保留</span></div>
- <div class="notebook-toolbar taxonomy-toolbar"><label>范围 <select id="gallery-event-scope"><option value="refined">原许可相关记录细分</option><option value="all">全部细分事件</option></select></label><label>数量 <select id="gallery-event-metric"><option value="events">事件观察数</option><option value="profiles">关联画像数</option></select></label><label>阶段 <select id="gallery-event-stage"><option value="all">全部阶段</option><option value="confirmed">有阶段依据 confirmed</option><option value="proposed">拟议 proposed</option><option value="unknown">阶段未明 unknown</option></select></label><label><input id="gallery-event-log" type="checkbox"> 对数刻度</label></div>
+ <div class="taxonomy-reconciliation"><strong id="gallery-taxonomy-total">5,968,620</strong><span>条事件观察 · <b id="gallery-taxonomy-categories">18</b> 类<br>事件、阶段与来源全部保留</span></div>
+ <div class="notebook-toolbar taxonomy-toolbar"><label>数量 <select id="gallery-event-metric"><option value="events">事件观察数</option><option value="profiles">关联画像数</option></select></label><label>阶段 <select id="gallery-event-stage"><option value="all">全部阶段</option><option value="confirmed">有阶段依据 confirmed</option><option value="proposed">拟议 proposed</option><option value="unknown">阶段未明 unknown</option></select></label><label><input id="gallery-event-log" type="checkbox"> 对数刻度</label></div>
  <div id="gallery-event-chart" class="gallery-figure"></div><p class="notebook-insight" id="gallery-event-insight"></p>
- <div class="notebook-callout taxonomy-note">申请不算获批，人员、设备与产品单独归类。<strong id="gallery-taxonomy-downgraded">540,486</strong> 条原 confirmed 记录因分类或阶段证据不足改为阶段未明。独立有效证照数暂不统计。</div>
+ <div class="notebook-callout taxonomy-note">18 类事件全部汇入画像标签；申请、人员、设备与产品分别归类，保留拟议和阶段未明等状态。待分类复核保留在画像中，不参与相似度计算。事件数量不等于独立有效证照数。</div>
  <pre class="gallery-code"><code>SELECT event_type, status, count(*) AS observations
 FROM classified_events GROUP BY event_type, status;
 -- 原 event_id、原分类、原阶段与依据可追溯</code></pre>
@@ -114,7 +114,7 @@ representatives[key].append(record_id)
  <div class="notebook-callout">不能直接复用：企业相同但日期或其他字段不同，含“同上”等相对指代，或来自不同文件／逻辑表。</div><footer class="notebook-scope">全批复杂内容执行计划 · 精确分组 · 同文件／同逻辑表范围</footer></div></article><article class="data-notebook" data-card-key="network" data-notebook="6" aria-roledescription="幻灯片" aria-label="7 / 9：企业画像相似网络"><span class="notebook-category">画像网络</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[07]</span><div><h3>企业画像相似网络</h3><p>100 个圆点对应 100 家真实企业；切换相似网络与标签网络，观察共同标签及事件数量的影响。</p></div></div>
 <div class="network-simple-toolbar"><span id="network-total">正在读取真实企业样本…</span><label class="sr-only" for="network-mode">网络视图</label><select id="network-mode" aria-label="网络视图"><option value="similarity">企业相似网络</option><option value="bipartite">企业—标签网络</option></select><label class="sr-only" for="network-dimension">网络空间</label><select id="network-dimension" aria-label="网络空间"><option value="2">二维</option><option value="3">三维</option></select></div>
 <details id="network-options" class="network-options"><summary>更多选项</summary><div class="network-option-body">
-<div class="network-toolbar"><label>范围 <select id="network-scope"><option value="all">全部18类事件</option><option value="refined">许可相关十类</option></select></label></div>
+
 <div class="network-toolbar"><label>类别 <select id="network-category"></select></label><label class="network-label-toggle"><input id="network-labels" type="checkbox"> 显示标签</label></div>
 <label class="network-threshold">相似度阈值 <input id="network-threshold" type="range" min="0" max="1" step="0.05" value="0.1"><output id="network-threshold-value">0.10</output></label>
 <div id="network-legend" class="network-legend" aria-label="D3 Category10 标签配色"></div></div></details>

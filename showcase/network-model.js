@@ -2,8 +2,8 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.NetworkModel=api;})(typeof self==='object'?self:globalThis,function(){
  'use strict';
  const palette=['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'];
- function companies(data,scope='all',category=''){
-  const allowed=new Set(data.categories.filter((c,i)=>scope==='all'||i<10).map(c=>c.id));
+ function companies(data,category=''){
+  const allowed=new Set(data.categories.map(c=>c.id));
   return data.companies.map(c=>{
    const event_counts=Object.fromEntries(Object.entries(c.event_counts).filter(([t,n])=>allowed.has(t)&&n>0));
    const tags=Object.keys(event_counts).filter(t=>t!=='qualification_review');
