@@ -111,11 +111,11 @@ test('classification chart separates ten source topics and keeps profile counts 
 });
 test('timed playback advances from the last notebook to the first',async({page})=>{
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.locator('[data-gallery-page="3"]').click();
+  await page.locator('[data-gallery-page="9"]').click();
   await page.locator('#gallery-play').click();
   await page.mouse.move(5,5);
-  await expect(page.locator('[data-gallery-page="6"]')).toHaveAttribute('aria-pressed','true',{timeout:12000});
-  await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[4].dataset.notebook))).toBe(0);
+  await expect(page.locator('[data-gallery-page="0"]')).toHaveAttribute('aria-pressed','true',{timeout:12000});
+  await expect.poll(()=>page.locator('.carousel-track').evaluate(el=>Number(el.children[5].dataset.notebook))).toBe(0);
 });
 test('method pages replace in place with useful content and keyboard controls',async({page},info)=>{
   await page.locator('#approach').scrollIntoViewIfNeeded();
@@ -269,6 +269,8 @@ test('catalog background shows true counts and at most ten real source links per
  await expect(page.locator('#source-chart')).toHaveAttribute('data-ready','true');
  await expect(page.locator('#source-count')).toHaveText('4,710');
  await expect(page.locator('[data-source-bar]')).toHaveCount(20);
+ if(page.viewportSize().width<600){expect(await page.locator('.source-chart-scroll').evaluate(el=>el.scrollWidth>el.clientWidth)).toBe(true);}
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
  await page.locator('#source-theme-select').selectOption('5');
  await expect(page.locator('#source-links a')).toHaveCount(7);
  await expect(page.locator('#source-status')).toContainText('全部显示');

@@ -5,7 +5,7 @@
 
 [![Beijing Enterprise Intelligence：从分散的数据到有据可查的企业情报](showcase/assets/project-preview.svg)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
 
-**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/?view=compact#explorations)** · 八张数据笔记本、三模式缩放旭日图、100家真实企业样本的二维／三维网络，以及九步处理与来源追溯。[最终结果与文件索引](docs/full_run_results.md) · [页面设计与复现](docs/project_page.md)
+**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/?view=compact#explorations)** · 十张数据笔记本、真实来源目录与采集安全说明、三模式缩放旭日图、100家真实企业样本的二维／三维网络，以及九步处理与来源追溯。[最终结果与文件索引](docs/full_run_results.md) · [页面设计与复现](docs/project_page.md)
 
 本批于 **2026-11-10 05:56（北京时间）**完成自动处理、分类修正与最终验收，状态为 `COMPLETED_WITH_REVIEW`。
 
