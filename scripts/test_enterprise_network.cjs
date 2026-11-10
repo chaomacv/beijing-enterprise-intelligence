@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const {palette,jaccard,groups,links,project}=require('../showcase/network-model.js');
+const {palette,jaccard,groups,overview,links,project}=require('../showcase/network-model.js');
 const data=JSON.parse(fs.readFileSync(path.join(__dirname,'../showcase/assets/real-network.json'),'utf8'));
 test('real network is a complete, additive census of corrected tag signatures, not a sample',()=>{
  assert.equal(data.kind,'complete_real_profile_tag_census');assert.equal(data.sampled,false);assert.equal(data.groups.length,1753);
@@ -22,6 +22,19 @@ test('3D projection responds to real depth and rotation, while 2D keeps depth ab
  assert.notDeepEqual(project(n,camera,3),project(n,{...camera,yaw:.5},3));
  assert.deepEqual(project(n,camera,2),project({...n,z:-100},camera,2));
  assert.ok(Object.values(project(n,{...camera,yaw:1,pitch:.8},3)).every(Number.isFinite));
+});
+test('overview reduces visual density without sampling profiles or losing any tag marginal',()=>{
+ const complete=groups(data),simple=overview(complete,data.categories);
+ assert.equal(simple.length,127);assert.equal(simple.reduce((s,n)=>s+n.profiles,0),5202714);
+ const members=simple.flatMap(n=>n.members);assert.equal(members.length,1753);assert.equal(new Set(members.map(n=>n.id)).size,1753);
+ for(const n of simple){assert.equal(n.profiles,n.members.reduce((s,m)=>s+m.profiles,0));assert.ok(n.tags.length<=2);for(const m of n.members)assert.ok(n.tags.every(t=>m.tags.includes(t)));}
+ for(const c of data.categories)assert.equal(members.filter(n=>n.tags.includes(c.id)).reduce((s,n)=>s+n.profiles,0),c.profiles);
+ const edges=links(simple,.35,2);assert.ok(edges.length>0&&edges.length<=simple.length*2);
+});
+test('overview edges use the weighted full tag sets rather than just the displayed prefix',()=>{
+ const a={id:'a',tags:['a'],profiles:4,members:[{tags:['a'],profiles:3},{tags:['a','b'],profiles:1}]},b={id:'b',tags:['b'],profiles:2,members:[{tags:['b'],profiles:2}]};
+ assert.equal(jaccard(a.tags,b.tags),0);const edges=links([a,b],.1,2);
+ assert.equal(edges.length,1);assert.equal(edges[0].similarity,.125);
 });
 test('real network UI replaces synthetic data and exposes scope, dimension and complete census',()=>{
  const html=fs.readFileSync(path.join(__dirname,'../showcase/index.html'),'utf8'),module=fs.readFileSync(path.join(__dirname,'../showcase/enterprise-network.js'),'utf8');
