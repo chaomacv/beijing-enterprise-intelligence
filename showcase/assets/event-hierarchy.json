@@ -1,73 +1,60 @@
 {
-  "schema_version": 1,
-  "kind": "verified_event_hierarchy",
-  "unit": "event_observation",
-  "scope": "completed_1884_file_subset_legacy_qualification_only",
-  "snapshot_at": "2026-11-09T10:24:48.930053+00:00",
-  "source": "event-classification.json",
-  "excluded_other_event_observations": 929341,
-  "available_levels": [
-    "event_category"
+  "schema_version": 2,
+  "kind": "verified_exploration_manifest",
+  "default_mode": "attachments",
+  "snapshot_at": "2026-11-10T05:56:48.093902+08:00",
+  "source_commit": "57748c4c4086432c4b129a0fee059018a1d6a4c1",
+  "semantic_accuracy_evaluated": false,
+  "modes": [
+    {
+      "id": "attachments",
+      "label": "原始附件",
+      "unit": "份",
+      "levels": [
+        "文件格式",
+        "来源部门",
+        "数据集"
+      ],
+      "total": 5200,
+      "file": "sunburst-attachments.json",
+      "sha256": "57438f74e84c7282885b15fe7e57435dc0a9476180a80d8616b4400169479882",
+      "note": "按实际识别格式、官网“所属部门”和数据集归组；数量为已接收附件个数。"
+    },
+    {
+      "id": "logical",
+      "label": "逻辑文件",
+      "unit": "个",
+      "levels": [
+        "文件类型",
+        "生成方式",
+        "具体文件"
+      ],
+      "total": 11701,
+      "file": "sunburst-logical.json",
+      "sha256": "1a7fecbcc2d75aad5ac33fce170be3cd92843b25eb68fbc3114e12d9b375bdec",
+      "note": "包含原始附件、展开成员与转换结果；末层为一一对应的匿名文件编号，不公开原文件名或路径。"
+    },
+    {
+      "id": "records",
+      "label": "业务记录",
+      "unit": "条",
+      "levels": [
+        "业务主题",
+        "事件类别",
+        "细分类别"
+      ],
+      "total": 43653625,
+      "file": "sunburst-records.json",
+      "sha256": "0c52082162587ef12e6046fadb796014166c2325e5f5bb1d01bb1dd5fabcf80f",
+      "note": "主题来自官网目录；每条逻辑记录只计一次。细分为真实事件阶段或处理去向，多类别记录单列；包含排除和待复核记录，不等于已确认企业事实。"
+    }
   ],
-  "pending_levels": [
-    "business_subcategory",
-    "event_label"
-  ],
-  "tree": {
-    "id": "all",
-    "name": "全部事件（当前十类范围）",
-    "value": 5031890,
-    "children": [
-      {
-        "id": "business_permit",
-        "name": "企业经营许可",
-        "value": 1090473
-      },
-      {
-        "id": "enterprise_qualification",
-        "name": "企业行业资质",
-        "value": 282811
-      },
-      {
-        "id": "personnel_qualification",
-        "name": "人员执业资格",
-        "value": 965011
-      },
-      {
-        "id": "product_registration",
-        "name": "产品注册备案",
-        "value": 254244
-      },
-      {
-        "id": "equipment_inspection",
-        "name": "设备检验登记",
-        "value": 995402
-      },
-      {
-        "id": "qualification_application",
-        "name": "申请办理",
-        "value": 246846
-      },
-      {
-        "id": "regulatory_inspection",
-        "name": "监督检查",
-        "value": 231363
-      },
-      {
-        "id": "industry_assessment",
-        "name": "行业考核与年检",
-        "value": 321395
-      },
-      {
-        "id": "project_approval",
-        "name": "项目审批与验收",
-        "value": 235612
-      },
-      {
-        "id": "qualification_review",
-        "name": "待分类复核",
-        "value": 408733
-      }
-    ]
-  }
+  "checks": {
+    "all_mode_totals_reconciled": true,
+    "records_counted_once": true,
+    "excluded_records": 27792348,
+    "unmatched_catalog_attachments": 0
+  },
+  "record_detail_basis": "official_catalog_theme_then_exclusive_event_category_then_stage_or_processing_outcome",
+  "source": "completed_private_run_20261107"
 }

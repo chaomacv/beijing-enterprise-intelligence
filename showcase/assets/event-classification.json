@@ -1,30 +1,30 @@
 {
   "version": "qualification-refinement-v1",
-  "created_at": "2026-11-09T10:24:48.930053+00:00",
+  "created_at": "2026-11-09T21:51:29.332276+00:00",
   "basis": "source_topic_rules_and_structured_stage_evidence_not_manual_row_validation",
   "semantic_accuracy_evaluated": false,
-  "total_events": 5961231,
-  "legacy_qualification_events": 5031890,
+  "total_events": 5968620,
+  "legacy_qualification_events": 5032506,
   "unique_licences": null,
   "unique_registered_enterprises": null,
   "category_status": [
     {
       "event_type": "administrative_penalty",
       "status": "confirmed",
-      "observed_events": 20041,
-      "associated_profiles": 14963
+      "observed_events": 21513,
+      "associated_profiles": 16389
     },
     {
       "event_type": "administrative_penalty",
       "status": "proposed",
-      "observed_events": 59,
-      "associated_profiles": 53
+      "observed_events": 140,
+      "associated_profiles": 133
     },
     {
       "event_type": "administrative_penalty",
       "status": "unknown",
-      "observed_events": 198836,
-      "associated_profiles": 125101
+      "observed_events": 198850,
+      "associated_profiles": 125113
     },
     {
       "event_type": "business_abnormal",
@@ -42,12 +42,12 @@
       "event_type": "business_permit",
       "status": "confirmed",
       "observed_events": 764409,
-      "associated_profiles": 522145
+      "associated_profiles": 522144
     },
     {
       "event_type": "business_permit",
       "status": "unknown",
-      "observed_events": 326064,
+      "observed_events": 326069,
       "associated_profiles": 271134
     },
     {
@@ -71,14 +71,20 @@
     {
       "event_type": "environment",
       "status": "confirmed",
-      "observed_events": 362,
-      "associated_profiles": 356
+      "observed_events": 559,
+      "associated_profiles": 552
+    },
+    {
+      "event_type": "environment",
+      "status": "proposed",
+      "observed_events": 4346,
+      "associated_profiles": 4346
     },
     {
       "event_type": "environment",
       "status": "unknown",
-      "observed_events": 46764,
-      "associated_profiles": 15856
+      "observed_events": 46765,
+      "associated_profiles": 15857
     },
     {
       "event_type": "equipment_inspection",
@@ -113,8 +119,8 @@
     {
       "event_type": "innovation",
       "status": "proposed",
-      "observed_events": 860,
-      "associated_profiles": 860
+      "observed_events": 862,
+      "associated_profiles": 862
     },
     {
       "event_type": "innovation",
@@ -125,8 +131,8 @@
     {
       "event_type": "operating_status",
       "status": "confirmed",
-      "observed_events": 35299,
-      "associated_profiles": 35219
+      "observed_events": 35458,
+      "associated_profiles": 35321
     },
     {
       "event_type": "operating_status",
@@ -149,14 +155,14 @@
     {
       "event_type": "procurement",
       "status": "confirmed",
-      "observed_events": 46223,
-      "associated_profiles": 42067
+      "observed_events": 46573,
+      "associated_profiles": 42352
     },
     {
       "event_type": "procurement",
       "status": "proposed",
-      "observed_events": 596,
-      "associated_profiles": 502
+      "observed_events": 746,
+      "associated_profiles": 642
     },
     {
       "event_type": "procurement",
@@ -191,8 +197,8 @@
     {
       "event_type": "project_approval",
       "status": "unknown",
-      "observed_events": 78282,
-      "associated_profiles": 51373
+      "observed_events": 78313,
+      "associated_profiles": 51404
     },
     {
       "event_type": "qualification_application",
@@ -203,26 +209,26 @@
     {
       "event_type": "qualification_review",
       "status": "unknown",
-      "observed_events": 408733,
-      "associated_profiles": 280764
+      "observed_events": 409256,
+      "associated_profiles": 281262
     },
     {
       "event_type": "regulatory_inspection",
       "status": "confirmed",
-      "observed_events": 129911,
-      "associated_profiles": 74847
+      "observed_events": 129917,
+      "associated_profiles": 74851
     },
     {
       "event_type": "regulatory_inspection",
       "status": "proposed",
-      "observed_events": 4,
-      "associated_profiles": 2
+      "observed_events": 6,
+      "associated_profiles": 4
     },
     {
       "event_type": "regulatory_inspection",
       "status": "unknown",
-      "observed_events": 101448,
-      "associated_profiles": 99966
+      "observed_events": 101497,
+      "associated_profiles": 99993
     },
     {
       "event_type": "subsidy",
@@ -233,8 +239,8 @@
     {
       "event_type": "subsidy",
       "status": "proposed",
-      "observed_events": 2181,
-      "associated_profiles": 1408
+      "observed_events": 2182,
+      "associated_profiles": 1409
     },
     {
       "event_type": "subsidy",
@@ -258,7 +264,7 @@
   "category_profiles": [
     {
       "event_type": "administrative_penalty",
-      "associated_profiles": 134966
+      "associated_profiles": 136475
     },
     {
       "event_type": "business_abnormal",
@@ -266,7 +272,7 @@
     },
     {
       "event_type": "business_permit",
-      "associated_profiles": 711532
+      "associated_profiles": 711531
     },
     {
       "event_type": "enterprise_qualification",
@@ -274,7 +280,7 @@
     },
     {
       "event_type": "environment",
-      "associated_profiles": 16192
+      "associated_profiles": 20732
     },
     {
       "event_type": "equipment_inspection",
@@ -286,11 +292,11 @@
     },
     {
       "event_type": "innovation",
-      "associated_profiles": 54903
+      "associated_profiles": 54905
     },
     {
       "event_type": "operating_status",
-      "associated_profiles": 62088
+      "associated_profiles": 62190
     },
     {
       "event_type": "personnel_qualification",
@@ -298,7 +304,7 @@
     },
     {
       "event_type": "procurement",
-      "associated_profiles": 74917
+      "associated_profiles": 75319
     },
     {
       "event_type": "product_registration",
@@ -306,7 +312,7 @@
     },
     {
       "event_type": "project_approval",
-      "associated_profiles": 113047
+      "associated_profiles": 113078
     },
     {
       "event_type": "qualification_application",
@@ -314,15 +320,15 @@
     },
     {
       "event_type": "qualification_review",
-      "associated_profiles": 280764
+      "associated_profiles": 281262
     },
     {
       "event_type": "regulatory_inspection",
-      "associated_profiles": 174804
+      "associated_profiles": 174836
     },
     {
       "event_type": "subsidy",
-      "associated_profiles": 5761
+      "associated_profiles": 5762
     },
     {
       "event_type": "tax_credit",
@@ -334,7 +340,7 @@
       "original_status": "confirmed",
       "status": "confirmed",
       "stage_reason": "original_stage_retained_no_promotion",
-      "observed_events": 2609309
+      "observed_events": 2609315
     },
     {
       "original_status": "confirmed",
@@ -346,19 +352,19 @@
       "original_status": "confirmed",
       "status": "unknown",
       "stage_reason": "classification_unresolved",
-      "observed_events": 184890
+      "observed_events": 184981
     },
     {
       "original_status": "confirmed",
       "status": "unknown",
       "stage_reason": "insufficient_structured_stage_evidence",
-      "observed_events": 355241
+      "observed_events": 355319
     },
     {
       "original_status": "proposed",
       "status": "proposed",
       "stage_reason": "original_stage_retained_no_promotion",
-      "observed_events": 539
+      "observed_events": 541
     },
     {
       "original_status": "proposed",
@@ -370,7 +376,7 @@
       "original_status": "proposed",
       "status": "unknown",
       "stage_reason": "classification_unresolved",
-      "observed_events": 1021
+      "observed_events": 1453
     },
     {
       "original_status": "unknown",
@@ -388,7 +394,7 @@
       "original_status": "unknown",
       "status": "unknown",
       "stage_reason": "original_stage_retained_no_promotion",
-      "observed_events": 1411222
+      "observed_events": 1411229
     }
   ]
 }

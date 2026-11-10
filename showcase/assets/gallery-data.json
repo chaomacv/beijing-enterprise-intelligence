@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "kind": "aggregate_notebook_gallery",
-  "generated_at": "2026-11-09T10:29:25.301544+00:00",
+  "generated_at": "2026-11-10T05:56:48.093902+08:00",
   "source_commit": "57748c4c4086432c4b129a0fee059018a1d6a4c1",
-  "final_pipeline_complete": false,
+  "final_pipeline_complete": true,
   "corpus": {
     "snapshot_date": "2026-11-07",
     "catalog_datasets": 4710,
@@ -18,12 +18,12 @@
     "unreadable_logical_files": 65
   },
   "subset": {
-    "snapshot_at": "2026-11-08T18:59:43.271773+08:00",
-    "files": 1884,
-    "records": 14419963,
-    "events": 5961231,
-    "profiles": 5006073,
-    "partial_only": true,
+    "snapshot_at": "2026-11-10T05:56:48.093902+08:00",
+    "files": 5200,
+    "records": 15861277,
+    "events": 5968620,
+    "profiles": 5202714,
+    "partial_only": false,
     "semantic_accuracy_evaluated": false
   },
   "formats": [
@@ -450,22 +450,22 @@
       "type": "administrative_penalty",
       "label": "行政处罚",
       "status": "confirmed",
-      "count": 20041,
-      "associated_profiles": 14963
+      "count": 21513,
+      "associated_profiles": 16389
     },
     {
       "type": "administrative_penalty",
       "label": "行政处罚",
       "status": "proposed",
-      "count": 59,
-      "associated_profiles": 53
+      "count": 140,
+      "associated_profiles": 133
     },
     {
       "type": "administrative_penalty",
       "label": "行政处罚",
       "status": "unknown",
-      "count": 198836,
-      "associated_profiles": 125101
+      "count": 198850,
+      "associated_profiles": 125113
     },
     {
       "type": "business_abnormal",
@@ -486,13 +486,13 @@
       "label": "企业经营许可",
       "status": "confirmed",
       "count": 764409,
-      "associated_profiles": 522145
+      "associated_profiles": 522144
     },
     {
       "type": "business_permit",
       "label": "企业经营许可",
       "status": "unknown",
-      "count": 326064,
+      "count": 326069,
       "associated_profiles": 271134
     },
     {
@@ -520,15 +520,22 @@
       "type": "environment",
       "label": "环保监管",
       "status": "confirmed",
-      "count": 362,
-      "associated_profiles": 356
+      "count": 559,
+      "associated_profiles": 552
+    },
+    {
+      "type": "environment",
+      "label": "环保监管",
+      "status": "proposed",
+      "count": 4346,
+      "associated_profiles": 4346
     },
     {
       "type": "environment",
       "label": "环保监管",
       "status": "unknown",
-      "count": 46764,
-      "associated_profiles": 15856
+      "count": 46765,
+      "associated_profiles": 15857
     },
     {
       "type": "equipment_inspection",
@@ -569,8 +576,8 @@
       "type": "innovation",
       "label": "科技认定",
       "status": "proposed",
-      "count": 860,
-      "associated_profiles": 860
+      "count": 862,
+      "associated_profiles": 862
     },
     {
       "type": "innovation",
@@ -583,8 +590,8 @@
       "type": "operating_status",
       "label": "经营状态",
       "status": "confirmed",
-      "count": 35299,
-      "associated_profiles": 35219
+      "count": 35458,
+      "associated_profiles": 35321
     },
     {
       "type": "operating_status",
@@ -611,15 +618,15 @@
       "type": "procurement",
       "label": "采购中标",
       "status": "confirmed",
-      "count": 46223,
-      "associated_profiles": 42067
+      "count": 46573,
+      "associated_profiles": 42352
     },
     {
       "type": "procurement",
       "label": "采购中标",
       "status": "proposed",
-      "count": 596,
-      "associated_profiles": 502
+      "count": 746,
+      "associated_profiles": 642
     },
     {
       "type": "procurement",
@@ -660,8 +667,8 @@
       "type": "project_approval",
       "label": "项目审批与验收",
       "status": "unknown",
-      "count": 78282,
-      "associated_profiles": 51373
+      "count": 78313,
+      "associated_profiles": 51404
     },
     {
       "type": "qualification_application",
@@ -674,29 +681,29 @@
       "type": "qualification_review",
       "label": "待分类复核",
       "status": "unknown",
-      "count": 408733,
-      "associated_profiles": 280764
+      "count": 409256,
+      "associated_profiles": 281262
     },
     {
       "type": "regulatory_inspection",
       "label": "监督检查",
       "status": "confirmed",
-      "count": 129911,
-      "associated_profiles": 74847
+      "count": 129917,
+      "associated_profiles": 74851
     },
     {
       "type": "regulatory_inspection",
       "label": "监督检查",
       "status": "proposed",
-      "count": 4,
-      "associated_profiles": 2
+      "count": 6,
+      "associated_profiles": 4
     },
     {
       "type": "regulatory_inspection",
       "label": "监督检查",
       "status": "unknown",
-      "count": 101448,
-      "associated_profiles": 99966
+      "count": 101497,
+      "associated_profiles": 99993
     },
     {
       "type": "subsidy",
@@ -709,8 +716,8 @@
       "type": "subsidy",
       "label": "政策支持",
       "status": "proposed",
-      "count": 2181,
-      "associated_profiles": 1408
+      "count": 2182,
+      "associated_profiles": 1409
     },
     {
       "type": "subsidy",
@@ -736,9 +743,9 @@
   ],
   "taxonomy": {
     "version": "qualification-refinement-v1",
-    "updated_at": "2026-11-09T10:24:48.930053+00:00",
+    "updated_at": "2026-11-09T21:51:29.332276+00:00",
     "basis": "source_topic_rules_and_structured_stage_evidence_not_manual_row_validation",
-    "legacy_qualification_events": 5031890,
+    "legacy_qualification_events": 5032506,
     "refined_types": [
       "business_permit",
       "enterprise_qualification",
@@ -756,7 +763,7 @@
     "category_profiles": [
       {
         "type": "administrative_penalty",
-        "count": 134966
+        "count": 136475
       },
       {
         "type": "business_abnormal",
@@ -764,7 +771,7 @@
       },
       {
         "type": "business_permit",
-        "count": 711532
+        "count": 711531
       },
       {
         "type": "enterprise_qualification",
@@ -772,7 +779,7 @@
       },
       {
         "type": "environment",
-        "count": 16192
+        "count": 20732
       },
       {
         "type": "equipment_inspection",
@@ -784,11 +791,11 @@
       },
       {
         "type": "innovation",
-        "count": 54903
+        "count": 54905
       },
       {
         "type": "operating_status",
-        "count": 62088
+        "count": 62190
       },
       {
         "type": "personnel_qualification",
@@ -796,7 +803,7 @@
       },
       {
         "type": "procurement",
-        "count": 74917
+        "count": 75319
       },
       {
         "type": "product_registration",
@@ -804,7 +811,7 @@
       },
       {
         "type": "project_approval",
-        "count": 113047
+        "count": 113078
       },
       {
         "type": "qualification_application",
@@ -812,67 +819,67 @@
       },
       {
         "type": "qualification_review",
-        "count": 280764
+        "count": 281262
       },
       {
         "type": "regulatory_inspection",
-        "count": 174804
+        "count": 174836
       },
       {
         "type": "subsidy",
-        "count": 5761
+        "count": 5762
       },
       {
         "type": "tax_credit",
         "count": 11337
       }
     ],
-    "downgraded_confirmed": 540317
+    "downgraded_confirmed": 540486
   },
   "record_statuses": [
     {
       "status": "EXTRACTED",
-      "count": 6293885
+      "count": 6300941
     },
     {
       "status": "NO_EVENT",
-      "count": 2091911
+      "count": 3381302
     },
     {
       "status": "REVIEW",
-      "count": 6034167
+      "count": 6179034
     }
   ],
   "identities": [
     {
       "status": "provisional",
-      "count": 4168112
+      "count": 4364721
     },
     {
       "status": "code_checksum_only_not_registry_verified",
-      "count": 837961
+      "count": 837993
     }
   ],
   "matching": [
     {
-      "reason": "checksum_valid_code",
-      "mentions": 3578521
+      "reason": "insufficient_identity_fields",
+      "mentions": 3641839
     },
     {
-      "reason": "insufficient_identity_fields",
-      "mentions": 3447316
+      "reason": "checksum_valid_code",
+      "mentions": 3579629
     },
     {
       "reason": "exact_name_and_address",
-      "mentions": 996943
+      "mentions": 999075
     },
     {
       "reason": "conflicting_codes_require_review",
-      "mentions": 317416
+      "mentions": 317964
     },
     {
       "reason": "exact_name_address_to_unique_code",
-      "mentions": 261380
+      "mentions": 261722
     }
   ],
   "dedup": {
@@ -914,6 +921,10 @@
       {
         "at": "2026-11-09T08:11:01Z",
         "completed": 280360
+      },
+      {
+        "at": "2026-11-10T05:56:48.093902+08:00",
+        "completed": 388349
       }
     ],
     "series_kind": "observed_processing_snapshots_not_business_events"

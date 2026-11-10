@@ -90,8 +90,8 @@ test('classification chart separates ten source topics and keeps profile counts 
   await expect(page.locator('#gallery-event-table tr')).toHaveCount(10);
   await expect(page.locator('#gallery-event-table')).toContainText('人员执业资格');
   await expect(page.locator('#gallery-event-table')).toContainText('申请办理');
-  await expect(page.locator('#gallery-taxonomy-total')).toHaveText('5,031,890');
-  await expect(page.locator('#gallery-taxonomy-downgraded')).toHaveText('540,317');
+  await expect(page.locator('#gallery-taxonomy-total')).toHaveText('5,032,506');
+  await expect(page.locator('#gallery-taxonomy-downgraded')).toHaveText('540,486');
   await page.locator('#gallery-event-scope').selectOption('all');
   await expect(page.locator('#gallery-event-table tr')).toHaveCount(18);
   await page.locator('#gallery-event-metric').selectOption('profiles');
@@ -136,36 +136,39 @@ test('method pages replace in place with useful content and keyboard controls',a
   await page.screenshot({path:info.outputPath('method-pager.png')});
 });
 
-test('real event sunburst reconciles counts, exposes honest depth and filters without changing denominator',async({page},info)=>{
+test('three real sunburst modes retain full totals and support true two-level zoom',async({page},info)=>{
  await page.locator('[data-gallery-page="7"]').click();
  await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-ready','true');
- await expect(page.locator('#event-sunburst-chart [data-sun-node]')).toHaveCount(10);
- await expect(page.locator('#event-sunburst-table tr')).toHaveCount(10);
  await page.locator('[data-notebook="7"] .notebook-reader-open').click();
- await page.locator('[data-sun-node="business_permit"]').focus();
- await expect(page.locator('#event-sunburst-detail')).toContainText('1,090,473');
- await expect(page.locator('#event-sunburst-detail')).toContainText('占父级');
- await page.locator('[data-sun-node="business_permit"]').press('Enter');
- await expect(page.locator('#event-sunburst-detail')).toContainText('未开放下钻');
- await page.locator('#event-sunburst-filter').selectOption('business_permit');
- await expect(page.locator('#event-sunburst-table tr')).toHaveCount(1);
- await expect(page.locator('#event-sunburst-chart')).toContainText('5,031,890');
- await page.screenshot({path:info.outputPath('event-sunburst.png')});
+ for(const [mode,total] of [['attachments','5200'],['logical','11701'],['records','43653625']]){
+  await page.locator(`[data-sun-mode="${mode}"]`).click();
+  const chart=page.locator('#event-sunburst-chart');await expect(chart).toHaveAttribute('data-mode',mode);
+  await expect(chart).toHaveAttribute('data-focus-count',total);
+  await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(1);
+  await page.locator('#event-sunburst-table button').first().click();
+  await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(2);
+  expect(Number(await chart.getAttribute('data-focus-count'))).toBeLessThan(Number(total));
+  await page.locator('#event-sunburst-table button').first().click();
+  await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(3);
+  await expect(page.locator('#event-sunburst-detail')).toContainText('占父级');
+  await page.locator('[data-sun-up]').click();await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(2);
+  await page.locator('#event-sunburst-breadcrumb button').first().click();
+  await expect(chart).toHaveAttribute('data-focus-count',total);
+ }
+ await page.screenshot({path:info.outputPath('three-mode-sunburst.png')});
+ await page.locator('[data-sun-mode="attachments"]').click();await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-mode','attachments');
+ await page.screenshot({path:info.outputPath('attachment-sunburst.png')});
 });
 
-test('test-only deeper hierarchy supports zoom, breadcrumbs and center return',async({page})=>{
- // Routed fixture exercises future verified descendants; it never enters published data.
- const fixture={tree:{id:'all',name:'合成测试',value:10,children:[{id:'a',name:'测试甲',value:6,children:[{id:'aa',name:'甲一',value:2,children:[{id:'aaa',name:'标签一',value:1},{id:'aab',name:'标签二',value:1}]},{id:'ab',name:'甲二',value:4}]},{id:'b',name:'测试乙',value:4}]}};
- await page.route('**/assets/event-hierarchy.json',route=>route.fulfill({json:fixture}));
- await page.reload();await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-ready','true');
- await page.locator('[data-gallery-page="7"]').click();
- await page.locator('[data-notebook="7"] .notebook-reader-open').click();
- await page.locator('[data-sun-node="a"]').focus();await page.locator('[data-sun-node="a"]').press('Enter');
- await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(2);
- await expect(page.locator('[data-sun-node="aaa"]')).toHaveCount(1);
+test('sunburst animation remains correct after interrupted zoom and mode switches',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.locator('[data-gallery-page="7"]').click();await page.locator('[data-notebook="7"] .notebook-reader-open').click();
+ await page.locator('#event-sunburst-table button').first().click();
  await page.locator('[data-sun-up]').click();
- await expect(page.locator('#event-sunburst-breadcrumb button')).toHaveCount(1);
- await expect(page.locator('[data-sun-node="aaa"]')).toHaveCount(0);
+ await page.locator('[data-sun-mode="logical"]').click();await page.locator('[data-sun-mode="records"]').click();
+ await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-mode','records');
+ await expect(page.locator('#event-sunburst-chart')).toHaveAttribute('data-focus-count','43653625');
+ await expect(page.locator('#event-sunburst-chart svg')).toHaveCount(1);
 });
 
 test('five-question notebook explains each method in place',async({page},info)=>{
@@ -180,43 +183,45 @@ test('five-question notebook explains each method in place',async({page},info)=>
  await page.screenshot({path:info.outputPath('story-notebook.png')});
 });
 
-test('expanded similarity network supports filtering, two graph modes, zoom and dragging',async({page},info)=>{
- await expect(page.locator('#enterprise-network')).toHaveAttribute('data-ready','true');
- await page.locator('[data-gallery-page="4"]').click();
- await page.locator('[data-notebook="4"] .notebook-reader-open').click();
- await expect(page.locator('[data-network-node]')).toHaveCount(24);
- await page.locator('[data-network-node="demo-01"]').focus();
- await expect(page.locator('#network-detail')).toContainText('合成企业01');
+test('complete real network supports D3 colors, 2D dragging and true 3D rotation',async({page},info)=>{
+ await page.locator('[data-gallery-page="4"]').click();await page.locator('[data-notebook="4"] .notebook-reader-open').click();
+ const host=page.locator('#enterprise-network');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
+ await expect(page.locator('#network-total')).toContainText('5,202,714');
+ await expect(page.locator('[data-network-node]')).toHaveCount(1753);
+ await expect(page.locator('#network-size')).toContainText('5,202,714 / 5,202,714');
  await page.locator('#network-zoom-in').click();await expect(page.locator('#network-zoom-value')).toHaveText('125%');
- await page.locator('#network-reset').click();await expect(page.locator('#network-zoom-value')).toHaveText('100%');
+ await page.locator('#network-reset').click();await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
+ const first=page.locator('[data-network-node]').first();await first.focus();await expect(page.locator('#network-detail')).toContainText('真实主体画像');
  if(page.viewportSize().width>1100){
-  const circle=page.locator('[data-network-node="demo-01"] circle'),box=await circle.boundingBox();
-  const before=await circle.locator('..').getAttribute('transform');
+  const circle=first.locator('circle'),box=await circle.boundingBox(),before=await first.getAttribute('transform');
   await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();
-  await page.mouse.move(box.x+box.width/2+35,box.y+box.height/2+20,{steps:6});await page.mouse.up();
-  expect(await circle.locator('..').getAttribute('transform')).not.toBe(before);
-  const svgBox=await page.locator('#enterprise-network svg').boundingBox();
-  await page.mouse.move(svgBox.x+5,svgBox.y+5);await page.mouse.wheel(0,-120);
-  expect(await page.locator('#network-zoom-value').innerText()).not.toBe('100%');
-  const cameraBefore=await page.locator('#enterprise-network svg>g').getAttribute('transform');
-  await page.mouse.down();await page.mouse.move(svgBox.x+35,svgBox.y+25,{steps:4});await page.mouse.up();
-  expect(await page.locator('#enterprise-network svg>g').getAttribute('transform')).not.toBe(cameraBefore);
-
+  await page.mouse.move(box.x+box.width/2+30,box.y+box.height/2+18,{steps:6});await page.mouse.up();
+  expect(await first.getAttribute('transform')).not.toBe(before);
  }
- await page.locator('#network-mode').selectOption('bipartite');await expect(page.locator('[data-network-node]')).toHaveCount(34);
- await page.locator('#network-mode').selectOption('similarity');
- await page.locator('#network-category').selectOption('product_registration');
- expect(await page.locator('[data-network-node]').count()).toBeLessThan(24);
- await page.locator('#network-category').selectOption('');
- await page.screenshot({path:info.outputPath('similarity-network.png')});
+ await page.screenshot({path:info.outputPath('real-network-2d.png')});
+ await page.locator('#network-dimension').selectOption('3');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
+ await expect(host).toHaveAttribute('data-dimensions','3');
+ const camera=await host.getAttribute('data-camera');
+ if(page.viewportSize().width>1100){
+  const box=await host.locator('svg').boundingBox();await page.mouse.move(box.x+7,box.y+7);await page.mouse.down();
+  await page.mouse.move(box.x+70,box.y+38,{steps:6});await page.mouse.up();
+ }else{await host.focus();await host.press('ArrowRight');}
+ expect(await host.getAttribute('data-camera')).not.toBe(camera);
+ await page.locator('#network-mode').selectOption('bipartite');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
+ await expect(page.locator('.network-axis text')).toHaveCount(3);
+ await page.screenshot({path:info.outputPath('real-network-3d.png')});
+ await page.locator('#network-category').selectOption('product_registration');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
+ expect(await page.locator('[data-network-node]').count()).toBeLessThan(1771);
+ await page.locator('#network-category').selectOption('');await page.locator('#network-scope').selectOption('refined');
+ await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});await expect(page.locator('#network-size')).toContainText('5,202,714 / 5,202,714');
 });
 
 test('portrait separates real scale from synthetic company facts and can trace evidence',async({page},info)=>{
  await expect(page.locator('#portrait-summary')).toHaveAttribute('data-ready','true');
  await page.locator('[data-gallery-page="5"]').click();
  await page.locator('[data-notebook="5"] .notebook-reader-open').click();
- await expect(page.locator('#portrait-summary')).toContainText('5,006,073');
- await expect(page.locator('#portrait-summary')).toContainText('837,961');
+ await expect(page.locator('#portrait-summary')).toContainText('5,202,714');
+ await expect(page.locator('#portrait-summary')).toContainText('837,993');
  await expect(page.locator('#portrait-name')).toContainText('合成示例');
  await page.locator('[data-portrait-evidence="0"]').click();
  await expect(page.locator('#portrait-source-0')).toBeVisible();

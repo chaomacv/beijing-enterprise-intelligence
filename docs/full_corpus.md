@@ -1,0 +1,144 @@
+# 全量流程与中间结果
+
+全量入口是 `python -m bank_data.bulk_run`。小样本 SQLite 工作流继续可用；大量记录采用流式 JSONL 分区与 DuckDB 磁盘聚合。
+
+新启动的全量运行在原始聚合与覆盖对账后自动执行[事件细分与阶段校验](event_classification.md)，版本化输出位于 `10_classification/<attempt>/`，入口指针保存在 `08_results/summary.json` 的 `classification`。已在运行的冻结版本通过一次性 `scripts/refine_completed_run.py --wait` 接续，输出 `10_classification_v1/`，不会为了分类修正重新推理。下游采用修正后的 `classified_events` 和 `classified_profile_tags`；旧宽类结果继续保留作基线。
+
+原始文件保持只读。文件名、表头、首中尾和固定种子随机样本交给本地 Qwen 做相关性判断；没有把每张表的全部内容一次性输入模型。相关的结构化表由模型生成字段、条件和阶段映射，程序逐行复制原值并校验；需要语义理解的段落再按记录输入模型。这样能减少重复推理和模型转抄原值的错误。文件筛选仍可能遗漏相关文件，不能把处理覆盖率当成语义准确率。
+
+## 运行
+
+```bash
+python -m pip install -e '.[bulk,llm,serve,native]'
+# CUDA PyTorch 单独按服务器驱动安装；libarchive、antiword 和 OCR 图形依赖见部署说明。
+CUDA_VISIBLE_DEVICES=0 python -m bank_data.serve_batch \
+  --model-dir /private/models/Qwen3-8B --model-id YOUR_CHECKPOINT_ID --port 18080
+```
+
+服务仅绑定本机，支持每批最多 4 个独立 schema 请求。多 GPU 各启动一个副本并使用不同端口；单 GPU 也可完成全流程。
+
+客户端按实际 tokenizer 统计每个请求，默认将填充后的整批输入加输出预算限制为 24,576 token，长请求提前拆批；GPU 仍不足时保留递归缩批。字段规划将相近表头和事件类别数量放在相邻批次，减少长短请求混排的填充开销。它们改变调度，不删除请求内容。
+
+复杂记录组超出单请求预算时，先递归拆成可容纳的完整记录子组，再将独立请求成批提交。单条仍超预算的内容沿用原有文本分段及复核，保留原递归深度。每个请求继续携带自己的表头、语境和来源 ID。这样可避免长文本回退过程中只发单条请求、使批处理失效的问题。
+
+`BANK_PADDED_BATCH_TOKENS` 可设置传输层整批预算，显式构造参数优先于环境变量。vLLM 案例可验证后采用 32,768，与服务最多四个 8,192 上下文请求配合；单请求仍按实际 tokenizer 校验并预留输出空间。默认值继续是 24,576。该设置只改变独立请求的组合，不改变单条内容或输出上限。
+
+一次同 GPU、同权重、同输入的八条真实公告对照中，两种调度均先进行相同的前缀预热，客户端生成缓存从空开始。原调度耗时 89.917 秒，预算拆组后批量提交耗时 58.529 秒，服务实际批大小从单请求变成双请求；八条最终来源校验结果一致，均为 REVIEW。该单次结果包含服务调度和前缀缓存效应，只说明这组请求的工程瓶颈，不能外推全量耗时或真实语义准确率。批量预算随运行参数写入 `01_inputs/run_attempts`。
+
+```bash
+python -m bank_data.bulk_run \
+  --input /private/raw --work-dir /private/full_run \
+  --model YOUR_CHECKPOINT_ID --tokenizer-dir /private/models/Qwen3-8B \
+  --endpoints http://127.0.0.1:18080/v1 --workers 6
+```
+
+已有原始扫描可用 `--profiles /private/previous/file_profiles.json` 代替 `--input`。重复运行同一个工作目录即可续跑。推理服务不可用会停止，不会把剩余语料全部伪装成语义复核。实际启动参数、源码副本和 SHA256 在每次运行的 `01_inputs/run_attempts` 与 `code_snapshots` 中保存。
+
+## 可选的 vLLM 服务
+
+服务器案例使用原始 BF16 Qwen3-8B 权重。vLLM 提供同一批量协议、前缀缓存与 CUDA Graph；`--enforce-eager` 可关闭 Graph。每个服务最多同时处理 4 个独立请求，服务绑定 loopback，禁用使用统计与在线模型下载。
+
+CUDA 11.8 安装案例使用独立环境，并按 [核心组件约束](../scripts/vllm-cu118.constraints.txt) 安装。官方安装包 SHA256 为 `54230c11150a8d6314fb9d4856b045b3d5bf80092fa1901f3e1ef3b9afcd6e3f`，由 [官方发布包核对工作流](https://github.com/chaomacv/beijing-enterprise-intelligence/actions/runs/42392558379) 实际计算；镜像下载也须核对相同哈希。安装方法参考 [vLLM 0.8.5 官方 GPU 文档](https://docs.vllm.ai/en/v0.8.5/getting_started/installation/gpu.html)。
+
+```bash
+python -m pip install -c scripts/vllm-cu118.constraints.txt \
+  'https://github.com/vllm-project/vllm/releases/download/v0.8.5/vllm-0.8.5%2Bcu118-cp38-abi3-manylinux1_x86_64.whl' \
+  --extra-index-url https://download.pytorch.org/whl/cu118
+CUDA_VISIBLE_DEVICES=0 python -m bank_data.serve_vllm \
+  --model-dir /private/models/Qwen3-8B --model-id YOUR_CHECKPOINT_ID --port 18080
+```
+
+该版本 XGrammar 对数组长度和数值范围的支持有限。解码时使用其支持的结构约束，每条候选输出随后仍按**完整原始 JSON Schema**校验，再执行原文引用、主体和记录 ID 校验。失败输出仍走重试或复核。完整 Schema 保持原值并保存在请求中；单元测试覆盖超界输出被拒绝、独立约束、截断及日志不输出业务值。
+
+8 个相同的合成请求在原服务、vLLM eager、vLLM Graph 上分别耗时 49.090、17.469、15.209 秒；各自另有预热。三者均通过 8 项业务检查，原服务有 2 个请求需要来源校验重试。输出 token 数不同，这些时间只能描述该组测试，不能外推全量吞吐或真实数据准确率。实际依赖冻结、请求、回复和比较结果保留在私有运行目录。
+
+## 九步产物
+
+| 目录 | 处理 | 可检查的中间结果 |
+| --- | --- | --- |
+| 01_inputs | 固定输入，展开容器，保留转换来源 | input_ledger.json、archive_members.json、expanded/、ocr_cache/、xml_tables/、geodatabase_tables/ |
+| 02_profiles | 流式盘点与抽样 | original_profiles.json、all_profiles.json、all_profiles_native.json、file_cards.jsonl / file_cards_native.jsonl、summary.json |
+| 03_screen | 本地模型筛选每个逻辑表 | scopes/ 中的逐表判断及模型原回复、files.json、prompt.md、methods/、summary.json |
+| 04_plans | 模型选择主体、事实字段、条件和阶段 | scopes/ 中的映射、输入卡片哈希、校验错误与模型回复；config.json、prompt.md、summary.json |
+| 05_records | 按完整记录读取保留内容 | 每个 file_id 的 rows.jsonl、contexts.json、chunks.jsonl，保留 sheet / row / record_id |
+| 06_validation | 执行字段方案，复杂行模型抽取，校验来源 | mapped_results.jsonl、pending_llm.jsonl、llm_results/、record_results.jsonl、逐文件和总 summary.json |
+| 07_entities | 保守身份关联与候选匹配 | results.duckdb、entities.parquet、entity_mentions.parquet、name_ambiguities.parquet、name_neighbors.parquet |
+| 08_results | 导出事实、画像与来源 | profiles / events / event_sources 的 JSONL 和 Parquet；record_ledger.parquet、file_index.json、summary.json |
+| 09_review | 集中列出不确定及失败输入 | file_review.json、record_review.jsonl / parquet |
+
+根目录 `run_status.json` 给出阶段状态；`流程与结果.md` 汇总各步数量和追溯方法；`audit.json` 核对原始文件 ID 集合以及已知记录是否都有结果、显式排除或文件失败去向。
+
+人工查看可先打开各阶段的 `文件总表.csv`、`筛选总表.csv`、`字段方案总表.csv`、`分块与处理总表.csv` 和 `校验总表.csv`。这些是文件／表级索引；JSONL 和 Parquet 保存完整记录，避免大型结果受电子表格行数限制。
+
+## 状态的含义
+
+- 文件：PROFILED 已解析；EMPTY 无记录；CONTAINER 压缩容器；CONVERTED 有独立转换结果；COMPONENT 由数据库逻辑表消费的组件；METADATA 配套元数据；REVIEW 无法可靠读取。
+- 筛选：KEEP 保留；DROP 明确排除；REVIEW 继续尝试字段规划，仍不确定则保留复核。
+- 字段方案：map 直接应用；entity_only 基础主体信息；row_llm 逐行理解；exclude 排除；review 无可靠方案。缺失方案不能当作排除。
+- 记录：EXTRACTED 有可追溯事件；NO_EVENT 无该类事件，可以保留基础主体；REVIEW 不进入已确认事实库。
+- 事件阶段：confirmed / proposed / removed / revoked / unknown 分开保存。“未提取事件”不等于“企业无风险”。
+
+部分附件只包含数据字典、交通影像或地理数据库配套文件。它们在台账中有完整去向，不应虚构为企业事实。压缩包限制深度、成员数量和展开字节量，拒绝路径穿越；原始文件不会被修改。
+
+## 记录、长文本与证据
+
+结构化单元格保持完整，记录不因字符窗口被截断。文件卡片的样本不等于事实输入。准备块以完整行分组，重复表头、前置说明及工作表语境通过 contexts.json 关联。预算不足时先减少请求中的记录数；长文本使用带重叠的子段并保留字符位置。单条仍不可靠就进入复核，不能将截断输出算成功。
+
+OCR 保留模型版本、原图哈希、页号、文字框、识别置信度及原始文本。OCR 是未经人工核验的识别结果。FileGDB 属性表保留要素 ID，几何以 WKB 单独保存，并记录偏移、字节数及 CRS。通用 XML 展开保留重复节点索引和属性，原 XML 仍可追溯。
+
+PDF 缺少原生文字时，先检查该页渲染图像。只有像素全部为白色才跳过该页，其他内容继续尝试 OCR 或保留复核；原始页码不改变。无扩展名的文本文件通过完整编码校验和有界 CSV 探测识别，支持 UTF-8、UTF-16 与 GB18030；探测窗口落在多字节字符中间时使用增量解码，不丢弃字符。
+
+OCR 记录及其主体、事件会带 `source_quality=OCR_UNVERIFIED`、`source_kind` 和该页最低识别置信度；画像汇总 `observed_source_quality`。`confirmed` 描述来源中的事件阶段，不能理解为识别文字或银行事实已经人工核验。
+
+表头自动识别和列宽异常等 `quality_flags` 也会关联到记录台账、事件来源及事件；事件去重时合并所有来源的标记，画像汇总 `observed_quality_flags`。`header_uncertain` 表示启发式方法未确认表头，不等于判定表头错误。`09_review/表头及结构复核清单.csv` 按逻辑表列出需要检查的结构，避免把这类问题混同于企业风险。覆盖统计针对解析器识别的逻辑记录；原始表头候选保留在上下文中，不能据此宣称全部物理行已经人工核验。
+
+字段方案是有限的声明式映射，不执行模型生成的 Python 或正则。程序阻止机关代码充当企业代码、明确阶段与映射矛盾，以及检查合格生成处罚。来源引用、事件主体下标、记录 ID 集合分别验证；模型返回顺序不会改变记录归属。这些约束可以减少特定错误，无法替代独立语义评测。
+
+字段映射与复杂行抽取共用保守的机构名称校验。字段方案标为 business 也不能免除逐行名称检查；自然人、泛称及无法识别的主体进入 REVIEW。项目名称、工程名称、单体工程及案件名称列不能直接整格复制为机构身份；长文本中的具名机构仍可通过复杂行的明确子串抽取。基本信息同样执行这些校验，不因为没有事件就让个人名进入企业画像。短简称或不含已知机构特征的名称可能被保守复核，原始记录继续留存。
+
+`plan` 记录真正执行的方案：exclude / review / row_llm 的字段映射为空，entity_only 不包含事件映射。模型未被采用的定义仍可在 `response` 原回复中检查，避免把无效定义误当作已执行步骤。
+
+## 对完全相同的内容复用推理结果
+
+全量记录准备后，复杂记录按同一文件／逻辑表、完整单元格值及语境做精确哈希分组。模型处理代表记录，所有原始记录仍保留自己的 record_id、sheet、row 和来源。包含“同上”“上述”等相对表述的记录单独处理。数据不做空白归一化、近似文本合并或跨表复用。
+
+本次发现一份百万行附件中有 1,048,465 行内容完全相同。这样的重复内容由一个代表记录进入本地模型，结果回填到各来源时重新核对完整内容哈希、原文引用及记录 ID。同一抽取协议内复用有效检查点；协议升级使用独立签名，旧请求和结果可归档保留，不能把旧协议结果直接冒充新版本。
+
+`06_validation/内容去重总表.csv` 汇总每个文件的原始待抽取记录、不同内容数和重复数；`content_indices/<file_id>/records.jsonl` 保存每条原始任务到代表记录的关系，`groups.jsonl` 保存组内数量及原始行范围。`unique_inference` 是指向原始准备记录及结果目录的执行视图，不另外复制原始数据。模型进度在其 `06_validation/llm_progress.json` 中，根阶段进度同时标明代表记录数量和原始记录数量；回填后每条来源仍有独立结果，并接受最终数量对账。
+
+同一内容的多次出现不构成多份独立证据。原始记录数、不同内容数、模型请求次数、最终事实数分别统计，不能相互替代。
+
+## 复杂记录的来源引用协议
+
+复杂行仍输入完整内容和语境。输出使用固定的 `r0`、`r1` 等槽位，每个槽位为 Schema 必填项；程序将槽位还原为原始 record_id。缺少、重复或越界来源不能成为有效结果。缺失的可选属性由程序填为 null 或空数组，最终业务结构保持一致。
+
+主体必须同时给出类型和明确名称的原文子串，不能仅选择一个字段作为名称。证据、日期等可直接引用字段，由程序完整复制该单元格；只需部分原文时仍给字段及原文子串。个人、类型不明或无法识别为机构的名称进入复核，不能把地点、项目或编号自动当成企业。名称识别校验较保守，短简称、没有机构特征的名称可能需要人工复核。
+
+主体歧义按条记录 REVIEW 及具体原因，同批其他已通过校验的记录继续使用，不让一条主体歧义触发整批拆分重试。缺少槽位、引用错行、原文不存在等失败仍走原有重试和来源校验。该取舍减少对不明确名称的反复推理，但不会把保守复核当作真实语义已经确认。
+
+大表中的 HTML 富文本会将大量预算消耗在标签和展示属性上。模型输入使用有版本的 `__html_text__::原字段名` 视图：保留文字、注释、脚本数据及非展示属性，合并行内标签分隔的文本，省去样式内容和展示属性。原始单元格完整保存在 `05_records`，不覆盖原 HTML。视图来源元数据保存原字段 SHA256、版本、前后字符数及省略量。引用验证按相同版本重建视图，再检查原文子串；派生视图的字段名不会冒充原 HTML 的逐字子串。该步骤改变展示表示，不保证保留全部页面布局含义。
+
+复杂抽取默认使用 `local_llm_bounded_source_references`。模型输出的实体、事件各采用最多八个命名槽位对象，证据采用字段名到布尔值的对象；程序再还原为统一业务数组并验证主体引用。这针对实际遇到的重复生成问题，避免依赖当前解码器不支持的数组长度约束。完全相同的候选去重并重映射主体下标。模型声明容量不足时整条 REVIEW，不发布截取的部分事实；槽位容量和模型未识别的遗漏仍是需要评测的限制，不能据此声称抽取召回完整。
+
+日期、代码、地址等缺失时允许 null；HTML 视图中的此类值必须给明确子串，不能用整个长文本代替。证据只选择来源字段，程序复制该字段全文。状态与候选事实矛盾、无证据事件等质量问题按条复核；原模型回复和具体原因继续留存。
+
+无效机构候选若只是未被任何事件引用的 authority，会剔除并在 `rejected_non_subject_candidates` 保存其原始下标与原因，同时重映射剩余主体及事件下标。该规则不用于事件主体；无效候选被事件引用时仍整条复核。模型不能因为结果标题包含“企业”等字样就把它当作具名机构。
+
+`record_results.jsonl` 区分 `llm_field_plan`、`local_llm_sparse_source_references`、`local_llm_bounded_source_references` 和 `local_llm_exact_content_reuse`。`model_provenance` 保存 request_path、raw_response_path 和 model_cache_key：根目录 `model_requests/<key>.json`、`model_responses/<key>.json` 是完整请求与原回复，`model_cache/<key>.json` 保存可重放的生成结果；重复内容还保存 representative_record_id 和 content_key。主体类型、派生字段视图和槽位映射保留在该模型来源元数据中。原始回复留痕与已通过来源校验的结果分开，失败会重试或明确复核。
+
+原文引用校验只能证明引用存在。模型仍可能把有来源的描述理解错，真实数据语义准确率需要独立标注评测，不能由 Schema 测试或同模型自检代替。
+
+## 身份关联与使用结果
+
+有效信用代码只证明校验位正确，不代表已通过登记机关核验。缺码记录只有在名称和非空地址完全一致且唯一指向一个代码时才挂接；代码冲突阻止自动归并。仅名称相同的记录保留临时身份，名称近似仅生成复核候选。不会对所有条目做全量两两比较，不生成授信分数。
+
+```python
+import duckdb
+db = duckdb.connect('/private/full_run/07_entities/results.duckdb', read_only=True)
+print(db.sql('SELECT status, count(*) FROM record_ledger GROUP BY status').fetchall())
+print(db.sql('SELECT event_type, status, count(*) FROM events GROUP BY 1, 2').fetchall())
+# 用事件 ID 找原始记录位置和逐字段证据。
+print(db.execute('SELECT * FROM event_sources WHERE event_id = ?', ['YOUR_EVENT_ID']).fetchall())
+```
+
+全部结果保留在私有运行环境。仓库只包含代码、合成测试和汇总报告。

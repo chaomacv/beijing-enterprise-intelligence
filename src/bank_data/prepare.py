@@ -13,7 +13,9 @@ def source_metadata(path):
     data = json.loads(p.read_text(encoding='utf-8'))
     return {k: data[k] for k in ('dataset_url', 'file_name', 'expected_name', 'sha256', 'attachment_id',
                                'attachment_href', 'task_id', 'snapshot_id', 'archive_member', 'parent_sha256',
-                               'page_version_hint', 'format_mismatch') if k in data}
+                               'page_version_hint', 'format_mismatch','root_file_id','parent_file_id',
+                               'parent_filename','archive_member_ordinal','source_kind','derived_from_sha256',
+                               'ocr_engine','ocr_signature','native_member_ids','geometry_source','geometry_crs') if k in data}
 
 
 def build_cards(store, file_id):

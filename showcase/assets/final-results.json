@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "kind": "completed_run_public_aggregates",
+  "completed_at": "2026-11-10T05:56:48.093902+08:00",
+  "pipeline_status": "completed_with_review",
+  "source_commit": "57748c4c4086432c4b129a0fee059018a1d6a4c1",
+  "model": {
+    "name": "Qwen3-8B",
+    "weights": "original_bfloat16",
+    "deployment": "local"
+  },
+  "input": {
+    "catalog_datasets": 4710,
+    "attachments": 5200,
+    "attachment_bytes": 8447438913,
+    "distinct_file_contents": 5077,
+    "logical_files": 11701,
+    "scopes": 13281,
+    "known_logical_records": 43653625,
+    "upstream_failed_downloads": 22,
+    "pages_without_recognized_attachments": 4,
+    "unreadable_logical_files": 65
+  },
+  "counts": {
+    "record_ledger": 15861277,
+    "entities": 5202714,
+    "entity_mentions": 8800229,
+    "events": 5968620,
+    "event_sources": 6331400,
+    "name_ambiguities": 454027,
+    "name_neighbors": 300226
+  },
+  "record_statuses": [
+    {
+      "status": "EXTRACTED",
+      "records": 6300941
+    },
+    {
+      "status": "NO_EVENT",
+      "records": 3381302
+    },
+    {
+      "status": "REVIEW",
+      "records": 6179034
+    }
+  ],
+  "plans": {
+    "total": 9551,
+    "map": 1347,
+    "entity_only": 408,
+    "row_llm": 382,
+    "exclude": 6939,
+    "review": 475
+  },
+  "preparation": {
+    "retained_records": 15861277,
+    "field_mapped_records": 14420658,
+    "pending_semantic_source_records": 1440619,
+    "excluded_records": 27792348
+  },
+  "semantic_work": {
+    "representative_records": 388349,
+    "exact_duplicate_source_records": 1052270
+  },
+  "identity_statuses": [
+    {
+      "identity_status": "provisional",
+      "profiles": 4364721
+    },
+    {
+      "identity_status": "code_checksum_only_not_registry_verified",
+      "profiles": 837993
+    }
+  ],
+  "events_by_type_and_stage": [
+    {
+      "event_type": "administrative_penalty",
+      "status": "confirmed",
+      "observed_events": 21513,
+      "associated_profiles": 16389
+    },
+    {
+      "event_type": "administrative_penalty",
+      "status": "proposed",
+      "observed_events": 140,
+      "associated_profiles": 133
+    },
+    {
+      "event_type": "administrative_penalty",
+      "status": "unknown",
+      "observed_events": 198850,
+      "associated_profiles": 125113
+    },
+    {
+      "event_type": "business_abnormal",
+      "status": "confirmed",
+      "observed_events": 12051,
+      "associated_profiles": 12051
+    },
+    {
+      "event_type": "business_abnormal",
+      "status": "unknown",
+      "observed_events": 314714,
+      "associated_profiles": 313971
+    },
+    {
+      "event_type": "business_permit",
+      "status": "confirmed",
+      "observed_events": 764409,
+      "associated_profiles": 522144
+    },
+    {
+      "event_type": "business_permit",
+      "status": "unknown",
+      "observed_events": 326069,
+      "associated_profiles": 271134
+    },
+    {
+      "event_type": "enterprise_qualification",
+      "status": "confirmed",
+      "observed_events": 76438,
+      "associated_profiles": 53772
+    },
+    {
+      "event_type": "enterprise_qualification",
+      "status": "proposed",
+      "observed_events": 504,
+      "associated_profiles": 504
+    },
+    {
+      "event_type": "enterprise_qualification",
+      "status": "unknown",
+      "observed_events": 205869,
+      "associated_profiles": 87656
+    },
+    {
+      "event_type": "environment",
+      "status": "confirmed",
+      "observed_events": 559,
+      "associated_profiles": 552
+    },
+    {
+      "event_type": "environment",
+      "status": "proposed",
+      "observed_events": 4346,
+      "associated_profiles": 4346
+    },
+    {
+      "event_type": "environment",
+      "status": "unknown",
+      "observed_events": 46765,
+      "associated_profiles": 15857
+    },
+    {
+      "event_type": "equipment_inspection",
+      "status": "confirmed",
+      "observed_events": 619327,
+      "associated_profiles": 57814
+    },
+    {
+      "event_type": "equipment_inspection",
+      "status": "unknown",
+      "observed_events": 376075,
+      "associated_profiles": 371923
+    },
+    {
+      "event_type": "industry_assessment",
+      "status": "confirmed",
+      "observed_events": 62018,
+      "associated_profiles": 20767
+    },
+    {
+      "event_type": "industry_assessment",
+      "status": "unknown",
+      "observed_events": 259377,
+      "associated_profiles": 230909
+    },
+    {
+      "event_type": "innovation",
+      "status": "confirmed",
+      "observed_events": 96927,
+      "associated_profiles": 51469
+    },
+    {
+      "event_type": "innovation",
+      "status": "proposed",
+      "observed_events": 862,
+      "associated_profiles": 862
+    },
+    {
+      "event_type": "innovation",
+      "status": "unknown",
+      "observed_events": 3857,
+      "associated_profiles": 3095
+    },
+    {
+      "event_type": "operating_status",
+      "status": "confirmed",
+      "observed_events": 35458,
+      "associated_profiles": 35321
+    },
+    {
+      "event_type": "operating_status",
+      "status": "unknown",
+      "observed_events": 41636,
+      "associated_profiles": 40983
+    },
+    {
+      "event_type": "personnel_qualification",
+      "status": "confirmed",
+      "observed_events": 680347,
+      "associated_profiles": 680347
+    },
+    {
+      "event_type": "personnel_qualification",
+      "status": "unknown",
+      "observed_events": 284664,
+      "associated_profiles": 126210
+    },
+    {
+      "event_type": "procurement",
+      "status": "confirmed",
+      "observed_events": 46573,
+      "associated_profiles": 42352
+    },
+    {
+      "event_type": "procurement",
+      "status": "proposed",
+      "observed_events": 746,
+      "associated_profiles": 642
+    },
+    {
+      "event_type": "procurement",
+      "status": "unknown",
+      "observed_events": 70190,
+      "associated_profiles": 32746
+    },
+    {
+      "event_type": "product_registration",
+      "status": "confirmed",
+      "observed_events": 119560,
+      "associated_profiles": 16941
+    },
+    {
+      "event_type": "product_registration",
+      "status": "unknown",
+      "observed_events": 134684,
+      "associated_profiles": 134684
+    },
+    {
+      "event_type": "project_approval",
+      "status": "confirmed",
+      "observed_events": 157299,
+      "associated_profiles": 65305
+    },
+    {
+      "event_type": "project_approval",
+      "status": "proposed",
+      "observed_events": 31,
+      "associated_profiles": 21
+    },
+    {
+      "event_type": "project_approval",
+      "status": "unknown",
+      "observed_events": 78313,
+      "associated_profiles": 51404
+    },
+    {
+      "event_type": "qualification_application",
+      "status": "unknown",
+      "observed_events": 246846,
+      "associated_profiles": 71740
+    },
+    {
+      "event_type": "qualification_review",
+      "status": "unknown",
+      "observed_events": 409256,
+      "associated_profiles": 281262
+    },
+    {
+      "event_type": "regulatory_inspection",
+      "status": "confirmed",
+      "observed_events": 129917,
+      "associated_profiles": 74851
+    },
+    {
+      "event_type": "regulatory_inspection",
+      "status": "proposed",
+      "observed_events": 6,
+      "associated_profiles": 4
+    },
+    {
+      "event_type": "regulatory_inspection",
+      "status": "unknown",
+      "observed_events": 101497,
+      "associated_profiles": 99993
+    },
+    {
+      "event_type": "subsidy",
+      "status": "confirmed",
+      "observed_events": 5840,
+      "associated_profiles": 3925
+    },
+    {
+      "event_type": "subsidy",
+      "status": "proposed",
+      "observed_events": 2182,
+      "associated_profiles": 1409
+    },
+    {
+      "event_type": "subsidy",
+      "status": "unknown",
+      "observed_events": 2092,
+      "associated_profiles": 696
+    },
+    {
+      "event_type": "tax_credit",
+      "status": "confirmed",
+      "observed_events": 7959,
+      "associated_profiles": 7805
+    },
+    {
+      "event_type": "tax_credit",
+      "status": "unknown",
+      "observed_events": 22854,
+      "associated_profiles": 3541
+    }
+  ],
+  "validation": {
+    "file_coverage_passed": true,
+    "known_record_coverage_passed": true,
+    "exports_round_trip_validated": true,
+    "semantic_accuracy_evaluated": false
+  },
+  "boundaries": {
+    "unreadable_logical_files": 65,
+    "upstream_failed_downloads": 22,
+    "profiles_include_provisional_identities": true,
+    "current_licence_validity_verified": false
+  }
+}

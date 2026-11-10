@@ -25,7 +25,7 @@
   const [data,demo]=await Promise.all(responses.map(r=>r.json()));
   if(demo.provenance.kind!=='synthetic')throw Error('Synthetic provenance required');
   const provisional=data.identities.find(r=>r.status==='provisional').count,code=data.subset.profiles-provisional;
-  host.innerHTML=`<div class="portrait-total"><span>真实阶段子集 · 关联画像数</span><strong>${fmt(data.subset.profiles)}</strong><small>画像包含临时身份，不能解释为独立登记企业数量</small></div><div class="portrait-metrics"><div><strong>${fmt(code)}</strong><span>代码校验位通过</span></div><div><strong>${fmt(provisional)}</strong><span>临时身份</span></div></div><div class="portrait-identity-bar" role="img" aria-label="代码校验位通过${fmt(code)}，临时身份${fmt(provisional)}"><i style="width:${code/data.subset.profiles*100}%"></i></div>`;
+  host.innerHTML=`<div class="portrait-total"><span>真实全批结果 · 关联画像数</span><strong>${fmt(data.subset.profiles)}</strong><small>画像包含临时身份，不能解释为独立登记企业数量</small></div><div class="portrait-metrics"><div><strong>${fmt(code)}</strong><span>代码校验位通过</span></div><div><strong>${fmt(provisional)}</strong><span>临时身份</span></div></div><div class="portrait-identity-bar" role="img" aria-label="代码校验位通过${fmt(code)}，临时身份${fmt(provisional)}"><i style="width:${code/data.subset.profiles*100}%"></i></div>`;
   const profiles=[...demo.profiles].sort((a,b)=>a.names[0].localeCompare(b.names[0],'zh-CN'));
   $('portrait-company').innerHTML=profiles.map((p,i)=>`<option value="${i}">${esc(p.names[0])}</option>`).join('');
   function render(){const p=profiles[Number($('portrait-company').value)],events=demo.events.filter(e=>e.entity_id===p.entity_id).sort((a,b)=>(a.date?.value||'').localeCompare(b.date?.value||''));
