@@ -190,8 +190,12 @@ test('complete real network supports D3 colors, 2D dragging and true 3D rotation
  await page.locator('[data-gallery-page="4"]').click();await page.locator('[data-notebook="4"] .notebook-reader-open').click();
  const host=page.locator('#enterprise-network');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  await expect(page.locator('#network-total')).toContainText('5,202,714');
- await expect(page.locator('[data-network-node]')).toHaveCount(1753);
- await expect(page.locator('#network-size')).toContainText('5,202,714 / 5,202,714');
+ await expect(page.locator('[data-network-node]')).toHaveCount(127);
+ await expect(page.locator('#network-options')).not.toHaveAttribute('open','');
+ await expect(page.locator('#network-category')).not.toBeVisible();
+ await expect(page.locator('.network-nodes text:visible')).toHaveCount(0);
+ expect(await page.locator('.network-edges line').count()).toBeLessThanOrEqual(254);
+ await expect(host).toHaveAttribute('data-profiles','5202714');
  await page.locator('#network-zoom-in').click();await expect(page.locator('#network-zoom-value')).toHaveText('125%');
  await page.locator('#network-reset').click();await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  const first=page.locator('[data-network-node]').first();await first.focus();await expect(page.locator('#network-detail')).toContainText('真实主体画像');
@@ -210,13 +214,19 @@ test('complete real network supports D3 colors, 2D dragging and true 3D rotation
   await page.mouse.move(box.x+70,box.y+38,{steps:6});await page.mouse.up();
  }else{await host.focus();await host.press('ArrowRight');}
  expect(await host.getAttribute('data-camera')).not.toBe(camera);
+ await page.screenshot({path:info.outputPath('simple-network-3d.png')});
+ await page.locator('#network-options summary').click();
  await page.locator('#network-mode').selectOption('bipartite');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  await expect(page.locator('.network-axis text')).toHaveCount(3);
  await page.screenshot({path:info.outputPath('real-network-3d.png')});
  await page.locator('#network-category').selectOption('product_registration');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
  expect(await page.locator('[data-network-node]').count()).toBeLessThan(1771);
  await page.locator('#network-category').selectOption('');await page.locator('#network-scope').selectOption('refined');
- await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});await expect(page.locator('#network-size')).toContainText('5,202,714 / 5,202,714');
+ await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});await expect(host).toHaveAttribute('data-profiles','5202714');
+ await page.locator('#network-scope').selectOption('all');await page.locator('#network-mode').selectOption('similarity');
+ await page.locator('#network-detail-level').selectOption('complete');await expect(host).toHaveAttribute('data-ready','true',{timeout:30000});
+ await expect(page.locator('[data-network-node]')).toHaveCount(1753);
+ await expect(host).toHaveAttribute('data-profiles','5202714');
 });
 
 test('portrait separates real scale from synthetic company facts and can trace evidence',async({page},info)=>{

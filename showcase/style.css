@@ -558,6 +558,12 @@ dialog { width: min(680px,calc(100% - 32px)); max-height: 88vh; color: var(--ink
 #event-sunburst-table button { padding:3px 0; color:#687b99; background:none; font-size:inherit; text-align:left; }
 #notebook-reader .event-sunburst-chart { max-width:740px; margin-inline:auto; }
 .network-notice.real-network-notice { color:#4f7686; background:#f2f7f8; border-color:#dfebed; }.network-notice.real-network-notice i { background:#1f77b4; }
+.network-simple-toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin:4px 0 9px; font:10px var(--sans); color:#8a94a2; }
+.network-simple-toolbar select { font:inherit; padding:4px 7px; border:1px solid #e1e5ec; border-radius:3px; background:#fff; color:#657386; }
+.network-options { margin:0 0 12px; color:#8a94a2; font-size:10px; }.network-options summary { width:max-content; cursor:pointer; padding:4px 0; }.network-option-body { margin-top:8px; padding:12px; background:#fafbfc; border:1px solid #edf0f3; }
+.network-view-note { font-size:9px; line-height:1.8; color:#9aa3ae; margin:8px 0 12px; }
+.data-notebook .enterprise-network { background:#fff; border:0; }
+.data-notebook .network-controls { margin-bottom:4px; }.data-notebook .network-census { margin:3px 0; }
 .network-census,.network-interaction-hint { font-size:10px; line-height:1.8; color:#8793a5; margin:8px 0; }
 .network-legend { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px 10px; margin:16px 0; }
 .network-legend span { font-size:9px; color:#7d899a; display:flex; align-items:center; gap:5px; }.network-legend i { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
