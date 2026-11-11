@@ -411,6 +411,7 @@ test('nine-step lineage table and selected details expose the same conserved rec
 
 test('language controls preserve notebook interaction, translate new content and persist the preference',async({page},info)=>{
  await expect(page.locator('html')).toHaveAttribute('data-locale-ready','zh');
+ await expect(page.locator('.header .brand')).toContainText('PublicData-LLM');
  await page.locator('[data-gallery-page="2"]').click();
  await page.locator('[data-notebook="2"] .notebook-reader-open').click();
  await page.locator('#gallery-event-stage').selectOption('unknown');
