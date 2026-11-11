@@ -6,6 +6,10 @@ test.beforeEach(async({page})=>{
   await expect(page.locator('#gallery-viewport')).toHaveAttribute('data-ready','true');
   await expect(page.locator('.method-pager')).toHaveAttribute('data-ready','true');
   expect(errors).toEqual([]);
+  expect(await page.evaluate(async()=>{
+    await document.fonts.load('600 22px "BEI Sans SC"','企业');
+    return [...document.fonts].some(f=>f.family.replace(/["']/g,'')==='BEI Sans SC'&&f.status==='loaded');
+  })).toBe(true);
 });
 async function measure(page){
   return page.locator('#gallery-viewport').evaluate(el=>{
