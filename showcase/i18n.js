@@ -20,7 +20,7 @@
   }
   function mount(win){
     const doc=win.document,texts=new WeakMap(),attributes=new WeakMap(),pending=new Set();
-    const skip='script,style,pre,code,[data-i18n-original],.language-switch,.source-links a,.source-examples tbody td:nth-child(-n+2),.source-preview';
+    const skip='script,style,pre,code,[data-i18n-original],.language-switch,.source-links a,.source-examples tbody td:nth-child(-n+2),.source-preview,.source-quote,.source-cells,.source-meta dd';
     let lang='zh',scheduled=false,observer;
     const attrs=['aria-label','aria-valuetext','title','placeholder','alt','content'];
     function localizeText(node){

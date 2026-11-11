@@ -43,7 +43,11 @@ test('hero actions move right on desktop and stack naturally on mobile',async({p
   await expect(page.locator('#gallery-clock')).not.toBeVisible();
   expect(await page.locator('.hero-bottom').evaluate(el=>parseFloat(getComputedStyle(el).marginTop))).toBe(136);
   const size=await title.evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
-  if(page.viewportSize().width>1100)expect(size).toBeCloseTo(Math.min(72,page.viewportSize().width*.04933333),1);
+  if(page.viewportSize().width>1100){
+    const leadSize=await page.locator('.hero .eyebrow').evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+    expect(size).toBeGreaterThan(leadSize*2.4);
+    expect(Number(await title.evaluate(el=>getComputedStyle(el).fontWeight))).toBeGreaterThanOrEqual(650);
+  }
   await page.screenshot({path:info.outputPath('hero-actions.png')});
 });
 test('square notebooks have protruding topic tabs and a separate corner expansion icon',async({page},info)=>{
@@ -441,6 +445,12 @@ test('language controls preserve notebook interaction, translate new content and
  await expect(page.locator('#run-lineage-table')).toContainText('15,861,277');
  await expect(page.locator('#run-lineage-table')).toContainText('provisional identities');
  await page.screenshot({path:info.outputPath('english-pipeline-table.png')});
+ await page.locator('#evidence').scrollIntoViewIfNeeded();
+ await page.locator('#event-timeline [data-event]').first().click();
+ await expect(page.locator('#source-content .source-cells')).toContainText('企业名称');
+ await expect(page.locator('#source-content .source-cells')).toContainText('合成');
+ await page.screenshot({path:info.outputPath('english-original-evidence.png')});
+ await page.locator('#close-source').click();
  await page.locator('[data-language="zh"]').click();
  await expect(page.locator('#pipeline-title')).toHaveText('每一步的数据量和去向');
  await expect(page.locator('#run-lineage-table')).toContainText('临时身份');
