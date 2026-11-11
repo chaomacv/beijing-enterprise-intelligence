@@ -32,7 +32,7 @@ test('bounded viewport shows three full desktop cards with clipped neighbors',as
   await page.screenshot({path:info.outputPath('bounded-gallery.png')});
 });
 test('hero actions move right on desktop and stack naturally on mobile',async({page},info)=>{
-  await expect(page.locator('.hero .eyebrow')).toHaveText('从数千万条异构记录中，提取可信、可追溯的企业事实');
+  await expect(page.locator('.hero .eyebrow')).toHaveText('本地大模型驱动的海量异构公开数据智能处理与分析');
   await expect(page.locator('.hero-lead')).toContainText('以公共数据为实践场景，结合数据工程与大模型技术');
   const lead=await page.locator('.hero-lead').boundingBox(),cta=await page.locator('.hero-cta').boundingBox();
   if(page.viewportSize().width>900)expect(cta.x).toBeGreaterThan(lead.x+lead.width);
@@ -468,4 +468,10 @@ test('language controls preserve notebook interaction, translate new content and
  await page.screenshot({path:info.outputPath('chinese-typography-hero.png')});
  await page.goto('/?lang=en#approach');await expect(page.locator('#approach-title')).toHaveText('Methods designed for specific challenges.');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+ await page.locator('.design-credit').scrollIntoViewIfNeeded();
+ await page.screenshot({path:info.outputPath('design-credit-english.png')});
+ await page.locator('[data-language="zh"]').click();
+ await expect(page.locator('.design-credit')).toContainText('设计风格参考');
+ await page.locator('.design-credit').scrollIntoViewIfNeeded();
+ await page.screenshot({path:info.outputPath('design-credit-chinese.png')});
 });
