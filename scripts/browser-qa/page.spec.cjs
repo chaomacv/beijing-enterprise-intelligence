@@ -7,8 +7,8 @@ test.beforeEach(async({page})=>{
   await expect(page.locator('.method-pager')).toHaveAttribute('data-ready','true');
   expect(errors).toEqual([]);
   expect(await page.evaluate(async()=>{
-    await document.fonts.load('600 22px "BEI Sans SC"','企业');
-    return [...document.fonts].some(f=>f.family.replace(/["']/g,'')==='BEI Sans SC'&&f.status==='loaded');
+    await document.fonts.load('600 22px "PublicData Sans SC"','企业');
+    return [...document.fonts].some(f=>f.family.replace(/["']/g,'')==='PublicData Sans SC'&&f.status==='loaded');
   })).toBe(true);
 });
 async function measure(page){
@@ -418,6 +418,10 @@ test('language controls preserve notebook interaction, translate new content and
  await page.locator('[data-language="en"]').click();
  await page.locator('[data-notebook="2"] .notebook-reader-open').click();
  await expect(page.locator('html')).toHaveAttribute('lang','en');
+ await expect(page.locator('.header .brand')).toContainText('PublicData-LLM');
+ await expect(page.locator('.hero h1')).toHaveText('PublicData-LLM');
+ await expect(page.locator('.design-credit')).toContainText('Design inspiration:');
+ await expect(page.locator('.design-credit a')).toHaveAttribute('href','https://observablehq.com/');
  await expect(page.locator('#notebook-reader h3')).toHaveText('Company event categories');
  await expect(page.locator('#gallery-event-stage')).toHaveValue('unknown');
  await expect(page.locator('#gallery-event-table tr')).toHaveCount(18);
@@ -437,6 +441,8 @@ test('language controls preserve notebook interaction, translate new content and
  await page.locator('[data-gallery-page="2"]').click();
  await page.locator('[data-language="zh"]').click();
  await expect(page.locator('#approach-title')).toHaveText('针对具体难点，给出相应的方法设计。');
+ await expect(page.locator('.hero h1')).toHaveText('公开数据智能分析系统');
+ await expect(page.locator('.design-credit')).toContainText('设计风格参考');
  await expect(page.locator('[data-gallery-page="2"]')).toHaveAttribute('aria-pressed','true');
  await page.locator('[data-language="en"]').click();
  await expect(page.locator('#approach-title')).toHaveText('Methods designed for specific challenges.');

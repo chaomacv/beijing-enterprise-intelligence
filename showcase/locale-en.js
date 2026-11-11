@@ -1,6 +1,6 @@
 /* English interface catalog. Source data and files remain unchanged. */
 (function(root){const catalog={
-  "Beijing Enterprise Intelligence · 从公开数据到有据可查的企业情报": "Beijing Enterprise Intelligence · Evidence-backed public-data intelligence",
+  "PublicData-LLM · 从公开数据到有据可查的企业情报": "PublicData-LLM · Evidence-backed public-data intelligence",
   "跳到主要内容": "Skip to main content",
   "数据探索": "Explore",
   "方法选择": "Methods",
@@ -712,7 +712,7 @@
   "环境与资源保护": "Environment & resources",
   "企业服务": "Business services",
   "农业农村": "Agriculture",
-  "Beijing Enterprise Intelligence 首页": "Beijing Enterprise Intelligence home",
+  "PublicData-LLM 首页": "PublicData-LLM home",
   "主导航": "Main navigation",
   "数据笔记本，左右方向键切换": "Data notebooks; use left and right arrow keys to navigate",
   "目录缓存进入链接解析，导航与点击限频后异步接收；完成验收，失败进入第二三轮补跑": "Cache catalog, resolve links, rate-limit launches, receive asynchronously and validate; retry failures in rounds two and three",
@@ -831,5 +831,10 @@
   "未知格式": "Unknown format",
   "未知类型": "Unknown type",
   "来源未标明": "Not specified by source",
-  "官网未提供部门": "No official department supplied"
+  "官网未提供部门": "No official department supplied",
+  "公开数据智能分析系统": "PublicData-LLM",
+  "本地大模型驱动的海量异构公开数据智能处理与分析": "Local LLMs for Large-Scale Heterogeneous Public Data",
+  "PublicData-LLM · 公开数据智能分析系统": "PublicData-LLM · Local LLMs for Large-Scale Heterogeneous Public Data",
+  "设计风格参考": "Design inspiration:",
+  "本地大模型": "Local LLMs"
 };if(typeof module==='object'&&module.exports)module.exports=catalog;root.BEIEnglish=catalog;})(typeof window==='object'?window:globalThis);
