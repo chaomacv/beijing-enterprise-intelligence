@@ -13,6 +13,8 @@
   <meta property="og:image" content="https://chaomacv.github.io/beijing-enterprise-intelligence/assets/project-preview.svg">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
+  <script src="locale-en.js" defer></script>
+  <script src="i18n.js" defer></script>
   <script src="model.js" defer></script>
   <script src="app.js" defer></script>
   <script src="lineage.js" defer></script>
@@ -34,6 +36,7 @@
   <header class="header">
     <a class="brand" href="#top" aria-label="Beijing Enterprise Intelligence 首页"><img src="assets/mark.svg" width="31" height="31" alt=""><span>BEI<span class="brand-rest">Enterprise Intelligence</span></span></a>
     <nav aria-label="主导航"><a href="#explorations">数据探索</a><a href="#approach">方法选择</a><a href="#pipeline">全量流程</a><a href="#lab">交互实验</a><a href="#evidence">企业与证据</a></nav>
+    <div class="language-switch" role="group" aria-label="Language / 语言"><button type="button" data-language="zh" aria-pressed="true" aria-label="切换到中文" title="中文">中</button><span aria-hidden="true">/</span><button type="button" data-language="en" aria-pressed="false" aria-label="Switch to English" title="English">EN</button></div>
     <a class="repo-link" href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
   </header>
 
@@ -252,7 +255,7 @@ python -m pip install -e .
 bank-data demo --work-dir ../demo_process_work</pre><p id="copy-status" role="status">仅生成合成示例，无需 GPU、模型权重或 API Key。</p></div></section>
     <div class="closing shell"><span class="closing-mark" aria-hidden="true">↳</span><p>让数据有来处，<br><span>让判断有依据。</span></p><a href="#top" aria-label="回到顶部">↑</a></div>
   </main>
-  <footer class="footer shell"><a class="brand" href="#top"><img src="assets/mark.svg" width="25" height="25" alt=""><span>Beijing Enterprise Intelligence</span></a><span>工程实践 · 2026</span><a href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">源码与文档 ↗</a></footer>
+  <footer class="footer shell"><a class="brand" href="#top"><img src="assets/mark.svg" width="25" height="25" alt=""><span>Beijing Enterprise Intelligence</span></a><span>工程实践 · 2026</span><span class="locale-source-note" lang="en">Source names, fields and evidence retain their original language.</span><a href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">源码与文档 ↗</a></footer>
   <dialog id="notebook-reader" class="notebook-reader" aria-labelledby="notebook-reader-title"><div class="notebook-reader-heading"><h2 id="notebook-reader-title">数据笔记本</h2><button type="button" id="notebook-reader-close" aria-label="关闭放大阅读">关闭 ×</button></div><div id="notebook-reader-body"></div></dialog>
   <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><span class="overline">SOURCE INSPECTOR / SYNTHETIC</span><button id="close-source" aria-label="关闭原始证据" type="button">×</button></div><h2 id="source-title">原始证据</h2><div id="source-content"></div><button class="button primary dialog-close" type="button">返回企业画像 <span aria-hidden="true">↗</span></button></dialog>
 </body>

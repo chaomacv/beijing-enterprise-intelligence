@@ -6,6 +6,10 @@ test.beforeEach(async({page})=>{
   await expect(page.locator('#gallery-viewport')).toHaveAttribute('data-ready','true');
   await expect(page.locator('.method-pager')).toHaveAttribute('data-ready','true');
   expect(errors).toEqual([]);
+  expect(await page.evaluate(async()=>{
+    await document.fonts.load('600 22px "BEI Sans SC"','企业');
+    return [...document.fonts].some(f=>f.family.replace(/["']/g,'')==='BEI Sans SC'&&f.status==='loaded');
+  })).toBe(true);
 });
 async function measure(page){
   return page.locator('#gallery-viewport').evaluate(el=>{
@@ -43,7 +47,11 @@ test('hero actions move right on desktop and stack naturally on mobile',async({p
   await expect(page.locator('#gallery-clock')).not.toBeVisible();
   expect(await page.locator('.hero-bottom').evaluate(el=>parseFloat(getComputedStyle(el).marginTop))).toBe(136);
   const size=await title.evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
-  if(page.viewportSize().width>1100)expect(size).toBeCloseTo(Math.min(72,page.viewportSize().width*.04933333),1);
+  if(page.viewportSize().width>1100){
+    const leadSize=await page.locator('.hero .eyebrow').evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+    expect(size).toBeGreaterThan(leadSize*2.4);
+    expect(Number(await title.evaluate(el=>getComputedStyle(el).fontWeight))).toBeGreaterThanOrEqual(650);
+  }
   await page.screenshot({path:info.outputPath('hero-actions.png')});
 });
 test('square notebooks have protruding topic tabs and a separate corner expansion icon',async({page},info)=>{
@@ -398,5 +406,60 @@ test('nine-step lineage table and selected details expose the same conserved rec
  await page.locator('#run-step-panel').scrollIntoViewIfNeeded();
  await page.screenshot({path:info.outputPath('pipeline-lineage-detail.png')});
  await page.locator('[data-run-step="8"]').click();await expect(page.locator('#run-detail-output')).toContainText('43,653,625');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+});
+
+test('language controls preserve notebook interaction, translate new content and persist the preference',async({page},info)=>{
+ await expect(page.locator('html')).toHaveAttribute('data-locale-ready','zh');
+ await page.locator('[data-gallery-page="2"]').click();
+ await page.locator('[data-notebook="2"] .notebook-reader-open').click();
+ await page.locator('#gallery-event-stage').selectOption('unknown');
+ await page.locator('#notebook-reader-close').click();
+ await page.locator('[data-language="en"]').click();
+ await page.locator('[data-notebook="2"] .notebook-reader-open').click();
+ await expect(page.locator('html')).toHaveAttribute('lang','en');
+ await expect(page.locator('#notebook-reader h3')).toHaveText('Company event categories');
+ await expect(page.locator('#gallery-event-stage')).toHaveValue('unknown');
+ await expect(page.locator('#gallery-event-table tr')).toHaveCount(18);
+ await expect(page.locator('#gallery-taxonomy-total')).toHaveText('5,968,620');
+ await page.locator('#gallery-event-stage').selectOption('all');
+ await expect(page.locator('#gallery-event-table')).toContainText('Business permits');
+ await page.screenshot({path:info.outputPath('english-event-notebook.png')});
+ await page.locator('#notebook-reader-close').click();
+ await page.locator('[data-gallery-page="6"]').click();
+ await page.locator('[data-notebook="6"] .notebook-reader-open').click();
+ await page.locator('#network-mode').selectOption('bipartite');
+ await expect(page.locator('#enterprise-network')).toHaveAttribute('data-ready','true');
+ await expect(page.locator('[data-node-kind="tag"]')).toHaveCount(18);
+ await expect.poll(()=>page.locator('[data-node-kind="tag"] text').allTextContents()).toContain('Personnelcredentials');
+ await page.screenshot({path:info.outputPath('english-company-network.png')});
+ await page.locator('#notebook-reader-close').click();
+ await page.locator('[data-gallery-page="2"]').click();
+ await page.locator('[data-language="zh"]').click();
+ await expect(page.locator('#approach-title')).toHaveText('针对具体难点，给出相应的方法设计。');
+ await expect(page.locator('[data-gallery-page="2"]')).toHaveAttribute('aria-pressed','true');
+ await page.locator('[data-language="en"]').click();
+ await expect(page.locator('#approach-title')).toHaveText('Methods designed for specific challenges.');
+ await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+ await page.screenshot({path:info.outputPath('english-typography-hero.png')});
+ await page.reload();await expect(page.locator('html')).toHaveAttribute('data-locale-ready','en');
+ await expect(page.locator('#pipeline-title')).toHaveText('Record counts and destinations at every step');
+ await page.locator('#pipeline').scrollIntoViewIfNeeded();
+ await page.locator('#run-lineage-title').click();
+ await expect(page.locator('#run-lineage-table')).toContainText('15,861,277');
+ await expect(page.locator('#run-lineage-table')).toContainText('provisional identities');
+ await page.screenshot({path:info.outputPath('english-pipeline-table.png')});
+ await page.locator('#evidence').scrollIntoViewIfNeeded();
+ await page.locator('#event-timeline [data-event]').first().click();
+ await expect(page.locator('#source-content .source-cells')).toContainText('企业名称');
+ await expect(page.locator('#source-content .source-cells')).toContainText('合成');
+ await page.screenshot({path:info.outputPath('english-original-evidence.png')});
+ await page.locator('#close-source').click();
+ await page.locator('[data-language="zh"]').click();
+ await expect(page.locator('#pipeline-title')).toHaveText('每一步的数据量和去向');
+ await expect(page.locator('#run-lineage-table')).toContainText('临时身份');
+ await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+ await page.screenshot({path:info.outputPath('chinese-typography-hero.png')});
+ await page.goto('/?lang=en#approach');await expect(page.locator('#approach-title')).toHaveText('Methods designed for specific challenges.');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
 });

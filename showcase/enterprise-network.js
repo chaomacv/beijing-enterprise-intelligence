@@ -18,6 +18,20 @@
    $('network-detail').innerHTML=`<strong>${esc(n.label)} · 一家真实企业的匿名编号</strong><span>${n.tag_count} 类可比较标签 · ${fmt(n.event_count)} 条事件观察</span><p>${counts.map(esc).join(' · ')}</p><small>含来源中拟议或阶段未明的观察；待分类复核不参与相似度。代码仅通过校验位检查。</small>`;
   }draw();
  }
+ function renderLabels(){
+  const english=root.BEILocale?.language==='en';
+  dots.selectAll('text').each(function(n){
+   const t=d3.select(this);t.selectAll('*').remove();t.text('');
+   const label=english?root.BEILocale.translate(n.label):n.label;
+   if(n.isTag){
+    let parts;
+    if(english){parts=[];for(const word of label.split(' ')){if(parts.length&&parts.at(-1).length+word.length<18)parts[parts.length-1]+=' '+word;else parts.push(word);}}
+    else parts=n.label.match(/.{1,6}/gu)||[];
+    parts.forEach((part,i)=>t.append('tspan').attr('dy',i?11:0).text(part));
+   }else t.text(label);
+  });
+ }
+ root.addEventListener('bei:languagechange',()=>{if(nodes.length){renderLabels();draw();}});
  function draw(){
   const positions=new Map(nodes.map(n=>[n.id,model.project(n,camera,dimension)]));
   lines.selectAll('line').attr('x1',e=>positions.get(e.source).x).attr('y1',e=>positions.get(e.source).y).attr('x2',e=>positions.get(e.target).x).attr('y2',e=>positions.get(e.target).y);
@@ -63,10 +77,7 @@
    items.select('circle').attr('fill',n=>n.color).attr('stroke','#fff').attr('display',n=>n.isTag?'none':null);
    items.select('rect').attr('fill',n=>n.color).attr('display',n=>n.isTag?null:'none');
    items.select('title').text(n=>n.isTag?n.label:`${n.label}\n${n.tag_count} 类标签 · ${n.event_count} 条事件观察\n`+n.tags.map(t=>data.categories.find(c=>c.id===t).label).join(' · '));
-   items.select('text').each(function(n){const t=d3.select(this);t.selectAll('*').remove();t.text('');
-    if(n.isTag){for(const [i,part] of (n.label.match(/.{1,6}/gu)||[]).entries())t.append('tspan').attr('dy',i?11:0).text(part);}
-    else t.text(n.label);
-   });
+   renderLabels();
    draw();host.dataset.ready='true';host.dataset.dimensions=dimension;host.dataset.companyCount=companies.length;host.setAttribute('aria-busy','false');
    $('network-edge-count').textContent=companies.length+' 家企业 · '+(mode==='similarity'?edges.length+' 条相似连线':visibleCategories.length+' 类外围标签');
    $('network-view-note').textContent=mode==='similarity'?'共同标签种类、共同事件数量越多，目标距离越短；几何位置是力布局的近似结果。':'圆点是企业，外围菱形是标签；连线只表示该企业具备此来源观察标签。';

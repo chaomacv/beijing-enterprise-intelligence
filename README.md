@@ -1,5 +1,7 @@
 # Beijing Enterprise Intelligence
 
+<p><strong>简体中文</strong> &nbsp; | &nbsp; <a href="README.en.md">English</a></p>
+
 [![Project Page](https://img.shields.io/badge/Project-Page-191919?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
 [![Interactive Methods](https://img.shields.io/badge/Interactive-Methods-4269d0?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/#lab)
 
