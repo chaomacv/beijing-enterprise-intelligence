@@ -113,3 +113,20 @@ test('public corpus snapshot contains only aggregate metadata and keeps pending 
   assert.equal(benchmark.review_records, benchmark.records);
   assert.ok(benchmark.packed_seconds < benchmark.serial_seconds);
 });
+
+test('locale catalog preserves quantities, technical identifiers and full-scope event semantics',()=>{
+ const {translate}=require('../showcase/i18n.js');
+ assert.equal(translate('企业经营许可'),'Business permits');
+ assert.equal(translate('5,968,620'),'5,968,620');
+ assert.equal(translate('EXTRACTED / NO_EVENT / REVIEW'),'EXTRACTED / NO_EVENT / REVIEW');
+ assert.match(translate('企业经营许可占当前选择的 18.3% · 共 5,968,620 条事件观察。记录数不能解释为独立证照数。'),/18\.3%.*5,968,620/);
+ assert.match(translate('5,202,714 个主体画像，包含 4,364,721 个临时身份。'),/5,202,714.*4,364,721.*provisional/);
+});
+
+test('README languages share exact executable commands and reciprocal language navigation',()=>{
+ const zh=fs.readFileSync(path.join(root,'README.md'),'utf8'),en=fs.readFileSync(path.join(root,'README.en.md'),'utf8');
+ assert.ok(zh.includes('href="README.en.md"'));assert.ok(en.includes('href="README.md"'));
+ const commands=s=>[...s.matchAll(/```bash\n([\s\S]*?)```/g)].map(m=>m[1]);
+ assert.deepEqual(commands(en),commands(zh));
+ for(const count of ['43,653,625','15,861,277','5,968,620','5,202,714','388,349'])assert.ok(zh.includes(count)&&en.includes(count));
+});
