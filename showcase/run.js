@@ -66,8 +66,6 @@
     $('run-overall-state').textContent=done?'本批流程已完成，含待复核结果':'本批全量抽取进行中';
     $('run-overall-state').dataset.state=done?'complete':'running';
     $('run-snapshot-date').textContent='固定输入 / '+data.snapshot_date+' · 汇总更新 / '+data.updated_at;
-    $('scale-attachments').textContent=format(data.input.attachments);$('scale-logical-files').textContent=format(data.input.logical_files);
-    $('scale-records').textContent=format(data.input.known_logical_records);$('scale-representatives').textContent=format(data.semantic_work.representative_records);
     $('dedup-source-count').textContent=format(data.preparation.pending_semantic_source_records);$('dedup-representative-count').textContent=format(data.semantic_work.representative_records);
     const ratio=data.semantic_work.exact_duplicate_source_records/data.preparation.pending_semantic_source_records*100;
     $('dedup-reuse-percent').textContent=ratio.toFixed(1)+'%';$('dedup-unique-bar').style.width=(100-ratio)+'%';
@@ -76,7 +74,6 @@
     $('batch-before-value').textContent=data.benchmarks.batching.serial_seconds.toFixed(1)+' s';
     $('batch-after-value').textContent=data.benchmarks.batching.packed_seconds.toFixed(1)+' s';
     $('batch-after-bar').style.width=(data.benchmarks.batching.packed_seconds/data.benchmarks.batching.serial_seconds*100)+'%';
-    if(done){$('release-run-title').textContent='本批全量验收';$('release-run-copy').textContent='流程与覆盖对账已完成，待复核项继续留存。独立语义准确率仍需标注评估。';}
     $('run-lineage-table').innerHTML=lineage.stages.map((row,i)=>'<tr><td><button type="button" data-flow-step="'+i+'">'+String(i+1).padStart(2,'0')+' '+escape(row.title)+'</button></td><td>'+escape(row.input)+'</td><td>'+escape(row.output)+'<small><code>'+escape(row.files[0])+'</code></small></td></tr>').join('');
     $('run-lineage-table').dataset.ready='true';
     $('run-lineage-table').addEventListener('click',event=>{const button=event.target.closest('[data-flow-step]');if(button){selectStep(Number(button.dataset.flowStep));$('run-step-panel').scrollIntoView({block:'nearest',behavior:'auto'});}});
