@@ -39,7 +39,7 @@ test('hero actions move right on desktop and stack naturally on mobile',async({p
   else expect(cta.y).toBeGreaterThanOrEqual(lead.y+lead.height);
   if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(648);
   const title=page.locator('#hero-title');
-  await expect(title).toHaveText('让公开数据，成为有据可查的企业情报。');
+  await expect(title).toHaveText('公开数据智能分析系统');
   expect(await title.locator('br').count()).toBe(0);
   expect(await title.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
   expect(await page.locator('.gallery-heading').count()).toBe(0);
