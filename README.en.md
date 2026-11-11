@@ -1,13 +1,15 @@
-# Beijing Enterprise Intelligence
+# PublicData-LLM
+
+**Local LLMs for Large-Scale Heterogeneous Public Data**
 
 <p><a href="README.md">简体中文</a> &nbsp; | &nbsp; <strong>English</strong></p>
 
-[![Project Page](https://img.shields.io/badge/Project-Page-191919?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/?lang=en)
-[![Interactive Methods](https://img.shields.io/badge/Interactive-Methods-4269d0?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/?lang=en#lab)
+[![Project Page](https://img.shields.io/badge/Project-Page-191919?style=flat-square)](https://chaomacv.github.io/public-data-llm/?lang=en)
+[![Interactive Methods](https://img.shields.io/badge/Interactive-Methods-4269d0?style=flat-square)](https://chaomacv.github.io/public-data-llm/?lang=en#lab)
 
-[![Beijing Enterprise Intelligence: evidence-backed public-data intelligence](showcase/assets/project-preview.svg)](https://chaomacv.github.io/beijing-enterprise-intelligence/?lang=en)
+[![PublicData-LLM: evidence-backed public-data intelligence](showcase/assets/project-preview.svg)](https://chaomacv.github.io/public-data-llm/?lang=en)
 
-**[Explore the project page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/?view=compact&lang=en#explorations)** · Nine interactive data notebooks, real source catalogs, acquisition safeguards, a three-mode zoomable sunburst, 2D/3D networks of 100 real company profiles, and a nine-step processing and provenance map. [Final results and file index](docs/full_run_results.md) · [Page design and reproduction](docs/project_page.md)
+**[Explore the project page ↗](https://chaomacv.github.io/public-data-llm/?view=compact&lang=en#explorations)** · Nine interactive data notebooks, real source catalogs, acquisition safeguards, a three-mode zoomable sunburst, 2D/3D networks of 100 real company profiles, and a nine-step processing and provenance map. [Final results and file index](docs/full_run_results.md) · [Page design and reproduction](docs/project_page.md)
 
 The batch completed automated processing, classification refinement and final acceptance on **2026-11-10 at 05:56 Beijing time**, with status `COMPLETED_WITH_REVIEW`.
 
@@ -37,7 +39,7 @@ After inference, validate and restore outputs to **1,440,619 complex source reco
 
 The retained ledger comprises mutually exclusive outcomes: EXTRACTED **6,300,941**, NO_EVENT **3,381,302**, and REVIEW **6,179,034**, totaling 15,861,277. Profiles, events and source links use different counting units and cannot be added to record totals.
 
-[Interactive lineage and observed progress](https://chaomacv.github.io/beijing-enterprise-intelligence/?view=compact&lang=en#explorations) · [Nine-step inputs, methods, counts and files](docs/data_lineage.md) · [Reconciled data interface](showcase/assets/data-lineage.json)
+[Interactive lineage and observed progress](https://chaomacv.github.io/public-data-llm/?view=compact&lang=en#explorations) · [Nine-step inputs, methods, counts and files](docs/data_lineage.md) · [Reconciled data interface](showcase/assets/data-lineage.json)
 
 The network uses **100 real company profiles with checksum-valid credit codes**, selected from the processed results by category and tag richness. Every circle is one anonymized company. Shared category types and corresponding observation counts determine target distances. In the tag view, peripheral category markers connect to companies with those observed tags. Both views support 2D dragging, zooming and 3D rotation.
 
@@ -182,7 +184,7 @@ Do not commit source data, processing outputs, model weights, browser profiles o
 
 ```text
 Bank/
-  beijing-enterprise-intelligence/   # Source, configuration, documentation and tests
+  public-data-llm/   # Source, configuration, documentation and tests
   beijing_download_work/            # Original downloader work directory
   data/raw/                        # Original files
   models/                          # Local weights

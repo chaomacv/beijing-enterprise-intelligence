@@ -30,7 +30,7 @@
 
 ## 页面怎样呈现阶段和时间
 
-[09卡片及下方九步流程](https://chaomacv.github.io/beijing-enterprise-intelligence/?view=compact#explorations)共用[数量与去向接口](../showcase/assets/data-lineage.json)。
+[09卡片及下方九步流程](https://chaomacv.github.io/public-data-llm/?view=compact#explorations)共用[数量与去向接口](../showcase/assets/data-lineage.json)。
 
 - 数据去向视图按真实处理顺序展示：解析总量→保留→语义来源→内容代表→来源回填→合并台账→覆盖对账。节点回升表示来源范围恢复或转为完整覆盖对账，不表示新增原始数据。默认对数刻度并明确标注，可切换线性刻度。
 - 时间进度视图只使用真实推理观测点，以388,349为内容代表分母。横轴按真实、非均匀的时间间隔绘制；末点为最终验收时已全部完成的快照，不冒充精确推理结束时刻。

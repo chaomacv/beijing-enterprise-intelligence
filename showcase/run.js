@@ -39,7 +39,7 @@
     $('run-detail-flow').innerHTML=lineage.stages[index].flow.map(value=>'<p>'+escape(value)+'</p>').join('');
     $('run-detail-files').innerHTML=lineage.stages[index].files.map(path=>'<code>'+escape(path)+'</code>').join('');
     const commit=/^[a-f0-9]{40}$/.test(snapshot.source_commit)?snapshot.source_commit:'main';
-    $('run-detail-source').href='https://github.com/chaomacv/beijing-enterprise-intelligence/blob/'+commit+'/src/bank_data/'+step.code;
+    $('run-detail-source').href='https://github.com/chaomacv/public-data-llm/blob/'+commit+'/src/bank_data/'+step.code;
   }
   buttons.forEach((button,index)=>{
     button.addEventListener('click',()=>selectStep(index));

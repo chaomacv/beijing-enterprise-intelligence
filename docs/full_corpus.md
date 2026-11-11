@@ -38,7 +38,7 @@ python -m bank_data.bulk_run \
 
 服务器案例使用原始 BF16 Qwen3-8B 权重。vLLM 提供同一批量协议、前缀缓存与 CUDA Graph；`--enforce-eager` 可关闭 Graph。每个服务最多同时处理 4 个独立请求，服务绑定 loopback，禁用使用统计与在线模型下载。
 
-CUDA 11.8 安装案例使用独立环境，并按 [核心组件约束](../scripts/vllm-cu118.constraints.txt) 安装。官方安装包 SHA256 为 `54230c11150a8d6314fb9d4856b045b3d5bf80092fa1901f3e1ef3b9afcd6e3f`，由 [官方发布包核对工作流](https://github.com/chaomacv/beijing-enterprise-intelligence/actions/runs/42392558379) 实际计算；镜像下载也须核对相同哈希。安装方法参考 [vLLM 0.8.5 官方 GPU 文档](https://docs.vllm.ai/en/v0.8.5/getting_started/installation/gpu.html)。
+CUDA 11.8 安装案例使用独立环境，并按 [核心组件约束](../scripts/vllm-cu118.constraints.txt) 安装。官方安装包 SHA256 为 `54230c11150a8d6314fb9d4856b045b3d5bf80092fa1901f3e1ef3b9afcd6e3f`，由 [官方发布包核对工作流](https://github.com/chaomacv/public-data-llm/actions/runs/42392558379) 实际计算；镜像下载也须核对相同哈希。安装方法参考 [vLLM 0.8.5 官方 GPU 文档](https://docs.vllm.ai/en/v0.8.5/getting_started/installation/gpu.html)。
 
 ```bash
 python -m pip install -c scripts/vllm-cu118.constraints.txt \

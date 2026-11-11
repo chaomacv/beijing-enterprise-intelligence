@@ -1,6 +1,6 @@
 # Project Page
 
-地址：https://chaomacv.github.io/beijing-enterprise-intelligence/?view=compact#explorations
+地址：https://chaomacv.github.io/public-data-llm/?view=compact#explorations
 
 页面沿用深色首屏向白色过渡、直角笔记本卡片和左上角页签。桌面中央显示三张完整卡片，两侧有限露出相邻卡片；九张首尾循环，卡片可移入扩大阅读器并保留交互状态。键盘、触摸、悬停、后台及减少动态效果的处理保持不变。
 
@@ -85,3 +85,7 @@ D3 7.9.0为ISC许可；d3-force-3d 3.0.6及其binarytree／octree依赖为MIT许
 导航右侧提供“中 / EN”切换，使用 `?lang=en` 或 `?lang=zh` 分享指定语言，偏好保存在浏览器 `bei-language` 中。切换保留当前卡片、放大阅读器、筛选和实验参数；静态说明、动态控件、图表提示及无障碍标签使用本地词表。原始文件名、字段、证据与代码保持原文，数据文件不因语言选择而改变。README.md 与 README.en.md 顶部提供相互切换入口。
 
 全站采用系统无衬线字体，章节标题加粗并扩大，正文保持常规字重；数字使用等宽字体和对齐数字，代码单独分层。英文笔记本标题采用衬线字体，保留参考站点的文档观感；中文界面随页提供 Noto Sans SC 的轻量字形子集（400–700），保留 OFL 许可；字体不依赖外部下载，原始来源中的其他汉字使用系统回退。
+
+## 项目命名
+
+GitHub 仓库为 `public-data-llm`，英文名为 **PublicData-LLM**，中文名为 **公开数据智能分析系统**。中文副标题为“本地大模型驱动的海量异构公开数据智能处理与分析”，英文副标题为“Local LLMs for Large-Scale Heterogeneous Public Data”。北京是本批实践数据来源，项目名与地域解耦。历史处理目录与来源哈希继续保留。

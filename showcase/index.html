@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffffff">
-  <title>Beijing Enterprise Intelligence · 从公开数据到有据可查的企业情报</title>
+  <title>PublicData-LLM · 公开数据智能分析系统</title>
   <meta name="description" content="一项可探索的本地模型数据工程实践：理解文件、保留记录、核对证据，将北京公开数据组织为企业事实与标签。">
-  <meta property="og:title" content="Beijing Enterprise Intelligence">
+  <meta property="og:title" content="PublicData-LLM · 公开数据智能分析系统">
   <meta property="og:description" content="分散的数据，有据可查的企业情报。探索文件筛选、结构化抽取与企业归并的工程选择。">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://chaomacv.github.io/beijing-enterprise-intelligence/">
-  <meta property="og:image" content="https://chaomacv.github.io/beijing-enterprise-intelligence/assets/project-preview.svg">
+  <meta property="og:url" content="https://chaomacv.github.io/public-data-llm/">
+  <meta property="og:image" content="https://chaomacv.github.io/public-data-llm/assets/project-preview.svg">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script src="locale-en.js" defer></script>
@@ -34,16 +34,16 @@
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
   <header class="header">
-    <a class="brand" href="#top" aria-label="Beijing Enterprise Intelligence 首页"><img src="assets/mark.svg" width="31" height="31" alt=""><span>BEI<span class="brand-rest">Enterprise Intelligence</span></span></a>
+    <a class="brand" href="#top" aria-label="PublicData-LLM 首页"><img src="assets/mark.svg" width="31" height="31" alt=""><span><span data-i18n-original>PublicData-LLM</span><span class="brand-rest">本地大模型</span></span></a>
     <nav aria-label="主导航"><a href="#explorations">数据探索</a><a href="#approach">方法选择</a><a href="#pipeline">全量流程</a><a href="#lab">交互实验</a><a href="#evidence">企业与证据</a></nav>
     <div class="language-switch" role="group" aria-label="Language / 语言"><button type="button" data-language="zh" aria-pressed="true" aria-label="切换到中文" title="中文">中</button><span aria-hidden="true">/</span><button type="button" data-language="en" aria-pressed="false" aria-label="Switch to English" title="English">EN</button></div>
-    <a class="repo-link" href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+    <a class="repo-link" href="https://github.com/chaomacv/public-data-llm" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
   </header>
 
   <main id="main">
 <div class="landing-stage">
  <section class="hero shell" id="top" aria-labelledby="hero-title">
-  <div class="hero-copy"><p class="eyebrow">从数千万条异构记录中，提取可信、可追溯的企业事实</p><h1 id="hero-title">让公开数据，成为有据可查的企业情报。</h1><div class="hero-bottom"><p class="hero-lead">以公共数据为实践场景，结合数据工程与大模型技术，实现公开数据的解析、清洗、信息提取与实体关联，构建可靠、可追溯的企业画像，为金融业务提供数据支持。</p><div class="hero-cta"><div class="hero-actions"><a class="button primary" href="#explorations">开始探索 <span aria-hidden="true">↓</span></a><a class="button secondary" href="#pipeline">查看处理流程 <span aria-hidden="true">↗</span></a></div><p class="hero-footnote">开源实践<span>·</span>本地 Qwen<span>·</span>来源可追溯</p></div></div></div>
+  <div class="hero-copy"><p class="eyebrow">本地大模型驱动的海量异构公开数据智能处理与分析</p><h1 id="hero-title">公开数据智能分析系统</h1><div class="hero-bottom"><p class="hero-lead">以公共数据为实践场景，结合数据工程与大模型技术，实现公开数据的解析、清洗、信息提取与实体关联，构建可靠、可追溯的企业画像，为金融业务提供数据支持。</p><div class="hero-cta"><div class="hero-actions"><a class="button primary" href="#explorations">开始探索 <span aria-hidden="true">↓</span></a><a class="button secondary" href="#pipeline">查看处理流程 <span aria-hidden="true">↗</span></a></div><p class="hero-footnote">开源实践<span>·</span>本地 Qwen<span>·</span>来源可追溯</p></div></div></div>
  </section>
  <section class="notebook-showcase" id="explorations" aria-label="数据笔记本" aria-roledescription="轮播">
   <div class="carousel-viewport" id="gallery-viewport" tabindex="0" aria-label="数据笔记本，左右方向键切换"><div class="carousel-track"><article class="data-notebook" data-card-key="sources" data-notebook="0" aria-roledescription="幻灯片" aria-label="1 / 9：来源分布与数据异构性"><span class="notebook-category">数据背景</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[01]</span><div><h3>来源分布与数据异构性</h3><p>按官网主题统计来源数量；悬停柱形查看下载页，下方对照文件结构与业务相关性。</p></div></div>
@@ -68,7 +68,7 @@ await rate_limit(min_interval=1)
 receive_in_background(task, max_inflight=4)
 # 一轮后验收；仅补失败项；累计最多尝试 3 次</code></pre>
 <div class="notebook-callout acquisition-boundary">限频不保证官网不会限制访问；遇登录、验证码或访问限制即暂停，保留进度。文件级续跑不等于 HTTP 字节断点续传。</div>
-<footer class="notebook-scope">已实现的下载策略与安全边界 · 默认参数，不是吞吐测量 · 本批 5,200 份附件已纳入输入核对，上游 22 个失败项另记 · <a href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/main/docs/acquisition.md">采集方法说明 ↗</a></footer></div></article><article class="data-notebook" data-card-key="events" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 9：企业事件分类统计">
+<footer class="notebook-scope">已实现的下载策略与安全边界 · 默认参数，不是吞吐测量 · 本批 5,200 份附件已纳入输入核对，上游 22 个失败项另记 · <a href="https://github.com/chaomacv/public-data-llm/blob/main/docs/acquisition.md">采集方法说明 ↗</a></footer></div></article><article class="data-notebook" data-card-key="events" data-notebook="2" aria-roledescription="幻灯片" aria-label="3 / 9：企业事件分类统计">
       <span class="notebook-category">事件分类</span><div class="notebook-page"><div class="notebook-heading"><span class="cell-number">[03]</span><div><h3>企业事件分类统计</h3><p>统计全部 18 类事件；柱长表示数量，可切换事件阶段、关联画像数和刻度。</p></div></div>
       
  <div class="taxonomy-reconciliation"><strong id="gallery-taxonomy-total">5,968,620</strong><span>条事件观察 · <b id="gallery-taxonomy-categories">18</b> 类<br>事件、阶段与来源全部保留</span></div>
@@ -234,7 +234,7 @@ else:
             <div class="run-detail-metric"><strong id="run-detail-number">388,349</strong><span id="run-detail-label">个不同内容代表需语义处置</span></div>
             <dl><dt>输入</dt><dd id="run-detail-input">复杂内容代表及各自表头、语境与来源 ID</dd><dt>方法</dt><dd id="run-detail-method">完整内容精确分组后推理；按实际 tokenizer 预算拆组，再批量提交。核对主体、原文引用与记录归属，逐条回填重复来源；不确定项进入复核。</dd><dt>产出</dt><dd id="run-detail-output">逐条状态、来源引用、模型请求与原回复</dd><dt>去向</dt><dd id="run-detail-flow">1,440,619 条复杂来源 → 388,349 个代表 → 回填到原始来源。</dd></dl>
             <div class="run-detail-files" id="run-detail-files"><code>06_validation/内容去重总表.csv</code><code>06_validation/content_indices/</code><code>06_validation/&lt;file_id&gt;/record_results.jsonl</code></div>
-            <a class="text-link" id="run-detail-source" href="https://github.com/chaomacv/beijing-enterprise-intelligence/blob/57748c4c4086432c4b129a0fee059018a1d6a4c1/src/bank_data/bulk_semantics.py" target="_blank" rel="noopener">查看本步骤源码 <span aria-hidden="true">↗</span></a>
+            <a class="text-link" id="run-detail-source" href="https://github.com/chaomacv/public-data-llm/blob/57748c4c4086432c4b129a0fee059018a1d6a4c1/src/bank_data/bulk_semantics.py" target="_blank" rel="noopener">查看本步骤源码 <span aria-hidden="true">↗</span></a>
           </article>
         </div>
         <p class="run-footnote">本页为已完成批次的数量与去向。排除、复核及来源回填均保留台账；下方交互案例明确使用合成数据。<a href="assets/run-summary.json">查看汇总 JSON ↗</a></p>
@@ -249,13 +249,14 @@ else:
       <article class="field-note"><div class="field-note-copy"><p class="overline">03 / BUDGET FIRST, THEN BATCH</p><h3>拆开长请求，<br>仍然用好批处理。</h3><p>长记录超预算后，逐条同步回退会让批处理失效。先拆出符合 tokenizer 预算的完整记录子组，再同时提交独立请求。</p><p class="field-note-caption">保留原来的分段深度、单请求内容与输出上限。已有检查点经逐条核验后继续复用。</p></div><div class="field-note-visual timing-figure"><p class="timing-meta">同一 RTX 4090 / Qwen3-8B BF16 / 8 条真实公告</p><div class="timing-row"><span>逐条回退</span><div><i class="timing-before"></i></div><strong id="batch-before-value">89.9 s</strong></div><div class="timing-row"><span>拆组后批量提交</span><div><i class="timing-after" id="batch-after-bar" style="width:47.98%"></i></div><strong id="batch-after-value">43.1 s</strong></div><p class="field-note-caption">两组先进行相同前缀预热，客户端生成缓存从空开始。实际请求键与最终来源校验结果一致，八条均为 REVIEW；这是单次工程对照。</p></div></article>
     </section>
 
-    <section class="section shell reproduce" id="reproduce" aria-labelledby="reproduce-title"><div><p class="eyebrow">OPEN SOURCE / REPRODUCIBLE</p><h2 id="reproduce-title">从一份可复现的<br>小样例开始。</h2><p>离线规则 Demo 可在 CPU 运行。先查看原始输入与中间结果，再接入私有环境中的本地模型。</p><a class="text-link" href="https://github.com/chaomacv/beijing-enterprise-intelligence#安装" target="_blank" rel="noopener">完整安装与运行说明 <span aria-hidden="true">↗</span></a></div><div class="terminal"><div class="terminal-top"><span>QUICK START / PYTHON 3.10+</span><button id="copy-command" type="button">复制命令</button></div><pre id="quickstart-code">git clone https://github.com/chaomacv/beijing-enterprise-intelligence.git
-cd beijing-enterprise-intelligence
+    <section class="section shell reproduce" id="reproduce" aria-labelledby="reproduce-title"><div><p class="eyebrow">OPEN SOURCE / REPRODUCIBLE</p><h2 id="reproduce-title">从一份可复现的<br>小样例开始。</h2><p>离线规则 Demo 可在 CPU 运行。先查看原始输入与中间结果，再接入私有环境中的本地模型。</p><a class="text-link" href="https://github.com/chaomacv/public-data-llm#安装" target="_blank" rel="noopener">完整安装与运行说明 <span aria-hidden="true">↗</span></a></div><div class="terminal"><div class="terminal-top"><span>QUICK START / PYTHON 3.10+</span><button id="copy-command" type="button">复制命令</button></div><pre id="quickstart-code">git clone https://github.com/chaomacv/public-data-llm.git
+cd public-data-llm
 python -m pip install -e .
 bank-data demo --work-dir ../demo_process_work</pre><p id="copy-status" role="status">仅生成合成示例，无需 GPU、模型权重或 API Key。</p></div></section>
     <div class="closing shell"><span class="closing-mark" aria-hidden="true">↳</span><p>让数据有来处，<br><span>让判断有依据。</span></p><a href="#top" aria-label="回到顶部">↑</a></div>
   </main>
-  <footer class="footer shell"><a class="brand" href="#top"><img src="assets/mark.svg" width="25" height="25" alt=""><span>Beijing Enterprise Intelligence</span></a><span>工程实践 · 2026</span><span class="locale-source-note" lang="en">Source names, fields and evidence retain their original language.</span><a href="https://github.com/chaomacv/beijing-enterprise-intelligence" target="_blank" rel="noopener">源码与文档 ↗</a></footer>
+  <footer class="footer shell"><a class="brand" href="#top"><img src="assets/mark.svg" width="25" height="25" alt=""><span data-i18n-original>PublicData-LLM</span></a><span>工程实践 · 2026</span><span class="locale-source-note" lang="en">Source names, fields and evidence retain their original language.</span><a href="https://github.com/chaomacv/public-data-llm" target="_blank" rel="noopener">源码与文档 ↗</a></footer>
+  <div class="design-credit shell">设计风格参考 <a href="https://observablehq.com/" target="_blank" rel="noopener">Observable ↗</a></div>
   <dialog id="notebook-reader" class="notebook-reader" aria-labelledby="notebook-reader-title"><div class="notebook-reader-heading"><h2 id="notebook-reader-title">数据笔记本</h2><button type="button" id="notebook-reader-close" aria-label="关闭放大阅读">关闭 ×</button></div><div id="notebook-reader-body"></div></dialog>
   <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><span class="overline">SOURCE INSPECTOR / SYNTHETIC</span><button id="close-source" aria-label="关闭原始证据" type="button">×</button></div><h2 id="source-title">原始证据</h2><div id="source-content"></div><button class="button primary dialog-close" type="button">返回企业画像 <span aria-hidden="true">↗</span></button></dialog>
 </body>

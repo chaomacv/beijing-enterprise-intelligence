@@ -1,13 +1,17 @@
-# Beijing Enterprise Intelligence
+# PublicData-LLM
+
+**公开数据智能分析系统**
+
+本地大模型驱动的海量异构公开数据智能处理与分析
 
 <p><strong>简体中文</strong> &nbsp; | &nbsp; <a href="README.en.md">English</a></p>
 
-[![Project Page](https://img.shields.io/badge/Project-Page-191919?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
-[![Interactive Methods](https://img.shields.io/badge/Interactive-Methods-4269d0?style=flat-square)](https://chaomacv.github.io/beijing-enterprise-intelligence/#lab)
+[![Project Page](https://img.shields.io/badge/Project-Page-191919?style=flat-square)](https://chaomacv.github.io/public-data-llm/)
+[![Interactive Methods](https://img.shields.io/badge/Interactive-Methods-4269d0?style=flat-square)](https://chaomacv.github.io/public-data-llm/#lab)
 
-[![Beijing Enterprise Intelligence：从分散的数据到有据可查的企业情报](showcase/assets/project-preview.svg)](https://chaomacv.github.io/beijing-enterprise-intelligence/)
+[![PublicData-LLM：从分散的数据到有据可查的企业情报](showcase/assets/project-preview.svg)](https://chaomacv.github.io/public-data-llm/)
 
-**[探索 Project Page ↗](https://chaomacv.github.io/beijing-enterprise-intelligence/?view=compact#explorations)** · 九张数据笔记本、真实来源目录与采集安全说明、三模式缩放旭日图、100家真实企业样本的二维／三维网络，以及九步处理与来源追溯。[最终结果与文件索引](docs/full_run_results.md) · [页面设计与复现](docs/project_page.md)
+**[探索 Project Page ↗](https://chaomacv.github.io/public-data-llm/?view=compact#explorations)** · 九张数据笔记本、真实来源目录与采集安全说明、三模式缩放旭日图、100家真实企业样本的二维／三维网络，以及九步处理与来源追溯。[最终结果与文件索引](docs/full_run_results.md) · [页面设计与复现](docs/project_page.md)
 
 本批于 **2026-11-10 05:56（北京时间）**完成自动处理、分类修正与最终验收，状态为 `COMPLETED_WITH_REVIEW`。
 
@@ -37,7 +41,7 @@
 
 处理台账进一步分为 EXTRACTED **6,300,941**、NO_EVENT **3,381,302**、REVIEW **6,179,034**。这些状态互斥、合计为15,861,277；画像、事件、来源链接分别计量，不能相加当作记录总数。
 
-[交互数据去向与实际时间进度](https://chaomacv.github.io/beijing-enterprise-intelligence/?view=compact#explorations) · [九步输入、方法、数量与中间文件](docs/data_lineage.md) · [可对账数据接口](showcase/assets/data-lineage.json)
+[交互数据去向与实际时间进度](https://chaomacv.github.io/public-data-llm/?view=compact#explorations) · [九步输入、方法、数量与中间文件](docs/data_lineage.md) · [可对账数据接口](showcase/assets/data-lineage.json)
 
 企业网络从已处理结果中分层选取 **100家具有校验位有效信用代码的企业画像**，每个圆点就是一家企业，以匿名编号展示。相似网络根据共同标签种类及可对应事件数决定目标距离；标签网络将标签固定在外围，企业与自身观察标签相连。保留二维拖动、缩放及三维旋转。
 
@@ -182,7 +186,7 @@ tokenizer 和权重只从本地读取，不下载远程代码。客户端只允�
 
 ```text
 Bank/
-  beijing-enterprise-intelligence/   # 仅源码、配置、文档、测试
+  public-data-llm/   # 仅源码、配置、文档、测试
   beijing_download_work/            # 原下载工作目录
   data/raw/                        # 原始文件
   models/                          # 本地权重

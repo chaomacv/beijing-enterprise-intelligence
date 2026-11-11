@@ -7,8 +7,8 @@ test.beforeEach(async({page})=>{
   await expect(page.locator('.method-pager')).toHaveAttribute('data-ready','true');
   expect(errors).toEqual([]);
   expect(await page.evaluate(async()=>{
-    await document.fonts.load('600 22px "BEI Sans SC"','企业');
-    return [...document.fonts].some(f=>f.family.replace(/["']/g,'')==='BEI Sans SC'&&f.status==='loaded');
+    await document.fonts.load('600 22px "PublicData Sans SC"','企业');
+    return [...document.fonts].some(f=>f.family.replace(/["']/g,'')==='PublicData Sans SC'&&f.status==='loaded');
   })).toBe(true);
 });
 async function measure(page){
@@ -32,14 +32,14 @@ test('bounded viewport shows three full desktop cards with clipped neighbors',as
   await page.screenshot({path:info.outputPath('bounded-gallery.png')});
 });
 test('hero actions move right on desktop and stack naturally on mobile',async({page},info)=>{
-  await expect(page.locator('.hero .eyebrow')).toHaveText('从数千万条异构记录中，提取可信、可追溯的企业事实');
+  await expect(page.locator('.hero .eyebrow')).toHaveText('本地大模型驱动的海量异构公开数据智能处理与分析');
   await expect(page.locator('.hero-lead')).toContainText('以公共数据为实践场景，结合数据工程与大模型技术');
   const lead=await page.locator('.hero-lead').boundingBox(),cta=await page.locator('.hero-cta').boundingBox();
   if(page.viewportSize().width>900)expect(cta.x).toBeGreaterThan(lead.x+lead.width);
   else expect(cta.y).toBeGreaterThanOrEqual(lead.y+lead.height);
   if(page.viewportSize().width>1100)expect(await page.locator('.notebook-page').first().evaluate(el=>Math.round(el.getBoundingClientRect().height))).toBe(648);
   const title=page.locator('#hero-title');
-  await expect(title).toHaveText('让公开数据，成为有据可查的企业情报。');
+  await expect(title).toHaveText('公开数据智能分析系统');
   expect(await title.locator('br').count()).toBe(0);
   expect(await title.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
   expect(await page.locator('.gallery-heading').count()).toBe(0);
@@ -411,6 +411,7 @@ test('nine-step lineage table and selected details expose the same conserved rec
 
 test('language controls preserve notebook interaction, translate new content and persist the preference',async({page},info)=>{
  await expect(page.locator('html')).toHaveAttribute('data-locale-ready','zh');
+ await expect(page.locator('.header .brand')).toContainText('PublicData-LLM');
  await page.locator('[data-gallery-page="2"]').click();
  await page.locator('[data-notebook="2"] .notebook-reader-open').click();
  await page.locator('#gallery-event-stage').selectOption('unknown');
@@ -418,6 +419,10 @@ test('language controls preserve notebook interaction, translate new content and
  await page.locator('[data-language="en"]').click();
  await page.locator('[data-notebook="2"] .notebook-reader-open').click();
  await expect(page.locator('html')).toHaveAttribute('lang','en');
+ await expect(page.locator('.header .brand')).toContainText('PublicData-LLM');
+ await expect(page.locator('.hero h1')).toHaveText('PublicData-LLM');
+ await expect(page.locator('.design-credit')).toContainText('Design inspiration:');
+ await expect(page.locator('.design-credit a')).toHaveAttribute('href','https://observablehq.com/');
  await expect(page.locator('#notebook-reader h3')).toHaveText('Company event categories');
  await expect(page.locator('#gallery-event-stage')).toHaveValue('unknown');
  await expect(page.locator('#gallery-event-table tr')).toHaveCount(18);
@@ -437,6 +442,8 @@ test('language controls preserve notebook interaction, translate new content and
  await page.locator('[data-gallery-page="2"]').click();
  await page.locator('[data-language="zh"]').click();
  await expect(page.locator('#approach-title')).toHaveText('针对具体难点，给出相应的方法设计。');
+ await expect(page.locator('.hero h1')).toHaveText('公开数据智能分析系统');
+ await expect(page.locator('.design-credit')).toContainText('设计风格参考');
  await expect(page.locator('[data-gallery-page="2"]')).toHaveAttribute('aria-pressed','true');
  await page.locator('[data-language="en"]').click();
  await expect(page.locator('#approach-title')).toHaveText('Methods designed for specific challenges.');
@@ -462,4 +469,10 @@ test('language controls preserve notebook interaction, translate new content and
  await page.screenshot({path:info.outputPath('chinese-typography-hero.png')});
  await page.goto('/?lang=en#approach');await expect(page.locator('#approach-title')).toHaveText('Methods designed for specific challenges.');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
+ await page.locator('.design-credit').scrollIntoViewIfNeeded();
+ await page.screenshot({path:info.outputPath('design-credit-english.png')});
+ await page.locator('[data-language="zh"]').click();
+ await expect(page.locator('.design-credit')).toContainText('设计风格参考');
+ await page.locator('.design-credit').scrollIntoViewIfNeeded();
+ await page.screenshot({path:info.outputPath('design-credit-chinese.png')});
 });
