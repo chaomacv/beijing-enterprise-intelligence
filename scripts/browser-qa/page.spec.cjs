@@ -369,6 +369,19 @@ test('lineage routing returns to original sources while observed time remains a 
 
 test('nine-step lineage table and selected details expose the same conserved record quantities',async({page},info)=>{
  await page.locator('#pipeline').scrollIntoViewIfNeeded();await expect(page.locator('#run-lineage-table')).toHaveAttribute('data-ready','true');
+ const disclosure=page.locator('#run-lineage-overview'),summary=page.locator('#run-lineage-title');
+ await expect(disclosure).not.toHaveAttribute('open','');
+ await expect(page.locator('#run-lineage-table')).not.toBeVisible();
+ await expect(page.locator('#run-step-panel')).toBeVisible();
+ await expect(page.locator('#approach-title')).toHaveText('针对具体难点，给出相应的方法设计。');
+ await expect(page.locator('#lab-title')).toHaveText('方法举例演示');
+ await expect(page.locator('#pipeline-title')).toHaveText('每一步的数据量和去向');
+ await expect(page.locator('#field-notes-title')).toHaveText('工程处理设计');
+ await expect(page.locator('#validation, #release')).toHaveCount(0);
+ await page.screenshot({path:info.outputPath('pipeline-lineage-collapsed.png')});
+ await summary.focus();await summary.press('Enter');
+ await expect(disclosure).toHaveAttribute('open','');
+ await expect(page.locator('#run-lineage-table')).toBeVisible();
  await expect(page.locator('#run-lineage-table tr')).toHaveCount(9);
  await expect(page.locator('#run-lineage-table tr').nth(4)).toContainText('27,792,348');
  await expect(page.locator('#run-lineage-table tr').nth(4)).toContainText('14,420,658');
@@ -378,6 +391,11 @@ test('nine-step lineage table and selected details expose the same conserved rec
  await page.screenshot({path:info.outputPath('pipeline-lineage-table.png')});
  await page.locator('[data-flow-step="5"]').click();await expect(page.locator('#run-detail-flow')).toContainText('1,052,270');
  await expect(page.locator('#run-detail-output')).toContainText('15,861,277');
+ await summary.focus();await summary.press('Space');
+ await expect(disclosure).not.toHaveAttribute('open','');
+ await expect(page.locator('#run-lineage-table')).not.toBeVisible();
+ await expect(page.locator('#run-detail-flow')).toContainText('1,052,270');
+ await page.locator('#run-step-panel').scrollIntoViewIfNeeded();
  await page.screenshot({path:info.outputPath('pipeline-lineage-detail.png')});
  await page.locator('[data-run-step="8"]').click();await expect(page.locator('#run-detail-output')).toContainText('43,653,625');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width+1);
